@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import fetchedJobs from "../../public/FetchedJobs.json";
 import { Box, Container, Grid, Stack, Typography } from "@mui/material";
-import JobCard from "@/components/JobCard";
+import JobCard from "@/old-components/JobCard";
 // import ChipCard from "@/components/Chip";
 
 const Jobs = () => {
