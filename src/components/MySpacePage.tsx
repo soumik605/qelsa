@@ -1,28 +1,64 @@
-import { useState, useEffect } from 'react';
-import { ArrowRight, TrendingUp, Users, BookOpen, Briefcase, Zap, Target, Rocket, Star, Activity, Brain, Network, Sparkles, User, MapPin, Calendar, Award, Building, GraduationCap, ChevronRight, Edit3, Download, Share2, Eye, LayoutDashboard, User2, CheckCircle, Clock, Send, Trophy, TrendingDown, Plus, ArrowUp, ArrowDown, EyeIcon, MessageCircle, Heart } from 'lucide-react';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Progress } from './ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Separator } from './ui/separator';
+import { useState, useEffect } from "react";
+import {
+  ArrowRight,
+  TrendingUp,
+  Users,
+  BookOpen,
+  Briefcase,
+  Zap,
+  Target,
+  Rocket,
+  Star,
+  Activity,
+  Brain,
+  Network,
+  Sparkles,
+  User,
+  MapPin,
+  Calendar,
+  Award,
+  Building,
+  GraduationCap,
+  ChevronRight,
+  Edit3,
+  Download,
+  Share2,
+  Eye,
+  LayoutDashboard,
+  User2,
+  CheckCircle,
+  Clock,
+  Send,
+  Trophy,
+  TrendingDown,
+  Plus,
+  ArrowUp,
+  ArrowDown,
+  EyeIcon,
+  MessageCircle,
+  Heart,
+} from "lucide-react";
+import { Button } from "./ui/button";
+import { Card } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Progress } from "./ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Separator } from "./ui/separator";
 
-interface MySpacePageProps {
-  onNavigate: (section: string) => void;
-}
+interface MySpacePageProps {}
 
-export function MySpacePage({ onNavigate }: MySpacePageProps) {
+export function MySpacePage({}: MySpacePageProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [animatedValues, setAnimatedValues] = useState({ 
-    jobs: 0, 
-    skillProgress: 0, 
-    connections: 0, 
+  const [animatedValues, setAnimatedValues] = useState({
+    jobs: 0,
+    skillProgress: 0,
+    connections: 0,
     courses: 0,
     careerScore: 0,
-    profileViews: 0
+    profileViews: 0,
   });
-  const [viewMode, setViewMode] = useState<'tabs' | 'split'>('tabs');
+  const [viewMode, setViewMode] = useState<"tabs" | "split">("tabs");
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -40,16 +76,16 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
           current = target;
           clearInterval(timer);
         }
-        setAnimatedValues(prev => ({ ...prev, [key]: Math.floor(current) }));
+        setAnimatedValues((prev) => ({ ...prev, [key]: Math.floor(current) }));
       }, 30);
     };
 
-    animate(12, 'jobs');
-    animate(73, 'skillProgress');
-    animate(45, 'connections');
-    animate(3, 'courses');
-    animate(84, 'careerScore');
-    animate(127, 'profileViews');
+    animate(12, "jobs");
+    animate(73, "skillProgress");
+    animate(45, "connections");
+    animate(3, "courses");
+    animate(84, "careerScore");
+    animate(127, "profileViews");
   }, []);
 
   // Enhanced career data
@@ -58,23 +94,36 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
     inProgress: 8,
     shortlisted: 3,
     offers: 1,
-    trends: { total: '+15%', inProgress: '+8%', shortlisted: '+200%', offers: '+100%' }
+    trends: {
+      total: "+15%",
+      inProgress: "+8%",
+      shortlisted: "+200%",
+      offers: "+100%",
+    },
   };
 
   const skillStats = {
     overallProgress: 73,
-    trendingSkills: ['AI/ML', 'Product Strategy', 'Data Analytics'],
-    skillGaps: ['Leadership', 'Public Speaking'],
+    trendingSkills: ["AI/ML", "Product Strategy", "Data Analytics"],
+    skillGaps: ["Leadership", "Public Speaking"],
     completedCertifications: 5,
-    activeLearning: ['Product Management Mastery', 'Digital Marketing Pro', 'Data Science Fundamentals']
+    activeLearning: [
+      "Product Management Mastery",
+      "Digital Marketing Pro",
+      "Data Science Fundamentals",
+    ],
   };
 
   const networkStats = {
     totalConnections: 245,
     newThisWeek: 8,
     profileViews: 127,
-    visibility: 'High',
-    topConnections: ['Product Managers', 'Data Scientists', 'Marketing Leaders']
+    visibility: "High",
+    topConnections: [
+      "Product Managers",
+      "Data Scientists",
+      "Marketing Leaders",
+    ],
   };
 
   const learningStats = {
@@ -82,136 +131,148 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
     completedCertifications: 5,
     activeModules: 3,
     hoursLearned: 127,
-    nextDeadline: 'Digital Marketing Assessment - Due in 3 days'
+    nextDeadline: "Digital Marketing Assessment - Due in 3 days",
   };
 
   const careerScore = 84; // Calculated from profile completion, skills, network, activity
 
   const quickStats = [
-    { 
-      label: 'Applications Tracker', 
-      value: animatedValues.jobs, 
-      icon: Briefcase, 
-      color: 'from-neon-cyan to-blue-500',
-      glow: 'glow-cyan',
+    {
+      label: "Applications Tracker",
+      value: animatedValues.jobs,
+      icon: Briefcase,
+      color: "from-neon-cyan to-blue-500",
+      glow: "glow-cyan",
       details: applicationStats,
-      trend: '+15%'
+      trend: "+15%",
     },
-    { 
-      label: 'Skill Progress', 
-      value: animatedValues.skillProgress, 
-      icon: TrendingUp, 
-      color: 'from-neon-green to-emerald-500',
-      glow: 'glow-green',
+    {
+      label: "Skill Progress",
+      value: animatedValues.skillProgress,
+      icon: TrendingUp,
+      color: "from-neon-green to-emerald-500",
+      glow: "glow-green",
       details: skillStats,
-      trend: '+12%'
+      trend: "+12%",
     },
-    { 
-      label: 'Network Growth', 
-      value: animatedValues.connections, 
-      icon: Users, 
-      color: 'from-neon-purple to-violet-500',
-      glow: 'glow-purple',
+    {
+      label: "Network Growth",
+      value: animatedValues.connections,
+      icon: Users,
+      color: "from-neon-purple to-violet-500",
+      glow: "glow-purple",
       details: networkStats,
-      trend: '+25%'
+      trend: "+25%",
     },
-    { 
-      label: 'Learning Activity', 
-      value: animatedValues.courses, 
-      icon: BookOpen, 
-      color: 'from-neon-pink to-rose-500',
-      glow: 'glow-pink',
+    {
+      label: "Learning Activity",
+      value: animatedValues.courses,
+      icon: BookOpen,
+      color: "from-neon-pink to-rose-500",
+      glow: "glow-pink",
       details: learningStats,
-      trend: '+8%'
-    }
+      trend: "+8%",
+    },
   ];
 
   const recentActivity = [
-    { 
-      type: 'job', 
-      title: 'Applied to Product Manager at PayNxt Technologies', 
-      time: '2 hours ago',
+    {
+      type: "job",
+      title: "Applied to Product Manager at PayNxt Technologies",
+      time: "2 hours ago",
       icon: Send,
-      color: 'text-neon-cyan'
+      color: "text-neon-cyan",
     },
-    { 
-      type: 'skill', 
-      title: 'Completed: Digital Marketing Fundamentals Module 3', 
-      time: '1 day ago',
+    {
+      type: "skill",
+      title: "Completed: Digital Marketing Fundamentals Module 3",
+      time: "1 day ago",
       icon: CheckCircle,
-      color: 'text-neon-green'
+      color: "text-neon-green",
     },
-    { 
-      type: 'connection', 
-      title: 'Connected with Sarah Chen, Senior PM at TechCorp', 
-      time: '2 days ago',
+    {
+      type: "connection",
+      title: "Connected with Sarah Chen, Senior PM at TechCorp",
+      time: "2 days ago",
       icon: Users,
-      color: 'text-neon-purple'
+      color: "text-neon-purple",
     },
-    { 
-      type: 'assessment', 
-      title: 'Career Assessment completed - 89% match for PM roles', 
-      time: '3 days ago',
+    {
+      type: "assessment",
+      title: "Career Assessment completed - 89% match for PM roles",
+      time: "3 days ago",
       icon: Trophy,
-      color: 'text-neon-yellow'
+      color: "text-neon-yellow",
     },
-    { 
-      type: 'profile', 
-      title: 'Profile viewed by 5 recruiters from top companies', 
-      time: '5 days ago',
+    {
+      type: "profile",
+      title: "Profile viewed by 5 recruiters from top companies",
+      time: "5 days ago",
       icon: EyeIcon,
-      color: 'text-neon-pink'
-    }
+      color: "text-neon-pink",
+    },
   ];
 
   const workExperience = [
     {
-      title: 'Senior Product Manager',
-      company: 'TechFlow Solutions',
-      duration: 'Jan 2023 - Present',
-      location: 'Bangalore, India',
-      highlights: ['Led 3 product launches with 40% user growth', 'Managed cross-functional team of 12', 'Increased revenue by ₹2.5Cr']
+      title: "Senior Product Manager",
+      company: "TechFlow Solutions",
+      duration: "Jan 2023 - Present",
+      location: "Bangalore, India",
+      highlights: [
+        "Led 3 product launches with 40% user growth",
+        "Managed cross-functional team of 12",
+        "Increased revenue by ₹2.5Cr",
+      ],
     },
     {
-      title: 'Product Manager',
-      company: 'InnovateCorp',
-      duration: 'Mar 2021 - Dec 2022',
-      location: 'Mumbai, India',
-      highlights: ['Launched B2B SaaS platform', 'Improved user retention by 35%', 'Reduced customer acquisition cost by 25%']
+      title: "Product Manager",
+      company: "InnovateCorp",
+      duration: "Mar 2021 - Dec 2022",
+      location: "Mumbai, India",
+      highlights: [
+        "Launched B2B SaaS platform",
+        "Improved user retention by 35%",
+        "Reduced customer acquisition cost by 25%",
+      ],
     },
     {
-      title: 'Associate Product Manager',
-      company: 'StartupX',
-      duration: 'Jul 2019 - Feb 2021',
-      location: 'Pune, India',
-      highlights: ['Built MVP from 0 to 10K users', 'Designed user onboarding flow', 'Achieved Product-Market Fit']
-    }
+      title: "Associate Product Manager",
+      company: "StartupX",
+      duration: "Jul 2019 - Feb 2021",
+      location: "Pune, India",
+      highlights: [
+        "Built MVP from 0 to 10K users",
+        "Designed user onboarding flow",
+        "Achieved Product-Market Fit",
+      ],
+    },
   ];
 
   const education = [
     {
-      degree: 'Master of Business Administration (MBA)',
-      institution: 'Indian Institute of Management, Ahmedabad',
-      year: '2019',
-      specialization: 'Product Management & Strategy'
+      degree: "Master of Business Administration (MBA)",
+      institution: "Indian Institute of Management, Ahmedabad",
+      year: "2019",
+      specialization: "Product Management & Strategy",
     },
     {
-      degree: 'Bachelor of Technology (B.Tech)',
-      institution: 'National Institute of Technology, Warangal',
-      year: '2017',
-      specialization: 'Computer Science Engineering'
-    }
+      degree: "Bachelor of Technology (B.Tech)",
+      institution: "National Institute of Technology, Warangal",
+      year: "2017",
+      specialization: "Computer Science Engineering",
+    },
   ];
 
   const skills = [
-    { name: 'Product Management', level: 95, category: 'Professional' },
-    { name: 'Data Analysis', level: 88, category: 'Technical' },
-    { name: 'User Experience Design', level: 82, category: 'Design' },
-    { name: 'Digital Marketing', level: 78, category: 'Marketing' },
-    { name: 'Project Management', level: 90, category: 'Professional' },
-    { name: 'SQL & Analytics', level: 85, category: 'Technical' },
-    { name: 'Figma & Prototyping', level: 75, category: 'Design' },
-    { name: 'Growth Hacking', level: 80, category: 'Marketing' }
+    { name: "Product Management", level: 95, category: "Professional" },
+    { name: "Data Analysis", level: 88, category: "Technical" },
+    { name: "User Experience Design", level: 82, category: "Design" },
+    { name: "Digital Marketing", level: 78, category: "Marketing" },
+    { name: "Project Management", level: 90, category: "Professional" },
+    { name: "SQL & Analytics", level: 85, category: "Technical" },
+    { name: "Figma & Prototyping", level: 75, category: "Design" },
+    { name: "Growth Hacking", level: 80, category: "Marketing" },
   ];
 
   const dashboardContent = (
@@ -229,23 +290,20 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
               <span className="text-white">Alex! 👋</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Your AI-powered career journey continues. Let&apos;s make today count and unlock new opportunities! 🚀
+              Your AI-powered career journey continues. Let&apos;s make today
+              count and unlock new opportunities! 🚀
             </p>
           </div>
 
           <div className="flex items-center justify-center gap-4">
-            <Button 
-              onClick={() => onNavigate('qelsa-ai')}
-              className="group glass-strong hover:glow-cyan transition-all duration-300 px-8 py-3 rounded-2xl border-0 bg-gradient-to-r from-neon-cyan to-neon-purple hover:scale-105"
-            >
+            <Button className="group glass-strong hover:glow-cyan transition-all duration-300 px-8 py-3 rounded-2xl border-0 bg-gradient-to-r from-neon-cyan to-neon-purple hover:scale-105">
               <Brain className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform" />
               Ask Qelsa AI
               <Sparkles className="h-4 w-4 ml-2 group-hover:rotate-45 transition-transform" />
             </Button>
-            
-            <Button 
+
+            <Button
               variant="outline"
-              onClick={() => onNavigate('jobs')}
               className="group glass hover:glass-strong transition-all duration-300 px-8 py-3 rounded-2xl border border-glass-border hover:border-neon-purple hover:scale-105"
             >
               <Rocket className="h-5 w-5 mr-2 group-hover:-rotate-12 transition-transform" />
@@ -259,12 +317,14 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
       <Card className="glass hover:glass-strong p-8 rounded-2xl border border-glass-border transition-all duration-300 glow-cyan">
         <div className="flex items-center gap-3 mb-6">
           <Trophy className="h-6 w-6 text-neon-yellow" />
-          <h2 className="text-2xl font-bold text-white">Career Fitness Score</h2>
+          <h2 className="text-2xl font-bold text-white">
+            Career Fitness Score
+          </h2>
           <Badge className="bg-gradient-to-r from-neon-yellow to-neon-pink text-black px-3 py-1">
             Excellent
           </Badge>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-4 mb-4">
@@ -279,28 +339,40 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
                 </p>
               </div>
             </div>
-            <Progress value={animatedValues.careerScore} className="h-4 bg-glass-bg mb-4" />
+            <Progress
+              value={animatedValues.careerScore}
+              className="h-4 bg-glass-bg mb-4"
+            />
             <p className="text-muted-foreground">
-              Your career health is excellent! You&apos;re in the top 15% of professionals in your field. 
-              Focus on expanding your network to reach the next level.
+              Your career health is excellent! You&apos;re in the top 15% of
+              professionals in your field. Focus on expanding your network to
+              reach the next level.
             </p>
           </div>
-          
+
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Profile Completion</span>
+              <span className="text-sm text-muted-foreground">
+                Profile Completion
+              </span>
               <span className="text-sm font-medium text-neon-green">95%</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Skill Development</span>
+              <span className="text-sm text-muted-foreground">
+                Skill Development
+              </span>
               <span className="text-sm font-medium text-neon-cyan">88%</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Network Activity</span>
+              <span className="text-sm text-muted-foreground">
+                Network Activity
+              </span>
               <span className="text-sm font-medium text-neon-purple">75%</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Application Rate</span>
+              <span className="text-sm text-muted-foreground">
+                Application Rate
+              </span>
               <span className="text-sm font-medium text-neon-pink">82%</span>
             </div>
           </div>
@@ -312,69 +384,80 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
         {quickStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card 
-              key={index} 
+            <Card
+              key={index}
               className={`group relative glass hover:glass-strong ${stat.glow} p-6 rounded-2xl border border-glass-border hover:scale-105 transition-all duration-300 cursor-pointer`}
             >
               <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                <div
+                  className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                >
                   <Icon className="h-6 w-6 text-white" />
                 </div>
                 <Badge className="bg-glass-bg text-neon-green border-glass-border">
                   {stat.trend}
                 </Badge>
               </div>
-              
+
               <div className="space-y-3">
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-bold text-white">
-                    {stat.label.includes('Progress') ? `${stat.value}%` : stat.value}
+                    {stat.label.includes("Progress")
+                      ? `${stat.value}%`
+                      : stat.value}
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    {stat.label.includes('Progress') ? 'Complete' : 'Total'}
+                    {stat.label.includes("Progress") ? "Complete" : "Total"}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground">{stat.label}</p>
-                
-                {stat.label.includes('Progress') && (
-                  <Progress 
-                    value={stat.value} 
-                    className="h-2 bg-glass-bg"
-                  />
+
+                {stat.label.includes("Progress") && (
+                  <Progress value={stat.value} className="h-2 bg-glass-bg" />
                 )}
 
                 {/* Additional details for each stat */}
-                {stat.label === 'Applications Tracker' && (
+                {stat.label === "Applications Tracker" && (
                   <div className="space-y-1 text-xs text-muted-foreground">
                     <div className="flex justify-between">
                       <span>In Progress</span>
-                      <span className="text-neon-cyan">{applicationStats.inProgress}</span>
+                      <span className="text-neon-cyan">
+                        {applicationStats.inProgress}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Shortlisted</span>
-                      <span className="text-neon-green">{applicationStats.shortlisted}</span>
+                      <span className="text-neon-green">
+                        {applicationStats.shortlisted}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Offers</span>
-                      <span className="text-neon-yellow">{applicationStats.offers}</span>
+                      <span className="text-neon-yellow">
+                        {applicationStats.offers}
+                      </span>
                     </div>
                   </div>
                 )}
 
-                {stat.label === 'Network Growth' && (
+                {stat.label === "Network Growth" && (
                   <div className="space-y-1 text-xs text-muted-foreground">
                     <div className="flex justify-between">
                       <span>New this week</span>
-                      <span className="text-neon-purple">{networkStats.newThisWeek}</span>
+                      <span className="text-neon-purple">
+                        {networkStats.newThisWeek}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Profile views</span>
-                      <span className="text-neon-pink">{animatedValues.profileViews}</span>
+                      <span className="text-neon-pink">
+                        {animatedValues.profileViews}
+                      </span>
                     </div>
                   </div>
                 )}
               </div>
-              
+
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </Card>
           );
@@ -389,12 +472,9 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
             <h2 className="text-2xl font-bold text-white">Quick Actions</h2>
             <div className="h-px bg-gradient-to-r from-neon-cyan to-transparent flex-1"></div>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Card 
-              className="group relative glass hover:glass-strong hover:glow-cyan p-6 rounded-2xl border border-glass-border hover:scale-105 transition-all duration-300 cursor-pointer"
-              onClick={() => onNavigate('kelsa-ai')}
-            >
+            <Card className="group relative glass hover:glass-strong hover:glow-cyan p-6 rounded-2xl border border-glass-border hover:scale-105 transition-all duration-300 cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className="relative">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-neon-cyan to-neon-purple flex items-center justify-center group-hover:rotate-6 transition-transform duration-300">
@@ -403,17 +483,18 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
                   <div className="absolute inset-0 w-14 h-14 rounded-2xl bg-gradient-to-r from-neon-cyan to-neon-purple opacity-30 blur-md group-hover:opacity-50 transition-opacity"></div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-white mb-1 group-hover:text-neon-cyan transition-colors">Ask Kelsa AI</h3>
-                  <p className="text-sm text-muted-foreground">Get instant career insights</p>
+                  <h3 className="font-bold text-white mb-1 group-hover:text-neon-cyan transition-colors">
+                    Ask Kelsa AI
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Get instant career insights
+                  </p>
                 </div>
                 <ArrowRight className="h-5 w-5 text-neon-cyan group-hover:translate-x-2 transition-transform" />
               </div>
             </Card>
 
-            <Card 
-              className="group relative glass hover:glass-strong hover:glow-purple p-6 rounded-2xl border border-glass-border hover:scale-105 transition-all duration-300 cursor-pointer"
-              onClick={() => onNavigate('jobs')}
-            >
+            <Card className="group relative glass hover:glass-strong hover:glow-purple p-6 rounded-2xl border border-glass-border hover:scale-105 transition-all duration-300 cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className="relative">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-neon-purple to-neon-pink flex items-center justify-center group-hover:rotate-6 transition-transform duration-300">
@@ -422,17 +503,18 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
                   <div className="absolute inset-0 w-14 h-14 rounded-2xl bg-gradient-to-r from-neon-purple to-neon-pink opacity-30 blur-md group-hover:opacity-50 transition-opacity"></div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-white mb-1 group-hover:text-neon-purple transition-colors">Smart Jobs</h3>
-                  <p className="text-sm text-muted-foreground">AI-matched opportunities</p>
+                  <h3 className="font-bold text-white mb-1 group-hover:text-neon-purple transition-colors">
+                    Smart Jobs
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    AI-matched opportunities
+                  </p>
                 </div>
                 <ArrowRight className="h-5 w-5 text-neon-purple group-hover:translate-x-2 transition-transform" />
               </div>
             </Card>
 
-            <Card 
-              className="group relative glass hover:glass-strong hover:glow-pink p-6 rounded-2xl border border-glass-border hover:scale-105 transition-all duration-300 cursor-pointer"
-              onClick={() => onNavigate('courses')}
-            >
+            <Card className="group relative glass hover:glass-strong hover:glow-pink p-6 rounded-2xl border border-glass-border hover:scale-105 transition-all duration-300 cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className="relative">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-neon-pink to-neon-yellow flex items-center justify-center group-hover:rotate-6 transition-transform duration-300">
@@ -441,17 +523,18 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
                   <div className="absolute inset-0 w-14 h-14 rounded-2xl bg-gradient-to-r from-neon-pink to-neon-yellow opacity-30 blur-md group-hover:opacity-50 transition-opacity"></div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-white mb-1 group-hover:text-neon-pink transition-colors">Skill Development</h3>
-                  <p className="text-sm text-muted-foreground">Future-ready learning</p>
+                  <h3 className="font-bold text-white mb-1 group-hover:text-neon-pink transition-colors">
+                    Skill Development
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Future-ready learning
+                  </p>
                 </div>
                 <ArrowRight className="h-5 w-5 text-neon-pink group-hover:translate-x-2 transition-transform" />
               </div>
             </Card>
 
-            <Card 
-              className="group relative glass hover:glass-strong hover:glow-green p-6 rounded-2xl border border-glass-border hover:scale-105 transition-all duration-300 cursor-pointer"
-              onClick={() => onNavigate('connections')}
-            >
+            <Card className="group relative glass hover:glass-strong hover:glow-green p-6 rounded-2xl border border-glass-border hover:scale-105 transition-all duration-300 cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className="relative">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-neon-green to-neon-cyan flex items-center justify-center group-hover:rotate-6 transition-transform duration-300">
@@ -460,8 +543,12 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
                   <div className="absolute inset-0 w-14 h-14 rounded-2xl bg-gradient-to-r from-neon-green to-neon-cyan opacity-30 blur-md group-hover:opacity-50 transition-opacity"></div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-white mb-1 group-hover:text-neon-green transition-colors">Professional Network</h3>
-                  <p className="text-sm text-muted-foreground">Connect with professionals</p>
+                  <h3 className="font-bold text-white mb-1 group-hover:text-neon-green transition-colors">
+                    Professional Network
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Connect with professionals
+                  </p>
                 </div>
                 <ArrowRight className="h-5 w-5 text-neon-green group-hover:translate-x-2 transition-transform" />
               </div>
@@ -473,14 +560,20 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <Activity className="h-5 w-5 text-neon-cyan" />
-                <h3 className="font-bold text-white">Skill Progress & Insights</h3>
+                <h3 className="font-bold text-white">
+                  Skill Progress & Insights
+                </h3>
               </div>
-              <Button variant="outline" size="sm" className="glass hover:glass-strong border-glass-border hover:border-neon-cyan">
+              <Button
+                variant="outline"
+                size="sm"
+                className="glass hover:glass-strong border-glass-border hover:border-neon-cyan"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Skill
               </Button>
             </div>
-            
+
             <div className="space-y-6">
               <div>
                 <div className="flex justify-between text-sm mb-2">
@@ -488,33 +581,47 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
                   <span className="font-medium text-neon-cyan">95%</span>
                 </div>
                 <Progress value={95} className="h-3 bg-glass-bg" />
-                <p className="text-xs text-muted-foreground mt-1">Expert level • High demand skill</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Expert level • High demand skill
+                </p>
               </div>
-              
+
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-foreground">Data Analysis</span>
                   <span className="font-medium text-neon-green">88%</span>
                 </div>
                 <Progress value={88} className="h-3 bg-glass-bg" />
-                <p className="text-xs text-muted-foreground mt-1">Advanced • Trending +15%</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Advanced • Trending +15%
+                </p>
               </div>
-              
+
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-foreground">Leadership</span>
                   <span className="font-medium text-neon-pink">65%</span>
                 </div>
                 <Progress value={65} className="h-3 bg-glass-bg" />
-                <p className="text-xs text-yellow-400 mt-1">Skill gap identified • Recommended for growth</p>
+                <p className="text-xs text-yellow-400 mt-1">
+                  Skill gap identified • Recommended for growth
+                </p>
               </div>
             </div>
 
             <div className="mt-6 p-4 glass rounded-xl">
-              <h4 className="font-medium text-white mb-2">AI Recommendations</h4>
+              <h4 className="font-medium text-white mb-2">
+                AI Recommendations
+              </h4>
               <ul className="space-y-1 text-sm text-muted-foreground">
-                <li>• Complete &quot;Leadership Fundamentals&quot; to boost career score by +8</li>
-                <li>• AI/ML skills are in high demand in your field (+45% job posts)</li>
+                <li>
+                  • Complete &quot;Leadership Fundamentals&quot; to boost career
+                  score by +8
+                </li>
+                <li>
+                  • AI/ML skills are in high demand in your field (+45% job
+                  posts)
+                </li>
                 <li>• Consider learning Agile methodology for PM roles</li>
               </ul>
             </div>
@@ -527,27 +634,36 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
             <Star className="h-5 w-5 text-neon-purple" />
             <h2 className="text-xl font-bold text-white">Recent Activity</h2>
           </div>
-          
+
           <Card className="glass hover:glass-strong p-6 rounded-2xl border border-glass-border transition-all duration-300">
             <div className="space-y-4">
               {recentActivity.map((activity, index) => {
                 const ActivityIcon = activity.icon;
                 return (
-                  <div key={index} className="flex gap-3 pb-4 border-b border-glass-border last:border-b-0 last:pb-0">
-                    <div className={`w-8 h-8 rounded-full glass flex items-center justify-center flex-shrink-0 ${activity.color}`}>
+                  <div
+                    key={index}
+                    className="flex gap-3 pb-4 border-b border-glass-border last:border-b-0 last:pb-0"
+                  >
+                    <div
+                      className={`w-8 h-8 rounded-full glass flex items-center justify-center flex-shrink-0 ${activity.color}`}
+                    >
                       <ActivityIcon className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground mb-1">{activity.title}</p>
-                      <p className="text-xs text-muted-foreground">{activity.time}</p>
+                      <p className="text-sm font-medium text-foreground mb-1">
+                        {activity.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {activity.time}
+                      </p>
                     </div>
                   </div>
                 );
               })}
             </div>
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               className="w-full mt-4 glass hover:glass-strong border-glass-border hover:border-neon-cyan transition-all duration-300"
             >
               View All Activity
@@ -563,15 +679,21 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <CheckCircle className="h-4 w-4 text-neon-green" />
-                <span className="text-sm text-muted-foreground line-through">Apply to 5 jobs</span>
+                <span className="text-sm text-muted-foreground line-through">
+                  Apply to 5 jobs
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Clock className="h-4 w-4 text-neon-cyan" />
-                <span className="text-sm text-foreground">Complete marketing course</span>
+                <span className="text-sm text-foreground">
+                  Complete marketing course
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Clock className="h-4 w-4 text-neon-cyan" />
-                <span className="text-sm text-foreground">Connect with 3 professionals</span>
+                <span className="text-sm text-foreground">
+                  Connect with 3 professionals
+                </span>
               </div>
             </div>
           </Card>
@@ -587,19 +709,28 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex flex-col items-center lg:items-start">
             <Avatar className="w-32 h-32 ring-4 ring-neon-cyan/20 ring-offset-4 ring-offset-background">
-              <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face" alt="Alex Johnson" />
-              <AvatarFallback className="text-2xl bg-gradient-to-r from-neon-cyan to-neon-purple text-black">AJ</AvatarFallback>
+              <AvatarImage
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+                alt="Alex Johnson"
+              />
+              <AvatarFallback className="text-2xl bg-gradient-to-r from-neon-cyan to-neon-purple text-black">
+                AJ
+              </AvatarFallback>
             </Avatar>
             <Button className="mt-4 glass hover:glass-strong border border-glass-border hover:border-neon-cyan transition-all duration-300">
               <Edit3 className="h-4 w-4 mr-2" />
               Edit Profile
             </Button>
           </div>
-          
+
           <div className="flex-1 space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Alex Johnson</h1>
-              <p className="text-xl text-neon-cyan mb-4">Senior Product Manager</p>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                Alex Johnson
+              </h1>
+              <p className="text-xl text-neon-cyan mb-4">
+                Senior Product Manager
+              </p>
               <div className="flex flex-wrap gap-4 text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
@@ -615,26 +746,36 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
                 </div>
               </div>
             </div>
-            
+
             <div>
-              <h3 className="font-semibold text-white mb-2">Professional Summary</h3>
+              <h3 className="font-semibold text-white mb-2">
+                Professional Summary
+              </h3>
               <p className="text-muted-foreground leading-relaxed">
-                Experienced Product Manager with 5+ years in building scalable B2B and B2C products. 
-                Led cross-functional teams to deliver innovative solutions that increased user engagement by 40% 
-                and revenue by ₹2.5Cr. Passionate about leveraging data-driven insights to create exceptional user experiences.
+                Experienced Product Manager with 5+ years in building scalable
+                B2B and B2C products. Led cross-functional teams to deliver
+                innovative solutions that increased user engagement by 40% and
+                revenue by ₹2.5Cr. Passionate about leveraging data-driven
+                insights to create exceptional user experiences.
               </p>
             </div>
-            
+
             <div className="flex gap-3">
               <Button className="bg-gradient-to-r from-neon-cyan to-neon-purple text-black hover:scale-105 transition-all duration-300">
                 <Download className="h-4 w-4 mr-2" />
                 Download Resume
               </Button>
-              <Button variant="outline" className="glass hover:glass-strong border-glass-border hover:border-neon-purple">
+              <Button
+                variant="outline"
+                className="glass hover:glass-strong border-glass-border hover:border-neon-purple"
+              >
                 <Share2 className="h-4 w-4 mr-2" />
                 Share Profile
               </Button>
-              <Button variant="outline" className="glass hover:glass-strong border-glass-border hover:border-neon-pink">
+              <Button
+                variant="outline"
+                className="glass hover:glass-strong border-glass-border hover:border-neon-pink"
+              >
                 <Eye className="h-4 w-4 mr-2" />
                 Preview
               </Button>
@@ -670,10 +811,15 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
                   <div className="flex-1">
                     <h4 className="font-semibold text-white">{exp.title}</h4>
                     <p className="text-neon-cyan">{exp.company}</p>
-                    <p className="text-sm text-muted-foreground mb-3">{exp.duration} • {exp.location}</p>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {exp.duration} • {exp.location}
+                    </p>
                     <ul className="space-y-1">
                       {exp.highlights.map((highlight, idx) => (
-                        <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                        <li
+                          key={idx}
+                          className="text-sm text-muted-foreground flex items-start gap-2"
+                        >
                           <ChevronRight className="h-3 w-3 mt-1 text-neon-cyan flex-shrink-0" />
                           {highlight}
                         </li>
@@ -712,7 +858,9 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
                 <div key={index} className="p-4 glass rounded-xl">
                   <h4 className="font-semibold text-white">{edu.degree}</h4>
                   <p className="text-neon-purple">{edu.institution}</p>
-                  <p className="text-sm text-muted-foreground">{edu.year} • {edu.specialization}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {edu.year} • {edu.specialization}
+                  </p>
                 </div>
               ))}
             </div>
@@ -723,7 +871,9 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <Award className="h-5 w-5 text-neon-pink" />
-                <h3 className="text-xl font-bold text-white">Skills & Expertise</h3>
+                <h3 className="text-xl font-bold text-white">
+                  Skills & Expertise
+                </h3>
               </div>
               <Button
                 variant="ghost"
@@ -735,26 +885,36 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
               </Button>
             </div>
             <div className="space-y-4">
-              {['Professional', 'Technical', 'Design', 'Marketing'].map((category) => (
-                <div key={category}>
-                  <h4 className="font-medium text-white mb-3">{category}</h4>
-                  <div className="space-y-3">
-                    {skills.filter(skill => skill.category === category).map((skill, index) => (
-                      <div key={index}>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span className="text-foreground">{skill.name}</span>
-                          <span className="font-medium text-neon-cyan">{skill.level}%</span>
-                        </div>
-                        <Progress 
-                          value={skill.level} 
-                          className="h-2 bg-glass-bg"
-                        />
-                      </div>
-                    ))}
+              {["Professional", "Technical", "Design", "Marketing"].map(
+                (category) => (
+                  <div key={category}>
+                    <h4 className="font-medium text-white mb-3">{category}</h4>
+                    <div className="space-y-3">
+                      {skills
+                        .filter((skill) => skill.category === category)
+                        .map((skill, index) => (
+                          <div key={index}>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="text-foreground">
+                                {skill.name}
+                              </span>
+                              <span className="font-medium text-neon-cyan">
+                                {skill.level}%
+                              </span>
+                            </div>
+                            <Progress
+                              value={skill.level}
+                              className="h-2 bg-glass-bg"
+                            />
+                          </div>
+                        ))}
+                    </div>
+                    {category !== "Marketing" && (
+                      <Separator className="mt-4 bg-glass-border" />
+                    )}
                   </div>
-                  {category !== 'Marketing' && <Separator className="mt-4 bg-glass-border" />}
-                </div>
-              ))}
+                )
+              )}
             </div>
           </Card>
         </div>
@@ -762,7 +922,7 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
     </div>
   );
 
-  if (viewMode === 'split') {
+  if (viewMode === "split") {
     return (
       <div className="min-h-screen relative">
         {/* Background */}
@@ -780,10 +940,12 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
                   My Space
                 </span>
               </h1>
-              <p className="text-muted-foreground">Your AI-powered career fitness tracker + digital resume</p>
+              <p className="text-muted-foreground">
+                Your AI-powered career fitness tracker + digital resume
+              </p>
             </div>
-            <Button 
-              onClick={() => setViewMode('tabs')}
+            <Button
+              onClick={() => setViewMode("tabs")}
               variant="outline"
               className="glass hover:glass-strong border-glass-border hover:border-neon-cyan"
             >
@@ -797,7 +959,9 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <LayoutDashboard className="h-6 w-6 text-neon-cyan" />
-                <h2 className="text-2xl font-bold text-white">Career Dashboard</h2>
+                <h2 className="text-2xl font-bold text-white">
+                  Career Dashboard
+                </h2>
               </div>
               {dashboardContent}
             </div>
@@ -806,7 +970,9 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <User2 className="h-6 w-6 text-neon-purple" />
-                <h2 className="text-2xl font-bold text-white">Professional Profile</h2>
+                <h2 className="text-2xl font-bold text-white">
+                  Professional Profile
+                </h2>
               </div>
               {profileContent}
             </div>
@@ -833,23 +999,24 @@ export function MySpacePage({ onNavigate }: MySpacePageProps) {
                 My Space
               </span>
             </h1>
-            <p className="text-muted-foreground">Your AI-powered career fitness tracker + digital resume</p>
+            <p className="text-muted-foreground">
+              Your AI-powered career fitness tracker + digital resume
+            </p>
           </div>
-
         </div>
 
         {/* Tabs Layout */}
         <Tabs defaultValue="dashboard" className="space-y-8">
           <TabsList className="glass border border-glass-border p-1 rounded-2xl">
-            <TabsTrigger 
-              value="dashboard" 
+            <TabsTrigger
+              value="dashboard"
               className="flex items-center gap-2 px-6 py-3 rounded-xl data-[state=active]:bg-neon-cyan data-[state=active]:text-black transition-all duration-300"
             >
               <LayoutDashboard className="h-4 w-4" />
               Career Dashboard
             </TabsTrigger>
-            <TabsTrigger 
-              value="profile" 
+            <TabsTrigger
+              value="profile"
               className="flex items-center gap-2 px-6 py-3 rounded-xl data-[state=active]:bg-neon-purple data-[state=active]:text-white transition-all duration-300"
             >
               <User2 className="h-4 w-4" />

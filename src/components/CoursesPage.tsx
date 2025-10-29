@@ -469,12 +469,12 @@ export function CoursesPage({ onNavigate }: CoursesPageProps) {
                         {course.platform === 'YouTube' ? (
                           <>
                             <Eye className="h-4 w-4" />
-                            {course.learners.toLocaleString()} views
+                            {/* {course.learners.toLocaleString()} views */}
                           </>
                         ) : (
                           <>
                             <Users className="h-4 w-4" />
-                            {course.learners.toLocaleString()}
+                            {/* {course.learners.toLocaleString()} */}
                           </>
                         )}
                       </div>

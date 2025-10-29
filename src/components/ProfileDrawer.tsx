@@ -7,12 +7,10 @@ import { Switch } from './ui/switch';
 interface ProfileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  onNavigate: (section: string) => void;
 }
 
-export function ProfileDrawer({ isOpen, onClose, onNavigate }: ProfileDrawerProps) {
+export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
   const handleNavigation = (section: string) => {
-    onNavigate(section);
     onClose();
   };
 

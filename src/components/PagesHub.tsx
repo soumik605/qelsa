@@ -17,6 +17,7 @@ import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { useRouter } from 'next/navigation';
 
 interface Page {
   id: string;
@@ -32,12 +33,10 @@ interface Page {
 }
 
 interface PagesHubProps {
-  onCreatePage: () => void;
-  onViewPage: (pageId: string) => void;
-  onManagePage: (pageId: string) => void;
 }
 
-export function PagesHub({ onCreatePage, onViewPage, onManagePage }: PagesHubProps) {
+export function PagesHub({ }: PagesHubProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('my-pages');
 
@@ -174,7 +173,6 @@ export function PagesHub({ onCreatePage, onViewPage, onManagePage }: PagesHubPro
         <Button
           size="sm"
           variant="outline"
-          onClick={() => onViewPage(page.id)}
           className="flex-1 border-neon-cyan/30 text-neon-cyan"
         >
           <Eye className="w-3 h-3 mr-1" />
@@ -183,7 +181,6 @@ export function PagesHub({ onCreatePage, onViewPage, onManagePage }: PagesHubPro
         {showRole && (page.role === 'admin' || page.role === 'editor') && (
           <Button
             size="sm"
-            onClick={() => onManagePage(page.id)}
             className="flex-1 gradient-animated"
           >
             <Edit className="w-3 h-3 mr-1" />
@@ -209,7 +206,7 @@ export function PagesHub({ onCreatePage, onViewPage, onManagePage }: PagesHubPro
               </p>
             </div>
 
-            <Button onClick={onCreatePage} className="gradient-animated shadow-lg hover:shadow-neon-purple/30">
+            <Button onClick={() => router.push("create-page")} className="gradient-animated shadow-lg hover:shadow-neon-purple/30">
               <Plus className="w-4 h-4 mr-2" />
               Create Page
             </Button>
@@ -301,7 +298,7 @@ export function PagesHub({ onCreatePage, onViewPage, onManagePage }: PagesHubPro
                 <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                   Create your first page to showcase your company, build a community, or establish your personal brand.
                 </p>
-                <Button onClick={onCreatePage} className="gradient-animated">
+                <Button className="gradient-animated">
                   <Plus className="w-4 h-4 mr-2" />
                   Create Your First Page
                 </Button>

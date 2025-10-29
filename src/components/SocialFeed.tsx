@@ -188,11 +188,9 @@ const categoryIcons = {
 };
 
 interface SocialFeedProps {
-  onViewProfile?: (userId: string) => void;
-  sharedBlogPosts?: any[];
 }
 
-export function SocialFeed({ onViewProfile, sharedBlogPosts = [] }: SocialFeedProps = {}) {
+export function SocialFeed({ }: SocialFeedProps = {}) {
   const [activeTab, setActiveTab] = useState('all');
   const [posts, setPosts] = useState(mockPosts);
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -200,6 +198,7 @@ export function SocialFeed({ onViewProfile, sharedBlogPosts = [] }: SocialFeedPr
   const [newPostType, setNewPostType] = useState<'text' | 'image' | 'video' | 'pdf'>('text');
   const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
   const [commentInputs, setCommentInputs] = useState<{ [key: string]: string }>({});
+  const sharedBlogPosts = []
 
   const handlePostInteraction = (postId: string, action: 'like' | 'bookmark' | 'share') => {
     setPosts(posts.map(post => {
@@ -503,7 +502,6 @@ export function SocialFeed({ onViewProfile, sharedBlogPosts = [] }: SocialFeedPr
                 <div className="flex items-start gap-4 mb-4">
                   <div 
                     className="relative cursor-pointer" 
-                    onClick={() => onViewProfile?.('sarah-chen')}
                   >
                     <Avatar className="h-12 w-12 ring-2 ring-glass-border group-hover:ring-neon-cyan/50 transition-all">
                       <AvatarImage src={post.author.avatar} alt={post.author.name} />
@@ -520,7 +518,6 @@ export function SocialFeed({ onViewProfile, sharedBlogPosts = [] }: SocialFeedPr
                     <div className="flex items-center gap-2 mb-1">
                       <h3 
                         className="font-bold text-white group-hover:text-neon-cyan transition-colors cursor-pointer"
-                        onClick={() => onViewProfile?.('sarah-chen')}
                       >
                         {post.author.name}
                       </h3>

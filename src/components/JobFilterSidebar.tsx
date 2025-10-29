@@ -17,8 +17,6 @@ import { Badge } from './ui/badge';
 
 interface JobFilterSidebarProps {
   isOpen: boolean;
-  onClose: () => void;
-  onApplyFilters: (filters: JobFilters) => void;
 }
 
 export interface JobFilters {
@@ -73,7 +71,7 @@ const jobSourceOptions = [
   { id: 'glassdoor', label: 'Glassdoor', count: 45 }
 ];
 
-export function JobFilterSidebar({ isOpen, onClose, onApplyFilters }: JobFilterSidebarProps) {
+export function JobFilterSidebar({ isOpen }: JobFilterSidebarProps) {
   const [filters, setFilters] = useState<JobFilters>({
     location: [],
     experience: [],
@@ -110,8 +108,6 @@ export function JobFilterSidebar({ isOpen, onClose, onApplyFilters }: JobFilterS
       (filters.salary[0] > 0 || filters.salary[1] < 50 ? 1 : 0);
     
     setAppliedFiltersCount(totalFilters);
-    onApplyFilters(filters);
-    onClose();
   };
 
   const handleClearFilters = () => {
@@ -133,7 +129,6 @@ export function JobFilterSidebar({ isOpen, onClose, onApplyFilters }: JobFilterS
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
-        onClick={onClose}
       />
       
       {/* Sidebar */}
@@ -154,7 +149,6 @@ export function JobFilterSidebar({ isOpen, onClose, onApplyFilters }: JobFilterS
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={onClose}
             className="h-8 w-8 text-foreground hover:text-neon-cyan hover:bg-glass-bg transition-all duration-300"
           >
             <X className="h-4 w-4" />

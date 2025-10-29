@@ -64,10 +64,9 @@ interface ActionCard {
 
 interface ModernAIChatInterfaceProps {
   userName?: string;
-  onViewAllJobs?: (query: string) => void;
 }
 
-export function ModernAIChatInterface({ userName = 'User', onViewAllJobs }: ModernAIChatInterfaceProps) {
+export function ModernAIChatInterface({ userName = 'User' }: ModernAIChatInterfaceProps) {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [showAgentsDropdown, setShowAgentsDropdown] = useState(false);
   const [showConversationsDropdown, setShowConversationsDropdown] = useState(true);

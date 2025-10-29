@@ -22,6 +22,7 @@ import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
 import { Separator } from './ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { useRouter } from 'next/navigation';
 
 type PageType = 'company' | 'community' | 'personal' | null;
 type Step = 'type' | 'basic' | 'branding' | 'social' | 'review';
@@ -45,11 +46,10 @@ interface PageData {
 }
 
 interface CreatePageFlowProps {
-  onBack: () => void;
-  onComplete: (pageData: PageData) => void;
 }
 
-export function CreatePageFlow({ onBack, onComplete }: CreatePageFlowProps) {
+export function CreatePageFlow({ }: CreatePageFlowProps) {
+  const router = useRouter();
   const [step, setStep] = useState<Step>('type');
   const [isGenerating, setIsGenerating] = useState(false);
   const [pageData, setPageData] = useState<PageData>({
@@ -111,7 +111,6 @@ Join us and be part of something meaningful.`
   };
 
   const handleComplete = () => {
-    onComplete(pageData);
   };
 
   const isStepValid = () => {
@@ -138,8 +137,8 @@ Join us and be part of something meaningful.`
         <div className="glass-strong border-b border-glass-border">
           <div className="max-w-5xl mx-auto px-6 py-6">
             <Button
+              onClick={() => router.push('pages')}
               variant="ghost"
-              onClick={onBack}
               className="mb-4 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />

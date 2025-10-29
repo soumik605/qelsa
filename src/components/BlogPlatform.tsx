@@ -6,11 +6,10 @@ import { useBlogManager, BlogPost } from './BlogManager';
 import { toast } from 'sonner';
 
 interface BlogPlatformProps {
-  onNavigate: (section: string) => void;
   onShareToFeed?: (blogPost: any) => void;
 }
 
-export function BlogPlatform({ onNavigate, onShareToFeed }: BlogPlatformProps) {
+export function BlogPlatform({ onShareToFeed }: BlogPlatformProps) {
   const [currentView, setCurrentView] = useState<'listing' | 'detail' | 'editor'>('listing');
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
@@ -92,7 +91,6 @@ export function BlogPlatform({ onNavigate, onShareToFeed }: BlogPlatformProps) {
   return (
     <BlogListingPage 
       onViewPost={handleViewPost}
-      onNavigate={onNavigate}
       onCreatePost={handleCreatePost}
       onEditPost={handleEditPost}
     />

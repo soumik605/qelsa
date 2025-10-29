@@ -32,12 +32,9 @@ import { Input } from './ui/input';
 interface PageViewProps {
   pageId: string;
   isAdmin?: boolean;
-  onBack: () => void;
-  onEdit?: () => void;
-  onJobClick?: (jobId: string) => void;
 }
 
-export function PageView({ pageId, isAdmin = false, onBack, onEdit, onJobClick }: PageViewProps) {
+export function PageView({ pageId, isAdmin = false }: PageViewProps) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [aiQuestion, setAiQuestion] = useState('');
@@ -159,7 +156,6 @@ Our mission is to leverage technology to solve complex problems and create meani
         <div className="absolute top-6 left-6">
           <Button
             variant="ghost"
-            onClick={onBack}
             className="glass-strong text-white hover:text-foreground"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -168,7 +164,7 @@ Our mission is to leverage technology to solve complex problems and create meani
         </div>
         {isAdmin && (
           <div className="absolute top-6 right-6">
-            <Button onClick={onEdit} className="gradient-animated">
+            <Button className="gradient-animated">
               Edit Page
             </Button>
           </div>
@@ -310,7 +306,6 @@ Our mission is to leverage technology to solve complex problems and create meani
                   <Card
                     key={job.id}
                     className="p-6 glass border-glass-border hover:border-neon-cyan/50 transition-all cursor-pointer"
-                    onClick={() => onJobClick?.(job.id)}
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div>

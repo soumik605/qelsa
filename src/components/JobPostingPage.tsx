@@ -41,8 +41,6 @@ import { Separator } from './ui/separator';
 import { ScreeningQuestionsBuilder, ScreeningQuestion } from './ScreeningQuestionsBuilder';
 
 interface JobPostingPageProps {
-  onBack: () => void;
-  onPublish?: (jobData: any) => void;
 }
 
 type PostingMode = 'select' | 'ai-copilot' | 'manual';
@@ -63,7 +61,7 @@ interface JobData {
   screeningQuestions: ScreeningQuestion[];
 }
 
-export function JobPostingPage({ onBack, onPublish }: JobPostingPageProps) {
+export function JobPostingPage({ }: JobPostingPageProps) {
   const [mode, setMode] = useState<PostingMode>('select');
   const [step, setStep] = useState<PostingStep>('input');
   const [aiPrompt, setAiPrompt] = useState('');
@@ -199,8 +197,6 @@ export function JobPostingPage({ onBack, onPublish }: JobPostingPageProps) {
         conversionRate: 6.7
       });
     }, 1000);
-    
-    onPublish?.(jobData);
   };
 
   const handleSaveDraft = () => {
@@ -219,7 +215,6 @@ export function JobPostingPage({ onBack, onPublish }: JobPostingPageProps) {
           <div className="max-w-5xl mx-auto px-6 py-6">
             <Button
               variant="ghost"
-              onClick={onBack}
               className="mb-4 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -576,7 +571,6 @@ export function JobPostingPage({ onBack, onPublish }: JobPostingPageProps) {
           <div className="max-w-5xl mx-auto px-6 py-6">
             <Button
               variant="ghost"
-              onClick={onBack}
               className="mb-4 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
