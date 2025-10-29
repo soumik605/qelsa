@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import fetchedJobs from "../../public/FetchedJobs.json";
 import { Box, Container, Grid, Stack, Typography } from "@mui/material";
-import JobCard from "@/old-components/JobCard";
+// import JobCard from "@/old-components/JobCard";
 // import ChipCard from "@/components/Chip";
 
 const Jobs = () => {
@@ -31,7 +31,7 @@ const Jobs = () => {
         <Grid container spacing={4}>
           {jobs.map((job, index) => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index} >
-              <JobCard data={job}/>
+              {/* <JobCard data={job}/> */}
             </Grid>
           ))}
         </Grid>
