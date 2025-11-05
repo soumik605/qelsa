@@ -4,7 +4,7 @@ import Layout from '../layout'
 
 const Blogs = () => {
   return (
-    <Layout activeSection={"home"}>
+    <Layout activeSection={"blog"}>
       <BlogPlatform />
     </Layout>
   )

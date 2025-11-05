@@ -5,6 +5,7 @@ import { OnboardingFlow } from "../components/OnboardingFlow";
 
 import Layout from "../layout";
 import { SocialFeed } from "../components/SocialFeed";
+import { MySpacePage } from "../components/MySpacePage";
 
 interface ResponseData {
   id: string;
@@ -77,5 +78,5 @@ export default function App() {
     return <OnboardingFlow onComplete={handleOnboardingComplete} />;
   }
 
-  return <Layout activeSection={"home"}><SocialFeed /></Layout>;
+  return <Layout activeSection={"profile"}><MySpacePage /></Layout>;
 }
