@@ -9,7 +9,7 @@ const Layout = ({ activeSection, children }) => {
   const [showQelsaNavigation, setShowQelsaNavigation] = useState(false);
   const [showJobFilterSidebar, setShowJobFilterSidebar] = useState(false);
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
-  
+
   const handleProfileClick = useCallback(() => {
     setShowProfileDrawer(true);
   }, []);
@@ -17,7 +17,6 @@ const Layout = ({ activeSection, children }) => {
   const handleCloseProfileDrawer = useCallback(() => {
     setShowProfileDrawer(false);
   }, []);
-
 
   return (
     <div className="min-h-screen relative">

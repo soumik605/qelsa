@@ -6,6 +6,8 @@ import { OnboardingFlow } from "../components/OnboardingFlow";
 import Layout from "../layout";
 import { SocialFeed } from "../components/SocialFeed";
 import { MySpacePage } from "../components/MySpacePage";
+import { Provider } from "react-redux";
+import { store } from "../store";
 
 interface ResponseData {
   id: string;
@@ -75,8 +77,16 @@ export default function App() {
 
   // Show onboarding for first-time users
   if (isFirstTimeUser) {
-    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+    return (
+      <Provider store={store}>
+        <OnboardingFlow onComplete={handleOnboardingComplete} />;
+      </Provider>
+    );
   }
 
-  return <Layout activeSection={"profile"}><MySpacePage /></Layout>;
+  return (
+    <Layout activeSection={"profile"}>
+      <MySpacePage />
+    </Layout>
+  );
 }

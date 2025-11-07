@@ -11,55 +11,13 @@ import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
-export interface Job {
-  id: string;
-  title: string;
-  company: string;
-  companyLogo?: string;
-  location: string;
-  workType: "Full-time" | "Part-time" | "Contract" | "Remote" | "Hybrid";
-  experience: string;
-  salary?: string;
-  skills: string[];
-  postedDate: string;
-  views: number;
-  applications: number;
-  trending?: boolean;
-  urgent?: boolean;
-  isSaved: boolean;
-  isQuickApplyAvailable: boolean;
-  fitScore?: number;
-  fitExplanation?: string;
-  skillsGap?: string[];
-  aiSummary: string;
-  source: {
-    platform: "Qelsa" | "LinkedIn" | "Indeed" | "Naukri" | "AngelList" | "Glassdoor";
-    verified?: boolean;
-    exclusive?: boolean;
-  };
-  // Additional fields for JobDetailPage
-  description?: string;
-  responsibilities?: string[];
-  requiredSkills?: string[];
-  preferredSkills?: string[];
-  techStack?: string[];
-  companyDescription?: string;
-  careerGrowth?: string;
-  benefits?: string[];
-  applicationDeadline?: string;
-  applicants?: number;
-  companyRating?: number;
-  companyReviews?: number;
-  isApplied?: boolean;
-  appliedDate?: string;
-  isFraudulent?: boolean;
-  skillMatch?: number;
-}
-
 interface JobListingPageProps {
+  jobs: any
 }
 
-export function JobListingPage({}: JobListingPageProps) {
+
+export function JobListingPage({jobs}: JobListingPageProps) {
+  console.log("🚀 ~ JobListingPage ~ jobs:", jobs)
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
   const [experienceFilter, setExperienceFilter] = useState("all");
@@ -69,362 +27,26 @@ export function JobListingPage({}: JobListingPageProps) {
   const [viewedJobs, setViewedJobs] = useState<string[]>([]);
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [aiAssistantJob, setAiAssistantJob] = useState<Job | null>(null);
+  const [aiAssistantJob, setAiAssistantJob] = useState(null);
   const [viewMode, setViewMode] = useState<"discovery" | "all" | "my-jobs">("discovery");
   const [myJobsActiveTab, setMyJobsActiveTab] = useState<string>("saved");
 
-  // Mock job data
-  const jobs: Job[] = [
-    {
-      id: "1",
-      title: "Senior Frontend Developer",
-      company: "TechCorp",
-      companyLogo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=64&h=64&fit=crop&crop=center",
-      location: "San Francisco, CA",
-      workType: "Full-time",
-      experience: "3-5 years",
-      salary: "$120k - $160k",
-      skills: ["React", "TypeScript", "Node.js", "GraphQL", "AWS"],
-      postedDate: "2024-01-15",
-      views: 245,
-      applications: 23,
-      trending: true,
-      isSaved: false,
-      isQuickApplyAvailable: true,
-      fitScore: 92,
-      fitExplanation: "Strong match based on your React and TypeScript experience",
-      skillsGap: ["GraphQL", "AWS"],
-      aiSummary: "Excellent opportunity for a senior frontend role at a fast-growing tech company. Strong focus on React ecosystem with modern tooling.",
-      source: {
-        platform: "Qelsa",
-        verified: true,
-        exclusive: true,
-      },
-      // Additional fields for JobDetailPage
-      description:
-        "We are looking for a passionate Senior Frontend Developer to join our dynamic team. You will be responsible for building the next generation of our web applications using cutting-edge technologies.",
-      responsibilities: [
-        "Develop and maintain high-quality React applications",
-        "Collaborate with designers and backend developers",
-        "Implement responsive and accessible user interfaces",
-        "Optimize applications for maximum speed and scalability",
-        "Mentor junior developers and contribute to code reviews",
-      ],
-      requiredSkills: ["React", "TypeScript", "JavaScript", "HTML/CSS", "Git"],
-      preferredSkills: ["Node.js", "GraphQL", "AWS", "Testing frameworks"],
-      techStack: ["React", "TypeScript", "Node.js", "GraphQL", "AWS", "Docker"],
-      companyDescription:
-        "TechCorp is a leading technology company focused on building innovative solutions that transform how businesses operate. We pride ourselves on our collaborative culture and commitment to cutting-edge technology.",
-      careerGrowth: "Clear path to Lead Frontend Developer role with opportunities to mentor team members and drive technical decisions.",
-      benefits: ["Health Insurance", "Dental & Vision", "401k Matching", "Flexible PTO", "Remote Work Options", "Learning Budget"],
-      applicationDeadline: "2024-02-15",
-      applicants: 23,
-      companyRating: 4.6,
-      companyReviews: 142,
-      isApplied: false,
-      skillMatch: 10,
-    },
-    {
-      id: "2",
-      title: "Full Stack Engineer",
-      company: "StartupXYZ",
-      companyLogo: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=64&h=64&fit=crop&crop=center",
-      location: "Remote",
-      workType: "Remote",
-      experience: "2-4 years",
-      salary: "$90k - $130k",
-      skills: ["Python", "Django", "React", "PostgreSQL"],
-      postedDate: "2024-01-14",
-      views: 189,
-      applications: 45,
-      urgent: true,
-      isSaved: true,
-      isQuickApplyAvailable: false,
-      fitScore: 78,
-      fitExplanation: "Good match for your full-stack skills, though Python experience is limited",
-      skillsGap: ["Django", "PostgreSQL"],
-      aiSummary: "Remote-first startup looking for versatile engineers. Great opportunity to work with modern Python stack.",
-      source: {
-        platform: "LinkedIn",
-        verified: false,
-      },
-      // Additional fields for JobDetailPage
-      description:
-        "Join our fast-growing startup as a Full Stack Engineer! We are building the next generation of productivity tools and need talented engineers who can work across the entire stack.",
-      responsibilities: [
-        "Build scalable web applications using Python and React",
-        "Design and implement REST APIs and database schemas",
-        "Collaborate with product and design teams on new features",
-        "Optimize application performance and user experience",
-        "Participate in code reviews and technical discussions",
-      ],
-      requiredSkills: ["Python", "React", "JavaScript", "SQL", "Git"],
-      preferredSkills: ["Django", "PostgreSQL", "Redis", "Docker"],
-      techStack: ["Python", "Django", "React", "PostgreSQL", "Redis", "AWS"],
-      companyDescription:
-        "StartupXYZ is a remote-first company building innovative productivity tools for modern teams. We believe in work-life balance and provide a supportive environment for professional growth.",
-      careerGrowth: "Opportunity to grow into a Senior Full Stack Engineer or specialize in backend/frontend development.",
-      benefits: ["Competitive Salary", "Remote Work", "Health Insurance", "Learning Budget", "Flexible Hours"],
-      applicationDeadline: "2024-02-20",
-      applicants: 45,
-      companyRating: 4.2,
-      companyReviews: 28,
-      isApplied: false,
-      skillMatch: 20,
-    },
-    {
-      id: "3",
-      title: "UI/UX Designer",
-      company: "DesignStudio",
-      location: "New York, NY",
-      workType: "Hybrid",
-      experience: "1-3 years",
-      skills: ["Figma", "Adobe Creative Suite", "Prototyping", "User Research"],
-      postedDate: "2024-01-13",
-      views: 156,
-      applications: 67,
-      isSaved: false,
-      isQuickApplyAvailable: true,
-      fitScore: 65,
-      fitExplanation: "Partial match - design skills align but lacks some technical requirements",
-      aiSummary: "Creative agency seeking passionate designers. Focus on user-centered design and modern design tools.",
-      source: {
-        platform: "Indeed",
-        verified: true,
-      },
-      // Additional fields for JobDetailPage
-      description:
-        "We are looking for a talented UI/UX Designer to join our creative team. You will be responsible for creating intuitive and beautiful user experiences for our clients digital products.",
-      responsibilities: [
-        "Design user interfaces for web and mobile applications",
-        "Conduct user research and usability testing",
-        "Create wireframes, prototypes, and design systems",
-        "Collaborate with developers to ensure design implementation",
-        "Present design concepts to clients and stakeholders",
-      ],
-      requiredSkills: ["Figma", "Adobe Creative Suite", "Prototyping", "User Research"],
-      preferredSkills: ["Sketch", "InVision", "HTML/CSS", "Design Systems"],
-      techStack: ["Figma", "Adobe Creative Suite", "Sketch", "InVision", "Miro"],
-      companyDescription:
-        "DesignStudio is a boutique design agency specializing in user experience design for startups and established brands. We create meaningful digital experiences that drive business results.",
-      careerGrowth: "Path to Senior Designer or Design Lead roles with opportunities to mentor junior designers.",
-      benefits: ["Competitive Salary", "Health Insurance", "Creative Development Budget", "Flexible Schedule", "Modern Office"],
-      applicationDeadline: "2024-02-10",
-      applicants: 67,
-      companyRating: 4.4,
-      companyReviews: 89,
-      isApplied: false,
-      skillMatch: 30,
-    },
-    {
-      id: "4",
-      title: "Backend Developer",
-      company: "CloudTech",
-      companyLogo: "https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=64&h=64&fit=crop&crop=center",
-      location: "Austin, TX",
-      workType: "Full-time",
-      experience: "2-5 years",
-      salary: "$100k - $140k",
-      skills: ["Java", "Spring Boot", "Microservices", "Kubernetes", "MySQL"],
-      postedDate: "2024-01-12",
-      views: 312,
-      applications: 31,
-      isSaved: false,
-      isQuickApplyAvailable: true,
-      fitScore: 85,
-      fitExplanation: "Strong backend skills match well with requirements",
-      skillsGap: ["Kubernetes"],
-      aiSummary: "Great backend role with focus on scalable cloud infrastructure.",
-      source: {
-        platform: "Qelsa",
-        verified: true,
-        exclusive: false,
-      },
-      description: "Looking for a skilled Backend Developer to build scalable services.",
-      responsibilities: ["Design APIs", "Optimize database queries", "Deploy services"],
-      requiredSkills: ["Java", "Spring Boot", "MySQL"],
-      preferredSkills: ["Kubernetes", "Docker", "Redis"],
-      techStack: ["Java", "Spring Boot", "Kubernetes", "MySQL", "Redis"],
-      companyDescription: "CloudTech is building the next generation of cloud services.",
-      careerGrowth: "Senior Backend Developer role with leadership opportunities.",
-      benefits: ["Health Insurance", "401k", "Stock Options", "Remote Flexibility"],
-      applicationDeadline: "2024-02-25",
-      applicants: 31,
-      companyRating: 4.5,
-      companyReviews: 201,
-      isApplied: false,
-      skillMatch: 50,
-    },
-    {
-      id: "5",
-      title: "Product Manager",
-      company: "InnovateLabs",
-      companyLogo: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=64&h=64&fit=crop&crop=center",
-      location: "Boston, MA",
-      workType: "Hybrid",
-      experience: "5-7 years",
-      salary: "$130k - $170k",
-      skills: ["Product Strategy", "Agile", "User Research", "Analytics", "Roadmapping"],
-      postedDate: "2024-01-10",
-      views: 198,
-      applications: 52,
-      isSaved: false,
-      isQuickApplyAvailable: false,
-      fitScore: 72,
-      fitExplanation: "Good strategic fit but requires more enterprise experience",
-      aiSummary: "Strategic PM role focused on SaaS product development.",
-      source: {
-        platform: "LinkedIn",
-        verified: true,
-      },
-      description: "Seeking an experienced Product Manager to lead our SaaS initiatives.",
-      responsibilities: ["Define product vision", "Coordinate with stakeholders", "Analyze metrics"],
-      requiredSkills: ["Product Strategy", "Agile", "Analytics"],
-      preferredSkills: ["User Research", "B2B SaaS", "SQL"],
-      techStack: ["Jira", "Figma", "Amplitude", "SQL"],
-      companyDescription: "InnovateLabs creates cutting-edge SaaS solutions for enterprises.",
-      careerGrowth: "Path to Senior PM or Director of Product roles.",
-      benefits: ["Competitive Salary", "Equity", "Health Benefits", "Flexible Work"],
-      applicationDeadline: "2024-02-18",
-      applicants: 52,
-      companyRating: 4.3,
-      companyReviews: 167,
-      isApplied: false,
-      skillMatch: 50,
-    },
-    {
-      id: "6",
-      title: "Data Scientist",
-      company: "AI Analytics Co",
-      companyLogo: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=64&h=64&fit=crop&crop=center",
-      location: "Seattle, WA",
-      workType: "Remote",
-      experience: "3-6 years",
-      salary: "$120k - $160k",
-      skills: ["Python", "Machine Learning", "TensorFlow", "SQL", "Statistics"],
-      postedDate: "2024-01-11",
-      views: 287,
-      applications: 44,
-      trending: true,
-      isSaved: true,
-      isQuickApplyAvailable: true,
-      fitScore: 88,
-      fitExplanation: "Excellent match for ML and Python expertise",
-      skillsGap: ["TensorFlow"],
-      aiSummary: "Leading AI company looking for data scientists to build ML models.",
-      source: {
-        platform: "Qelsa",
-        verified: true,
-        exclusive: true,
-      },
-      description: "Join our ML team to develop innovative AI solutions.",
-      responsibilities: ["Build ML models", "Analyze large datasets", "Deploy models to production"],
-      requiredSkills: ["Python", "Machine Learning", "SQL"],
-      preferredSkills: ["TensorFlow", "PyTorch", "Cloud platforms"],
-      techStack: ["Python", "TensorFlow", "AWS", "SQL", "Docker"],
-      companyDescription: "AI Analytics Co is at the forefront of AI innovation.",
-      careerGrowth: "Senior Data Scientist or ML Engineer progression.",
-      benefits: ["Competitive Pay", "Remote Work", "Learning Budget", "Health Insurance"],
-      applicationDeadline: "2024-02-22",
-      applicants: 44,
-      companyRating: 4.7,
-      companyReviews: 93,
-      isApplied: false,
-      skillMatch: 50,
-    },
-    {
-      id: "7",
-      title: "DevOps Engineer",
-      company: "Infrastructure Pro",
-      companyLogo: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=64&h=64&fit=crop&crop=center",
-      location: "Denver, CO",
-      workType: "Full-time",
-      experience: "4-7 years",
-      salary: "$110k - $150k",
-      skills: ["AWS", "Docker", "Kubernetes", "Terraform", "CI/CD"],
-      postedDate: "2024-01-09",
-      views: 223,
-      applications: 38,
-      isSaved: false,
-      isQuickApplyAvailable: false,
-      fitScore: 79,
-      fitExplanation: "Good infrastructure knowledge, need more AWS experience",
-      skillsGap: ["Terraform"],
-      aiSummary: "DevOps role focused on cloud infrastructure and automation.",
-      source: {
-        platform: "Indeed",
-        verified: true,
-      },
-      description: "Looking for a DevOps Engineer to manage our cloud infrastructure.",
-      responsibilities: ["Manage AWS infrastructure", "Automate deployments", "Monitor systems"],
-      requiredSkills: ["AWS", "Docker", "Kubernetes"],
-      preferredSkills: ["Terraform", "Ansible", "Python"],
-      techStack: ["AWS", "Docker", "Kubernetes", "Terraform", "Jenkins"],
-      companyDescription: "Infrastructure Pro provides managed cloud services.",
-      careerGrowth: "Senior DevOps Engineer or Cloud Architect path.",
-      benefits: ["Salary", "Health Benefits", "Training Budget", "401k"],
-      applicationDeadline: "2024-02-28",
-      applicants: 38,
-      companyRating: 4.1,
-      companyReviews: 54,
-      isApplied: false,
-      skillMatch: 50,
-    },
-    {
-      id: "8",
-      title: "Mobile Developer (iOS)",
-      company: "AppWorks",
-      companyLogo: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=64&h=64&fit=crop&crop=center",
-      location: "Los Angeles, CA",
-      workType: "Hybrid",
-      experience: "2-4 years",
-      salary: "$95k - $130k",
-      skills: ["Swift", "SwiftUI", "iOS", "Xcode", "REST APIs"],
-      postedDate: "2024-01-08",
-      views: 176,
-      applications: 29,
-      urgent: true,
-      isSaved: false,
-      isQuickApplyAvailable: true,
-      fitScore: 81,
-      fitExplanation: "Strong iOS development skills match well",
-      skillsGap: ["SwiftUI"],
-      aiSummary: "iOS developer role for consumer mobile applications.",
-      source: {
-        platform: "Naukri",
-        verified: false,
-      },
-      description: "Build beautiful iOS applications for millions of users.",
-      responsibilities: ["Develop iOS features", "Collaborate with designers", "Optimize performance"],
-      requiredSkills: ["Swift", "iOS", "Xcode"],
-      preferredSkills: ["SwiftUI", "Combine", "Core Data"],
-      techStack: ["Swift", "SwiftUI", "Xcode", "Firebase"],
-      companyDescription: "AppWorks creates award-winning mobile applications.",
-      careerGrowth: "Senior iOS Developer role with team leadership.",
-      benefits: ["Competitive Salary", "Stock Options", "Gym Membership", "Health Insurance"],
-      applicationDeadline: "2024-02-14",
-      applicants: 29,
-      companyRating: 4.4,
-      companyReviews: 72,
-      isApplied: false,
-      skillMatch: 50,
-    },
-  ];
+  // const filteredJobs = jobs.filter((job) => {
+  //   const matchesSearch =
+  //     job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     job.skills.some((skill) => skill.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  const filteredJobs = jobs.filter((job) => {
-    const matchesSearch =
-      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.skills.some((skill) => skill.toLowerCase().includes(searchQuery.toLowerCase()));
+  //   const matchesLocation = !locationFilter || locationFilter === "all" || job.location.toLowerCase().includes(locationFilter.toLowerCase());
+  //   const matchesExperience = !experienceFilter || experienceFilter === "all" || job.experience.includes(experienceFilter);
+  //   const matchesWorkType = !workTypeFilter || workTypeFilter === "all" || job.workType === workTypeFilter;
 
-    const matchesLocation = !locationFilter || locationFilter === "all" || job.location.toLowerCase().includes(locationFilter.toLowerCase());
-    const matchesExperience = !experienceFilter || experienceFilter === "all" || job.experience.includes(experienceFilter);
-    const matchesWorkType = !workTypeFilter || workTypeFilter === "all" || job.workType === workTypeFilter;
+  //   return matchesSearch && matchesLocation && matchesExperience && matchesWorkType;
+  // });
 
-    return matchesSearch && matchesLocation && matchesExperience && matchesWorkType;
-  });
+  const filteredJobs = []
 
-  const handleJobClick = (job: Job) => {
+  const handleJobClick = (job) => {
     // Add to viewed jobs if not already viewed
     if (!viewedJobs.includes(job.id)) {
       setViewedJobs((prev) => [job.id, ...prev.slice(0, 4)]); // Keep last 5 viewed
@@ -590,7 +212,7 @@ export function JobListingPage({}: JobListingPageProps) {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {viewMode === "discovery" ? (
           /* Discovery Rails View - Full Width */
-          <JobDiscoveryRails onJobClick={handleJobClick} />
+          <JobDiscoveryRails onJobClick={handleJobClick} jobs={jobs} />
         ) : viewMode === "my-jobs" ? (
           /* My Jobs Dashboard - Full Width */
           <div className="mt-[-2rem]">
