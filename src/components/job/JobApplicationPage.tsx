@@ -1,13 +1,12 @@
-import { useState } from 'react';
-import { ArrowLeft, Send, Upload, CheckCircle2, Sparkles } from 'lucide-react';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
-import { Badge } from './ui/badge';
-import { Progress } from './ui/progress';
-import { Separator } from './ui/separator';
-import { ScreeningQuestion } from './ScreeningQuestionsBuilder';
+import { ArrowLeft, CheckCircle2, Send, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { ScreeningQuestion } from "../ScreeningQuestionsBuilder";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { Progress } from "../ui/progress";
+import { Separator } from "../ui/separator";
+import { Textarea } from "../ui/textarea";
 
 interface JobApplicationPageProps {
   job: {
@@ -31,37 +30,37 @@ export function JobApplicationPage({ job, onBack, onSubmit }: JobApplicationPage
   const progress = ((currentQuestionIndex + 1) / job.questions.length) * 100;
 
   const handleAnswer = (questionId: string, answer: any) => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
-      [questionId]: answer
+      [questionId]: answer,
     }));
   };
 
   const handleNext = () => {
     if (currentQuestionIndex < job.questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+      setCurrentQuestionIndex((prev) => prev + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
+      setCurrentQuestionIndex((prev) => prev - 1);
     }
   };
 
   const handleSubmit = () => {
     setIsSubmitting(true);
-    
+
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
-      
+
       const applicationData = {
         jobId: job.id,
         answers,
-        submittedAt: new Date().toISOString()
+        submittedAt: new Date().toISOString(),
       };
-      
+
       onSubmit?.(applicationData);
     }, 2000);
   };
@@ -69,8 +68,8 @@ export function JobApplicationPage({ job, onBack, onSubmit }: JobApplicationPage
   const isCurrentQuestionAnswered = () => {
     const answer = answers[currentQuestion?.id];
     if (!answer) return false;
-    
-    if (typeof answer === 'string') return answer.trim().length > 0;
+
+    if (typeof answer === "string") return answer.trim().length > 0;
     if (Array.isArray(answer)) return answer.length > 0;
     return true;
   };
@@ -83,7 +82,7 @@ export function JobApplicationPage({ job, onBack, onSubmit }: JobApplicationPage
             <div className="w-20 h-20 rounded-full bg-neon-green/20 border-2 border-neon-green flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-10 h-10 text-neon-green" />
             </div>
-            
+
             <h2 className="text-3xl font-bold mb-3">Application Submitted! 🎉</h2>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Your application for <span className="text-neon-cyan font-medium">{job.title}</span> at {job.company} has been successfully submitted.
@@ -118,18 +117,16 @@ export function JobApplicationPage({ job, onBack, onSubmit }: JobApplicationPage
       {/* Header */}
       <div className="glass-strong border-b border-glass-border">
         <div className="max-w-3xl mx-auto px-6 py-6">
-          <Button
-            variant="ghost"
-            onClick={onBack}
-            className="mb-4 text-muted-foreground hover:text-foreground"
-          >
+          <Button variant="ghost" onClick={onBack} className="mb-4 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Job
           </Button>
-          
+
           <div className="mb-4">
             <h1 className="text-2xl font-bold">{job.title}</h1>
-            <p className="text-muted-foreground">{job.company} • {job.location}</p>
+            <p className="text-muted-foreground">
+              {job.company} • {job.location}
+            </p>
           </div>
 
           {/* Progress */}
@@ -151,48 +148,33 @@ export function JobApplicationPage({ job, onBack, onSubmit }: JobApplicationPage
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-4">
               <Badge variant="secondary">
-                {currentQuestion?.type === 'multiple-choice' && 'Multiple Choice'}
-                {currentQuestion?.type === 'short-answer' && 'Short Answer'}
-                {currentQuestion?.type === 'coding' && 'Coding Challenge'}
-                {currentQuestion?.type === 'behavioral' && 'Behavioral'}
+                {currentQuestion?.type === "multiple-choice" && "Multiple Choice"}
+                {currentQuestion?.type === "short-answer" && "Short Answer"}
+                {currentQuestion?.type === "coding" && "Coding Challenge"}
+                {currentQuestion?.type === "behavioral" && "Behavioral"}
               </Badge>
-              {currentQuestion?.required && (
-                <Badge className="bg-neon-pink/20 text-neon-pink border-0">
-                  Required
-                </Badge>
-              )}
+              {currentQuestion?.required && <Badge className="bg-neon-pink/20 text-neon-pink border-0">Required</Badge>}
             </div>
 
-            <h2 className="text-xl font-semibold mb-2">
-              {currentQuestion?.question}
-            </h2>
+            <h2 className="text-xl font-semibold mb-2">{currentQuestion?.question}</h2>
 
-            {currentQuestion?.type === 'coding' && (
-              <p className="text-sm text-muted-foreground">
-                Write your solution in the code editor below. Explain your approach and consider edge cases.
-              </p>
-            )}
+            {currentQuestion?.type === "coding" && <p className="text-sm text-muted-foreground">Write your solution in the code editor below. Explain your approach and consider edge cases.</p>}
           </div>
 
           <Separator className="mb-6" />
 
           {/* Answer Input */}
           <div className="space-y-4">
-            {currentQuestion?.type === 'multiple-choice' && currentQuestion.options && (
+            {currentQuestion?.type === "multiple-choice" && currentQuestion.options && (
               <div className="space-y-3">
                 {currentQuestion.options.map((option, idx) => (
-                  <label
-                    key={idx}
-                    className="flex items-center gap-3 p-4 rounded-lg border border-glass-border hover:border-neon-cyan/50 cursor-pointer transition-colors"
-                  >
+                  <label key={idx} className="flex items-center gap-3 p-4 rounded-lg border border-glass-border hover:border-neon-cyan/50 cursor-pointer transition-colors">
                     <input
                       type="checkbox"
                       checked={(answers[currentQuestion.id] || []).includes(option)}
                       onChange={(e) => {
                         const currentAnswers = answers[currentQuestion.id] || [];
-                        const newAnswers = e.target.checked
-                          ? [...currentAnswers, option]
-                          : currentAnswers.filter((a: string) => a !== option);
+                        const newAnswers = e.target.checked ? [...currentAnswers, option] : currentAnswers.filter((a: string) => a !== option);
                         handleAnswer(currentQuestion.id, newAnswers);
                       }}
                       className="w-4 h-4 rounded border-glass-border"
@@ -203,23 +185,23 @@ export function JobApplicationPage({ job, onBack, onSubmit }: JobApplicationPage
               </div>
             )}
 
-            {(currentQuestion?.type === 'short-answer' || currentQuestion?.type === 'behavioral') && (
+            {(currentQuestion?.type === "short-answer" || currentQuestion?.type === "behavioral") && (
               <Textarea
                 placeholder="Type your answer here..."
-                value={answers[currentQuestion.id] || ''}
+                value={answers[currentQuestion.id] || ""}
                 onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
                 className="glass border-glass-border min-h-32"
               />
             )}
 
-            {currentQuestion?.type === 'coding' && (
+            {currentQuestion?.type === "coding" && (
               <div className="space-y-3">
                 <Textarea
                   placeholder="// Write your code here...
 function solution() {
   // Your implementation
 }"
-                  value={answers[currentQuestion.id] || ''}
+                  value={answers[currentQuestion.id] || ""}
                   onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
                   className="glass border-glass-border min-h-64 font-mono text-sm"
                 />
@@ -233,29 +215,16 @@ function solution() {
 
           {/* Navigation Buttons */}
           <div className="flex gap-3 mt-8">
-            <Button
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={currentQuestionIndex === 0}
-              className="border-glass-border"
-            >
+            <Button variant="outline" onClick={handlePrevious} disabled={currentQuestionIndex === 0} className="border-glass-border">
               Previous
             </Button>
 
             {currentQuestionIndex < job.questions.length - 1 ? (
-              <Button
-                onClick={handleNext}
-                disabled={currentQuestion?.required && !isCurrentQuestionAnswered()}
-                className="flex-1 gradient-animated"
-              >
+              <Button onClick={handleNext} disabled={currentQuestion?.required && !isCurrentQuestionAnswered()} className="flex-1 gradient-animated">
                 Next Question
               </Button>
             ) : (
-              <Button
-                onClick={handleSubmit}
-                disabled={currentQuestion?.required && !isCurrentQuestionAnswered() || isSubmitting}
-                className="flex-1 gradient-animated"
-              >
+              <Button onClick={handleSubmit} disabled={(currentQuestion?.required && !isCurrentQuestionAnswered()) || isSubmitting} className="flex-1 gradient-animated">
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin mr-2" />
@@ -279,14 +248,10 @@ function solution() {
             <div>
               <h4 className="font-medium text-sm mb-1">Pro Tip</h4>
               <p className="text-xs text-muted-foreground">
-                {currentQuestion?.type === 'coding' && 
-                  'Write clean, well-commented code. Explain your thought process and time/space complexity.'}
-                {currentQuestion?.type === 'behavioral' && 
-                  'Use the STAR method (Situation, Task, Action, Result) to structure your answer effectively.'}
-                {currentQuestion?.type === 'short-answer' && 
-                  'Be specific and concise. Provide concrete examples when possible.'}
-                {currentQuestion?.type === 'multiple-choice' && 
-                  'Select all options that apply to your experience.'}
+                {currentQuestion?.type === "coding" && "Write clean, well-commented code. Explain your thought process and time/space complexity."}
+                {currentQuestion?.type === "behavioral" && "Use the STAR method (Situation, Task, Action, Result) to structure your answer effectively."}
+                {currentQuestion?.type === "short-answer" && "Be specific and concise. Provide concrete examples when possible."}
+                {currentQuestion?.type === "multiple-choice" && "Select all options that apply to your experience."}
               </p>
             </div>
           </div>

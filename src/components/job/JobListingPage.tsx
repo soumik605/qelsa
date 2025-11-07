@@ -1,23 +1,21 @@
-import { Bookmark, BookmarkCheck, Briefcase, Building2, Check, Eye, Filter, Globe, Home, MapPin, Plus, Search, Sparkles, Target } from "lucide-react";
+import { Bookmark, BookmarkCheck, Briefcase, Building2, Eye, Filter, Globe, Home, MapPin, Plus, Search, Sparkles, Target } from "lucide-react";
 import { useState } from "react";
-import { CompareJobsTray } from "./CompareJobsTray";
+import { MyJobsPage } from "../MyJobsPage";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { Input } from "../ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { JobAIAssistantDrawer } from "./JobAIAssistantDrawer";
 import { JobDiscoveryRails } from "./JobDiscoveryRails";
-import { MyJobsPage } from "./MyJobsPage";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { Card } from "./ui/card";
-import { Input } from "./ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
 interface JobListingPageProps {
-  jobs: any
+  jobs: any;
 }
 
-
-export function JobListingPage({jobs}: JobListingPageProps) {
-  console.log("🚀 ~ JobListingPage ~ jobs:", jobs)
+export function JobListingPage({ jobs }: JobListingPageProps) {
+  console.log("🚀 ~ JobListingPage ~ jobs:", jobs);
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
   const [experienceFilter, setExperienceFilter] = useState("all");
@@ -44,7 +42,7 @@ export function JobListingPage({jobs}: JobListingPageProps) {
   //   return matchesSearch && matchesLocation && matchesExperience && matchesWorkType;
   // });
 
-  const filteredJobs = []
+  const filteredJobs = [];
 
   const handleJobClick = (job) => {
     // Add to viewed jobs if not already viewed

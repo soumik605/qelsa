@@ -1,9 +1,6 @@
-import React from "react";
-import Layout from "../layout";
-import { JobListingPage } from "../components/JobListingPage";
+import { JobListingPage } from "../components/job/JobListingPage";
 import { useGetJobsQuery } from "../features/api/jobsApi";
-import { Provider } from "react-redux";
-import { store } from "../store";
+import Layout from "../layout";
 
 const Jobs = () => {
   const { data: jobs, error, isLoading } = useGetJobsQuery();

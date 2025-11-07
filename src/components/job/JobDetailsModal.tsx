@@ -1,8 +1,6 @@
-import { X, MapPin, DollarSign, Clock, Users, CheckSquare, Star, Gift, Building, ExternalLink } from 'lucide-react';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Card } from './ui/card';
-import { Separator } from './ui/separator';
+import { Building, CheckSquare, Clock, DollarSign, ExternalLink, Gift, MapPin, Star, Users, X } from "lucide-react";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
 
 interface JobDetails {
   company: string;
@@ -26,15 +24,7 @@ interface JobDetailsModalProps {
   onCheckFit: () => void;
 }
 
-export function JobDetailsModal({ 
-  isOpen, 
-  onClose, 
-  jobTitle, 
-  jobDescription, 
-  jobDetails, 
-  onApply,
-  onCheckFit 
-}: JobDetailsModalProps) {
+export function JobDetailsModal({ isOpen, onClose, jobTitle, jobDescription, jobDetails, onApply, onCheckFit }: JobDetailsModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -69,17 +59,17 @@ export function JobDetailsModal({
                 </div>
               </div>
             </Card>
-            
+
             <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
               <div className="flex items-center gap-3">
                 <MapPin className="h-5 w-5 text-blue-600" />
                 <div>
                   <p className="text-sm text-blue-700">Location</p>
-                  <p className="font-semibold text-blue-900">{jobDetails.location.split(',')[0]}</p>
+                  <p className="font-semibold text-blue-900">{jobDetails.location.split(",")[0]}</p>
                 </div>
               </div>
             </Card>
-            
+
             <Card className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
               <div className="flex items-center gap-3">
                 <Clock className="h-5 w-5 text-purple-600" />
@@ -89,7 +79,7 @@ export function JobDetailsModal({
                 </div>
               </div>
             </Card>
-            
+
             <Card className="p-4 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
               <div className="flex items-center gap-3">
                 <Users className="h-5 w-5 text-orange-600" />
@@ -177,21 +167,12 @@ export function JobDetailsModal({
         {/* Footer Actions */}
         <div className="border-t border-gray-200 p-6 bg-gray-50">
           <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-500">
-              Posted by {jobDetails.company} • Active hiring
-            </div>
+            <div className="text-sm text-gray-500">Posted by {jobDetails.company} • Active hiring</div>
             <div className="flex gap-3">
-              <Button
-                onClick={onCheckFit}
-                variant="outline"
-                className="border-teal-300 text-teal-600 hover:bg-teal-50"
-              >
+              <Button onClick={onCheckFit} variant="outline" className="border-teal-300 text-teal-600 hover:bg-teal-50">
                 Check My Fit
               </Button>
-              <Button
-                onClick={onApply}
-                className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
-              >
+              <Button onClick={onApply} className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700">
                 <ExternalLink className="h-4 w-4 mr-2" />
                 Apply Now
               </Button>

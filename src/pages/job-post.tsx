@@ -1,13 +1,12 @@
-import React from 'react'
-import Layout from '../layout'
-import { JobPostingPage } from '../components/JobPostingPage'
+import { JobPostingPage } from "../components/job/JobPostingPage";
+import Layout from "../layout";
 
 const JobPost = () => {
   return (
     <Layout activeSection={"jobs"}>
       <JobPostingPage />;
     </Layout>
-  )
-}
+  );
+};
 
-export default JobPost
+export default JobPost;

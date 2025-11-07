@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { Sparkles, Target, TrendingUp, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import type { Job } from './JobListingPage';
+import { ChevronDown, ChevronUp, MessageCircle, Sparkles, Target, TrendingUp } from "lucide-react";
+import { useState } from "react";
+import { Badge } from "../ui/badge";
+import type { Job } from "./JobListingPage";
 
 interface JobCardAIActionsProps {
   job: Job;
@@ -14,29 +13,29 @@ export function JobCardAIActions({ job, onAskAI }: JobCardAIActionsProps) {
 
   const quickActions = [
     {
-      label: 'Analyze Fit',
+      label: "Analyze Fit",
       icon: Target,
       question: `What's my Qelsa Score for ${job.title} at ${job.company}?`,
-      color: 'text-neon-cyan'
+      color: "text-neon-cyan",
     },
     {
-      label: 'Skill Gaps',
+      label: "Skill Gaps",
       icon: Sparkles,
       question: `What skills am I missing for ${job.title}?`,
-      color: 'text-neon-purple'
+      color: "text-neon-purple",
     },
     {
-      label: 'Interview Prep',
+      label: "Interview Prep",
       icon: MessageCircle,
       question: `Prepare me for ${job.company} interview`,
-      color: 'text-neon-pink'
+      color: "text-neon-pink",
     },
     {
-      label: 'Career Path',
+      label: "Career Path",
       icon: TrendingUp,
       question: `Show me career path for ${job.title}`,
-      color: 'text-neon-green'
-    }
+      color: "text-neon-green",
+    },
   ];
 
   return (
@@ -53,15 +52,9 @@ export function JobCardAIActions({ job, onAskAI }: JobCardAIActionsProps) {
           <div className="w-6 h-6 rounded-md bg-gradient-to-br from-neon-cyan/20 to-neon-purple/20 flex items-center justify-center group-hover:from-neon-cyan/30 group-hover:to-neon-purple/30 transition-all">
             <Sparkles className="h-3 w-3 text-neon-cyan" />
           </div>
-          <span className="text-xs font-medium text-muted-foreground group-hover:text-white transition-colors">
-            AI Insights
-          </span>
+          <span className="text-xs font-medium text-muted-foreground group-hover:text-white transition-colors">AI Insights</span>
         </div>
-        {expanded ? (
-          <ChevronUp className="h-3 w-3 text-muted-foreground" />
-        ) : (
-          <ChevronDown className="h-3 w-3 text-muted-foreground" />
-        )}
+        {expanded ? <ChevronUp className="h-3 w-3 text-muted-foreground" /> : <ChevronDown className="h-3 w-3 text-muted-foreground" />}
       </button>
 
       {/* Expanded AI Actions */}
@@ -80,9 +73,7 @@ export function JobCardAIActions({ job, onAskAI }: JobCardAIActionsProps) {
                 className="flex items-center gap-2 p-2 rounded-lg glass border-glass-border hover:glass-strong hover:glow-cyan transition-all duration-300 group"
               >
                 <Icon className={`h-3 w-3 ${action.color}`} />
-                <span className="text-xs text-muted-foreground group-hover:text-white transition-colors">
-                  {action.label}
-                </span>
+                <span className="text-xs text-muted-foreground group-hover:text-white transition-colors">{action.label}</span>
               </button>
             );
           })}
@@ -91,7 +82,7 @@ export function JobCardAIActions({ job, onAskAI }: JobCardAIActionsProps) {
 
       {/* Quick Qelsa Score Preview */}
       {!expanded && job.fitScore && (
-        <div 
+        <div
           onClick={(e) => {
             e.stopPropagation();
             onAskAI(`Show me detailed Qelsa Score for ${job.title}`, job.id);
@@ -100,9 +91,7 @@ export function JobCardAIActions({ job, onAskAI }: JobCardAIActionsProps) {
         >
           <span className="text-xs text-muted-foreground">Qelsa Score</span>
           <div className="flex items-center gap-2">
-            <Badge className="bg-gradient-to-r from-neon-cyan to-neon-purple text-black text-xs">
-              {job.fitScore}%
-            </Badge>
+            <Badge className="bg-gradient-to-r from-neon-cyan to-neon-purple text-black text-xs">{job.fitScore}%</Badge>
             <Sparkles className="h-3 w-3 text-neon-cyan opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         </div>

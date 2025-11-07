@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { JobFilterSidebar } from "../components/JobFilterSidebar";
+import { JobFilterSidebar } from "../components/job/JobFilterSidebar";
 import { MainNavigation } from "../components/MainNavigation";
 import { ProfileDrawer } from "../components/ProfileDrawer";
 

@@ -1,23 +1,10 @@
-import { useState, useEffect } from 'react';
-import { 
-  Sparkles, 
-  TrendingUp, 
-  Target, 
-  GraduationCap, 
-  Award,
-  MessageCircle,
-  ChevronRight,
-  ArrowRight,
-  Clock,
-  Brain,
-  Zap,
-  CheckCircle2
-} from 'lucide-react';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Progress } from './ui/progress';
-import type { Job } from './JobListingPage';
+import { ArrowRight, Award, Brain, CheckCircle2, ChevronRight, Clock, GraduationCap, MessageCircle, Sparkles, Target, TrendingUp, Zap } from "lucide-react";
+import { useState } from "react";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { Progress } from "../ui/progress";
+import type { Job } from "./JobListingPage";
 
 interface JobContextAIProps {
   jobs: Job[];
@@ -32,12 +19,12 @@ export function JobContextAI({ jobs, onAskQuestion, onCompareJobs }: JobContextA
   // Generate dynamic prompts based on jobs
   const generateContextPrompts = () => {
     const prompts = [];
-    
+
     if (jobs.length === 0) {
       return [
         { text: "Find jobs matching my skills", icon: Target, category: "search" },
         { text: "Help me improve my resume", icon: GraduationCap, category: "career" },
-        { text: "Show me skill development roadmap", icon: TrendingUp, category: "skills" }
+        { text: "Show me skill development roadmap", icon: TrendingUp, category: "skills" },
       ];
     }
 
@@ -50,9 +37,9 @@ export function JobContextAI({ jobs, onAskQuestion, onCompareJobs }: JobContextA
       );
     } else if (jobs.length >= 2) {
       prompts.push(
-        { text: `Compare top ${Math.min(jobs.length, 4)} jobs`, icon: Award, category: "compare", jobIds: jobs.slice(0, 4).map(j => j.id) },
-        { text: "Which job best matches my profile?", icon: Target, category: "match", jobIds: jobs.slice(0, 4).map(j => j.id) },
-        { text: "Highlight skill gaps across these roles", icon: GraduationCap, category: "skills", jobIds: jobs.slice(0, 4).map(j => j.id) }
+        { text: `Compare top ${Math.min(jobs.length, 4)} jobs`, icon: Award, category: "compare", jobIds: jobs.slice(0, 4).map((j) => j.id) },
+        { text: "Which job best matches my profile?", icon: Target, category: "match", jobIds: jobs.slice(0, 4).map((j) => j.id) },
+        { text: "Highlight skill gaps across these roles", icon: GraduationCap, category: "skills", jobIds: jobs.slice(0, 4).map((j) => j.id) }
       );
     }
 
@@ -84,10 +71,7 @@ export function JobContextAI({ jobs, onAskQuestion, onCompareJobs }: JobContextA
             </Badge>
           </h3>
           <p className="text-sm text-muted-foreground">
-            {jobs.length > 0 
-              ? `Analyzing ${jobs.length} ${jobs.length === 1 ? 'job' : 'jobs'} for personalized insights`
-              : "Ask me anything about your career journey"
-            }
+            {jobs.length > 0 ? `Analyzing ${jobs.length} ${jobs.length === 1 ? "job" : "jobs"} for personalized insights` : "Ask me anything about your career journey"}
           </p>
         </div>
       </div>
@@ -107,23 +91,17 @@ export function JobContextAI({ jobs, onAskQuestion, onCompareJobs }: JobContextA
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-cyan/20 to-neon-purple/20 flex items-center justify-center flex-shrink-0 group-hover:from-neon-cyan/30 group-hover:to-neon-purple/30 transition-all">
                   <Icon className="h-4 w-4 text-neon-cyan" />
                 </div>
-                <span className="text-sm text-muted-foreground group-hover:text-white transition-colors flex-1">
-                  {prompt.text}
-                </span>
+                <span className="text-sm text-muted-foreground group-hover:text-white transition-colors flex-1">{prompt.text}</span>
                 <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-neon-cyan transition-colors" />
               </button>
             );
           })}
         </div>
-        
+
         {contextPrompts.length > 4 && (
-          <Button
-            variant="ghost"
-            onClick={() => setShowAllPrompts(!showAllPrompts)}
-            className="w-full text-neon-cyan hover:text-neon-cyan hover:bg-neon-cyan/10"
-          >
-            {showAllPrompts ? 'Show Less' : `View ${contextPrompts.length - 4} More Actions`}
-            <ChevronRight className={`h-4 w-4 ml-2 transition-transform ${showAllPrompts ? 'rotate-90' : ''}`} />
+          <Button variant="ghost" onClick={() => setShowAllPrompts(!showAllPrompts)} className="w-full text-neon-cyan hover:text-neon-cyan hover:bg-neon-cyan/10">
+            {showAllPrompts ? "Show Less" : `View ${contextPrompts.length - 4} More Actions`}
+            <ChevronRight className={`h-4 w-4 ml-2 transition-transform ${showAllPrompts ? "rotate-90" : ""}`} />
           </Button>
         )}
       </div>
@@ -132,7 +110,7 @@ export function JobContextAI({ jobs, onAskQuestion, onCompareJobs }: JobContextA
       {jobs.length >= 2 && onCompareJobs && (
         <div className="pt-4 border-t border-glass-border">
           <Button
-            onClick={() => onCompareJobs(jobs.slice(0, 4).map(j => j.id))}
+            onClick={() => onCompareJobs(jobs.slice(0, 4).map((j) => j.id))}
             className="w-full bg-gradient-to-r from-neon-cyan to-neon-purple text-black hover:opacity-90 transition-all duration-300 glow-cyan"
           >
             <Award className="h-4 w-4 mr-2" />
@@ -150,7 +128,7 @@ export function JobContextAI({ jobs, onAskQuestion, onCompareJobs }: JobContextA
             { label: "Skill Gap Analysis", icon: Target },
             { label: "Interview Prep", icon: MessageCircle },
             { label: "Career Forecasting", icon: TrendingUp },
-            { label: "Resume Tips", icon: GraduationCap }
+            { label: "Resume Tips", icon: GraduationCap },
           ].map((capability, index) => {
             const Icon = capability.icon;
             return (
@@ -174,7 +152,7 @@ interface SkillGapAnalysisProps {
   matchedSkills: string[];
   missingSkills: string[];
   matchPercentage: number;
-  recommendations: { skill: string; priority: 'high' | 'medium' | 'low'; course?: string }[];
+  recommendations: { skill: string; priority: "high" | "medium" | "low"; course?: string }[];
 }
 
 export function SkillGapAnalysis({ job, matchedSkills, missingSkills, matchPercentage, recommendations }: SkillGapAnalysisProps) {
@@ -184,11 +162,11 @@ export function SkillGapAnalysis({ job, matchedSkills, missingSkills, matchPerce
       <div className="flex items-start justify-between">
         <div>
           <h3 className="font-semibold text-white mb-1">Skill Fit Analysis</h3>
-          <p className="text-sm text-muted-foreground">{job.title} at {job.company}</p>
+          <p className="text-sm text-muted-foreground">
+            {job.title} at {job.company}
+          </p>
         </div>
-        <Badge className="bg-gradient-to-r from-neon-cyan to-neon-purple text-black">
-          {matchPercentage}% Match
-        </Badge>
+        <Badge className="bg-gradient-to-r from-neon-cyan to-neon-purple text-black">{matchPercentage}% Match</Badge>
       </div>
 
       {/* Match Progress */}
@@ -226,12 +204,12 @@ export function SkillGapAnalysis({ job, matchedSkills, missingSkills, matchPerce
             {recommendations.map((rec, index) => (
               <div key={index} className="flex items-center justify-between p-3 glass-strong rounded-lg">
                 <div className="flex items-center gap-3 flex-1">
-                  <Badge 
-                    variant="secondary" 
+                  <Badge
+                    variant="secondary"
                     className={`
-                      ${rec.priority === 'high' ? 'bg-neon-pink/20 text-neon-pink border-neon-pink/30' : ''}
-                      ${rec.priority === 'medium' ? 'bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30' : ''}
-                      ${rec.priority === 'low' ? 'bg-neon-cyan/20 text-neon-cyan border-neon-cyan/30' : ''}
+                      ${rec.priority === "high" ? "bg-neon-pink/20 text-neon-pink border-neon-pink/30" : ""}
+                      ${rec.priority === "medium" ? "bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30" : ""}
+                      ${rec.priority === "low" ? "bg-neon-cyan/20 text-neon-cyan border-neon-cyan/30" : ""}
                     `}
                   >
                     {rec.priority}
@@ -284,9 +262,7 @@ export function CareerPathForecast({ currentRole, targetRole, timelineMonths, st
             {currentRole} → {targetRole}
           </p>
         </div>
-        <Badge className="bg-gradient-to-r from-neon-purple to-neon-pink text-white">
-          {successRate}% Success Rate
-        </Badge>
+        <Badge className="bg-gradient-to-r from-neon-purple to-neon-pink text-white">{successRate}% Success Rate</Badge>
       </div>
 
       {/* Timeline */}
@@ -306,11 +282,9 @@ export function CareerPathForecast({ currentRole, targetRole, timelineMonths, st
             <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-xs font-semibold text-black">
               {index + 1}
             </div>
-            
+
             {/* Timeline line */}
-            {index < steps.length - 1 && (
-              <div className="absolute left-3 top-8 bottom-0 w-px bg-gradient-to-b from-neon-cyan/50 to-transparent"></div>
-            )}
+            {index < steps.length - 1 && <div className="absolute left-3 top-8 bottom-0 w-px bg-gradient-to-b from-neon-cyan/50 to-transparent"></div>}
 
             {/* Step content */}
             <div className="glass-strong rounded-lg p-4 space-y-2">
@@ -350,9 +324,7 @@ export function InterviewPrepPlan({ jobTitle, company, topics, estimatedPrepTime
   const [expandedTopics, setExpandedTopics] = useState<number[]>([0]);
 
   const toggleTopic = (index: number) => {
-    setExpandedTopics(prev => 
-      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
-    );
+    setExpandedTopics((prev) => (prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]));
   };
 
   return (
@@ -375,10 +347,7 @@ export function InterviewPrepPlan({ jobTitle, company, topics, estimatedPrepTime
       <div className="space-y-3">
         {topics.map((topic, index) => (
           <div key={index} className="glass-strong rounded-lg overflow-hidden">
-            <button
-              onClick={() => toggleTopic(index)}
-              className="w-full flex items-center justify-between p-4 hover:bg-glass-bg/30 transition-colors"
-            >
+            <button onClick={() => toggleTopic(index)} className="w-full flex items-center justify-between p-4 hover:bg-glass-bg/30 transition-colors">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-cyan/20 to-neon-purple/20 flex items-center justify-center">
                   <MessageCircle className="h-4 w-4 text-neon-cyan" />
@@ -388,9 +357,9 @@ export function InterviewPrepPlan({ jobTitle, company, topics, estimatedPrepTime
                   <p className="text-xs text-muted-foreground">{topic.questions.length} questions</p>
                 </div>
               </div>
-              <ChevronRight className={`h-5 w-5 text-muted-foreground transition-transform ${expandedTopics.includes(index) ? 'rotate-90' : ''}`} />
+              <ChevronRight className={`h-5 w-5 text-muted-foreground transition-transform ${expandedTopics.includes(index) ? "rotate-90" : ""}`} />
             </button>
-            
+
             {expandedTopics.includes(index) && (
               <div className="px-4 pb-4 space-y-2">
                 {topic.questions.map((question, qIndex) => (

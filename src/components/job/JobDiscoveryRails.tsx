@@ -1,10 +1,10 @@
-import { Award, BookmarkCheck, Briefcase, Building2, ChevronLeft, ChevronRight, Clock, Eye, EyeOff, Globe, MapPin, MoreVertical, Pin, Sparkles, Star, Target, TrendingUp, Zap } from "lucide-react";
+import { Award, Briefcase, ChevronLeft, ChevronRight, EyeOff, MapPin, MoreVertical, Pin, Sparkles, Star } from "lucide-react";
 import { useState } from "react";
-import { Button } from "./ui/button";
-import { Card } from "./ui/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { Badge } from "./ui/badge";
-import { Job } from "../types/job";
+import { Job } from "../../types/job";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 interface Rail {
   id: string;
@@ -259,13 +259,12 @@ function JobRailCard({ job, onClick, onToggleCompare, isCompared }: JobRailCardP
             <span className="text-muted-foreground/50">•</span>
             <span>{job["experience_level"]}</span>
           </div>
-          
+
           {(job.salary_max || job.salary_min) && job.salary_currency && (
             <div className="text-sm text-neon-green">
-              {job.salary_max || 'NA'} - {job.salary_min || 'NA'} {job.salary_currency}
+              {job.salary_max || "NA"} - {job.salary_min || "NA"} {job.salary_currency}
             </div>
           )}
-
         </div>
 
         {/* Skills */}
@@ -292,10 +291,7 @@ function JobRailCard({ job, onClick, onToggleCompare, isCompared }: JobRailCardP
         {/* Footer */}
         <div className="flex items-center justify-between pt-2 border-t border-white/5">
           <div className="flex items-center gap-2">
-            <Badge
-              variant="outline" 
-              className={`text-xs border-${getSourceColor('jobdataapi')}`}
-            >
+            <Badge variant="outline" className={`text-xs border-${getSourceColor("jobdataapi")}`}>
               Job Data API
             </Badge>
             {/* {job.source.exclusive && (
@@ -304,7 +300,7 @@ function JobRailCard({ job, onClick, onToggleCompare, isCompared }: JobRailCardP
               </Badge>
             )} */}
           </div>
-          
+
           {/* {job.fitScore && (
             <div className="flex items-center gap-1.5 text-xs">
               <Target className="w-3.5 h-3.5 text-neon-green" />

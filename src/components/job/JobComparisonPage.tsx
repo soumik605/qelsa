@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { ArrowLeft, MapPin, Briefcase, DollarSign, Clock, TrendingUp, Star, Award, CheckCircle2, Sparkles, Brain, Target, Save, Share2, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from './ui/button';
-import { Slider } from './ui/slider';
-import { Badge } from './ui/badge';
+import { ArrowLeft, Award, Brain, Briefcase, CheckCircle2, ChevronDown, ChevronUp, Clock, DollarSign, ExternalLink, MapPin, Save, Share2, Sparkles, Star, Target, TrendingUp } from "lucide-react";
+import { useState } from "react";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Slider } from "../ui/slider";
 
 interface Job {
   id: string;
@@ -14,7 +14,7 @@ interface Job {
   experience: string;
   salary?: string;
   source: {
-    platform: 'Qelsa' | 'LinkedIn' | 'Indeed' | 'Naukri' | 'AngelList' | 'Glassdoor';
+    platform: "Qelsa" | "LinkedIn" | "Indeed" | "Naukri" | "AngelList" | "Glassdoor";
     verified?: boolean;
     exclusive?: boolean;
   };
@@ -38,7 +38,7 @@ interface JobComparisonPageProps {
   onRemoveJob: (jobId: string) => void;
 }
 
-type PreferenceKey = 'salary' | 'growth' | 'workLife' | 'stability';
+type PreferenceKey = "salary" | "growth" | "workLife" | "stability";
 
 interface Preferences {
   salary: number;
@@ -52,7 +52,7 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
     salary: 25,
     growth: 25,
     workLife: 25,
-    stability: 25
+    stability: 25,
   });
   const [showPreferences, setShowPreferences] = useState(true);
   const [savedComparison, setSavedComparison] = useState(false);
@@ -61,20 +61,21 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
   const getAIInsights = (job: Job) => {
     const insights = {
       skillMatch: Math.floor(Math.random() * 30) + 70, // 70-100%
-      careerFit: ['Product Management', 'Leadership', 'Technical Growth'][Math.floor(Math.random() * 3)],
-      summary: job.source.platform === 'Qelsa' 
-        ? 'Best for candidates seeking fast growth in innovative tech startups with strong mentorship.'
-        : job.source.platform === 'LinkedIn'
-        ? 'Best for candidates prioritizing stable MNC careers with comprehensive benefits.'
-        : 'Best for candidates looking for work-life balance and established company culture.',
-      strengths: ['Competitive salary', 'Strong team culture', 'Growth opportunities'],
-      improvements: job.skillMatch < 80 ? ['SQL proficiency', 'Cloud architecture knowledge'] : [],
+      careerFit: ["Product Management", "Leadership", "Technical Growth"][Math.floor(Math.random() * 3)],
+      summary:
+        job.source.platform === "Qelsa"
+          ? "Best for candidates seeking fast growth in innovative tech startups with strong mentorship."
+          : job.source.platform === "LinkedIn"
+          ? "Best for candidates prioritizing stable MNC careers with comprehensive benefits."
+          : "Best for candidates looking for work-life balance and established company culture.",
+      strengths: ["Competitive salary", "Strong team culture", "Growth opportunities"],
+      improvements: job.skillMatch < 80 ? ["SQL proficiency", "Cloud architecture knowledge"] : [],
       scores: {
         salary: Math.floor(Math.random() * 30) + 70,
         growth: Math.floor(Math.random() * 30) + 70,
         workLife: Math.floor(Math.random() * 30) + 70,
         stability: Math.floor(Math.random() * 30) + 70,
-      }
+      },
     };
     return insights;
   };
@@ -82,53 +83,60 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
   const calculateQelsaScore = (job: Job) => {
     const insights = getAIInsights(job);
     const totalWeight = preferences.salary + preferences.growth + preferences.workLife + preferences.stability;
-    
+
     if (totalWeight === 0) return 0;
-    
-    const score = (
-      (insights.scores.salary * preferences.salary) +
-      (insights.scores.growth * preferences.growth) +
-      (insights.scores.workLife * preferences.workLife) +
-      (insights.scores.stability * preferences.stability)
-    ) / totalWeight;
-    
+
+    const score =
+      (insights.scores.salary * preferences.salary +
+        insights.scores.growth * preferences.growth +
+        insights.scores.workLife * preferences.workLife +
+        insights.scores.stability * preferences.stability) /
+      totalWeight;
+
     return Math.round(score);
   };
 
   const getSourceColor = (platform: string) => {
     switch (platform) {
-      case 'Qelsa': return 'bg-neon-cyan/10 text-neon-cyan border-neon-cyan';
-      case 'LinkedIn': return 'bg-blue-500/10 text-blue-400 border-blue-500';
-      case 'Indeed': return 'bg-blue-600/10 text-blue-400 border-blue-600';
-      case 'Naukri': return 'bg-purple-500/10 text-purple-400 border-purple-500';
-      case 'AngelList': return 'bg-gray-400/10 text-gray-300 border-gray-400';
-      case 'Glassdoor': return 'bg-green-500/10 text-green-400 border-green-500';
-      default: return 'bg-gray-400/10 text-gray-300 border-gray-400';
+      case "Qelsa":
+        return "bg-neon-cyan/10 text-neon-cyan border-neon-cyan";
+      case "LinkedIn":
+        return "bg-blue-500/10 text-blue-400 border-blue-500";
+      case "Indeed":
+        return "bg-blue-600/10 text-blue-400 border-blue-600";
+      case "Naukri":
+        return "bg-purple-500/10 text-purple-400 border-purple-500";
+      case "AngelList":
+        return "bg-gray-400/10 text-gray-300 border-gray-400";
+      case "Glassdoor":
+        return "bg-green-500/10 text-green-400 border-green-500";
+      default:
+        return "bg-gray-400/10 text-gray-300 border-gray-400";
     }
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return 'text-neon-green';
-    if (score >= 70) return 'text-neon-cyan';
-    if (score >= 60) return 'text-neon-yellow';
-    return 'text-orange-400';
+    if (score >= 85) return "text-neon-green";
+    if (score >= 70) return "text-neon-cyan";
+    if (score >= 60) return "text-neon-yellow";
+    return "text-orange-400";
   };
 
   const handlePreferenceChange = (key: PreferenceKey, value: number[]) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
-      [key]: value[0]
+      [key]: value[0],
     }));
   };
 
   const handleSaveComparison = () => {
     setSavedComparison(true);
     setTimeout(() => setSavedComparison(false), 2000);
-    console.log('Comparison saved');
+    console.log("Comparison saved");
   };
 
   const handleShareComparison = () => {
-    console.log('Share comparison with mentor/advisor');
+    console.log("Share comparison with mentor/advisor");
   };
 
   return (
@@ -138,12 +146,7 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
         <div className="max-w-7xl mx-auto px-4 py-4 lg:px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onBack}
-                className="text-muted-foreground hover:text-white"
-              >
+              <Button variant="ghost" size="sm" onClick={onBack} className="text-muted-foreground hover:text-white">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
@@ -155,25 +158,15 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                 <p className="text-sm text-muted-foreground">AI-powered comparison • {jobs.length} jobs</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleShareComparison}
-                className="hidden lg:flex text-muted-foreground hover:text-white"
-              >
+              <Button variant="ghost" size="sm" onClick={handleShareComparison} className="hidden lg:flex text-muted-foreground hover:text-white">
                 <Share2 className="w-4 h-4 mr-2" />
                 Share with Mentor
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSaveComparison}
-                className="text-muted-foreground hover:text-white"
-              >
+              <Button variant="ghost" size="sm" onClick={handleSaveComparison} className="text-muted-foreground hover:text-white">
                 <Save className="w-4 h-4 mr-2" />
-                {savedComparison ? 'Saved!' : 'Save'}
+                {savedComparison ? "Saved!" : "Save"}
               </Button>
             </div>
           </div>
@@ -183,23 +176,18 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
       <div className="max-w-7xl mx-auto px-4 py-6 lg:px-6">
         {/* AI Preference Controls */}
         <div className="glass-strong rounded-2xl p-4 lg:p-6 mb-6 border border-glass-border">
-          <button
-            onClick={() => setShowPreferences(!showPreferences)}
-            className="w-full flex items-center justify-between mb-4"
-          >
+          <button onClick={() => setShowPreferences(!showPreferences)} className="w-full flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Brain className="w-5 h-5 text-neon-purple" />
               <h2 className="text-white">Personalize Your Comparison</h2>
             </div>
             {showPreferences ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
           </button>
-          
+
           {showPreferences && (
             <>
-              <p className="text-sm text-muted-foreground mb-6">
-                Adjust what matters most to you. The Qelsa Score will be calculated based on your preferences.
-              </p>
-              
+              <p className="text-sm text-muted-foreground mb-6">Adjust what matters most to you. The Qelsa Score will be calculated based on your preferences.</p>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -209,13 +197,7 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                     </label>
                     <span className="text-sm text-neon-cyan">{preferences.salary}%</span>
                   </div>
-                  <Slider
-                    value={[preferences.salary]}
-                    onValueChange={(value) => handlePreferenceChange('salary', value)}
-                    max={100}
-                    step={5}
-                    className="mb-2"
-                  />
+                  <Slider value={[preferences.salary]} onValueChange={(value) => handlePreferenceChange("salary", value)} max={100} step={5} className="mb-2" />
                 </div>
 
                 <div>
@@ -226,13 +208,7 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                     </label>
                     <span className="text-sm text-neon-cyan">{preferences.growth}%</span>
                   </div>
-                  <Slider
-                    value={[preferences.growth]}
-                    onValueChange={(value) => handlePreferenceChange('growth', value)}
-                    max={100}
-                    step={5}
-                    className="mb-2"
-                  />
+                  <Slider value={[preferences.growth]} onValueChange={(value) => handlePreferenceChange("growth", value)} max={100} step={5} className="mb-2" />
                 </div>
 
                 <div>
@@ -243,13 +219,7 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                     </label>
                     <span className="text-sm text-neon-cyan">{preferences.workLife}%</span>
                   </div>
-                  <Slider
-                    value={[preferences.workLife]}
-                    onValueChange={(value) => handlePreferenceChange('workLife', value)}
-                    max={100}
-                    step={5}
-                    className="mb-2"
-                  />
+                  <Slider value={[preferences.workLife]} onValueChange={(value) => handlePreferenceChange("workLife", value)} max={100} step={5} className="mb-2" />
                 </div>
 
                 <div>
@@ -260,13 +230,7 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                     </label>
                     <span className="text-sm text-neon-cyan">{preferences.stability}%</span>
                   </div>
-                  <Slider
-                    value={[preferences.stability]}
-                    onValueChange={(value) => handlePreferenceChange('stability', value)}
-                    max={100}
-                    step={5}
-                    className="mb-2"
-                  />
+                  <Slider value={[preferences.stability]} onValueChange={(value) => handlePreferenceChange("stability", value)} max={100} step={5} className="mb-2" />
                 </div>
               </div>
             </>
@@ -279,7 +243,7 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
             {jobs.map((job) => {
               const insights = getAIInsights(job);
               const qelsaScore = calculateQelsaScore(job);
-              
+
               return (
                 <div key={job.id} className="glass-strong rounded-2xl overflow-hidden border border-glass-border">
                   {/* Top Section */}
@@ -287,11 +251,7 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                     {/* Company Logo & Basic Info */}
                     <div className="flex items-start gap-3 mb-4">
                       <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
-                        {job.logo ? (
-                          <img src={job.logo} alt={job.company} className="w-10 h-10 rounded-lg object-cover" />
-                        ) : (
-                          <Briefcase className="w-6 h-6 text-muted-foreground" />
-                        )}
+                        {job.logo ? <img src={job.logo} alt={job.company} className="w-10 h-10 rounded-lg object-cover" /> : <Briefcase className="w-6 h-6 text-muted-foreground" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-white mb-1 line-clamp-2">{job.title}</h3>
@@ -336,15 +296,10 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                           <Sparkles className="w-4 h-4 text-neon-cyan" />
                           Qelsa Score
                         </span>
-                        <span className={`text-2xl ${getScoreColor(qelsaScore)}`}>
-                          {qelsaScore}
-                        </span>
+                        <span className={`text-2xl ${getScoreColor(qelsaScore)}`}>{qelsaScore}</span>
                       </div>
                       <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-neon-cyan to-neon-purple transition-all duration-500"
-                          style={{ width: `${qelsaScore}%` }}
-                        />
+                        <div className="h-full bg-gradient-to-r from-neon-cyan to-neon-purple transition-all duration-500" style={{ width: `${qelsaScore}%` }} />
                       </div>
                     </div>
 
@@ -355,15 +310,10 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                           <Target className="w-4 h-4 text-neon-pink" />
                           Skill Match
                         </span>
-                        <span className={`text-lg ${getScoreColor(insights.skillMatch)}`}>
-                          {insights.skillMatch}%
-                        </span>
+                        <span className={`text-lg ${getScoreColor(insights.skillMatch)}`}>{insights.skillMatch}%</span>
                       </div>
                       <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-neon-pink transition-all duration-500"
-                          style={{ width: `${insights.skillMatch}%` }}
-                        />
+                        <div className="h-full bg-neon-pink transition-all duration-500" style={{ width: `${insights.skillMatch}%` }} />
                       </div>
                     </div>
 
@@ -424,27 +374,16 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                       <div className="mb-4 flex items-center gap-2">
                         <Star className="w-4 h-4 text-neon-yellow fill-neon-yellow" />
                         <span className="text-sm text-white">{job.companyInfo.rating.toFixed(1)}</span>
-                        {job.companyInfo.reviews && (
-                          <span className="text-xs text-muted-foreground">
-                            ({job.companyInfo.reviews.toLocaleString()} reviews)
-                          </span>
-                        )}
+                        {job.companyInfo.reviews && <span className="text-xs text-muted-foreground">({job.companyInfo.reviews.toLocaleString()} reviews)</span>}
                       </div>
                     )}
 
                     {/* Action Buttons */}
                     <div className="space-y-2">
-                      <Button
-                        onClick={() => onApply(job.id)}
-                        className="w-full gradient-animated text-black hover:opacity-90"
-                      >
+                      <Button onClick={() => onApply(job.id)} className="w-full gradient-animated text-black hover:opacity-90">
                         Apply Now
                       </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => onRemoveJob(job.id)}
-                        className="w-full text-muted-foreground hover:text-white"
-                      >
+                      <Button variant="outline" onClick={() => onRemoveJob(job.id)} className="w-full text-muted-foreground hover:text-white">
                         Remove from Comparison
                       </Button>
                     </div>
@@ -457,19 +396,11 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
 
         {/* Bottom Actions */}
         <div className="mt-8 flex flex-col lg:flex-row gap-4 items-center justify-center">
-          <Button
-            variant="outline"
-            onClick={handleSaveComparison}
-            className="w-full lg:w-auto"
-          >
+          <Button variant="outline" onClick={handleSaveComparison} className="w-full lg:w-auto">
             <Save className="w-4 h-4 mr-2" />
-            {savedComparison ? 'Comparison Saved!' : 'Save for Later'}
+            {savedComparison ? "Comparison Saved!" : "Save for Later"}
           </Button>
-          <Button
-            variant="outline"
-            onClick={handleShareComparison}
-            className="w-full lg:w-auto"
-          >
+          <Button variant="outline" onClick={handleShareComparison} className="w-full lg:w-auto">
             <Share2 className="w-4 h-4 mr-2" />
             Share with Mentor
           </Button>

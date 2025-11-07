@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Bot, Sparkles, X, Maximize2, Minimize2 } from 'lucide-react';
-import { Button } from './ui/button';
-import { JobContextAI } from './JobContextAI';
-import { ChatInterfaceEnhanced } from './ChatInterfaceEnhanced';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from './ui/dialog';
-import type { Job } from './JobListingPage';
+import { Bot, Maximize2, Minimize2, X } from "lucide-react";
+import { useState } from "react";
+import { ChatInterfaceEnhanced } from "../ChatInterfaceEnhanced";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
+import { JobContextAI } from "./JobContextAI";
+import type { Job } from "./JobListingPage";
 
 interface JobListingWithAIProps {
   visibleJobs: Job[];
@@ -13,12 +13,7 @@ interface JobListingWithAIProps {
   onViewAllJobs?: () => void;
 }
 
-export function JobListingWithAI({ 
-  visibleJobs, 
-  onApplyJob, 
-  onViewJob,
-  onViewAllJobs 
-}: JobListingWithAIProps) {
+export function JobListingWithAI({ visibleJobs, onApplyJob, onViewJob, onViewAllJobs }: JobListingWithAIProps) {
   const [showFloatingAI, setShowFloatingAI] = useState(true);
   const [showFullscreenAI, setShowFullscreenAI] = useState(false);
   const [minimized, setMinimized] = useState(false);
@@ -39,12 +34,9 @@ export function JobListingWithAI({
     <>
       {/* Floating AI Assistant */}
       {showFloatingAI && !showFullscreenAI && (
-        <div className={`fixed bottom-6 right-6 z-40 transition-all duration-300 ${minimized ? 'w-auto' : 'w-96'}`}>
+        <div className={`fixed bottom-6 right-6 z-40 transition-all duration-300 ${minimized ? "w-auto" : "w-96"}`}>
           {minimized ? (
-            <Button
-              onClick={() => setMinimized(false)}
-              className="bg-gradient-to-r from-neon-cyan to-neon-purple text-black hover:opacity-90 rounded-full w-14 h-14 p-0 glow-cyan"
-            >
+            <Button onClick={() => setMinimized(false)} className="bg-gradient-to-r from-neon-cyan to-neon-purple text-black hover:opacity-90 rounded-full w-14 h-14 p-0 glow-cyan">
               <Bot className="h-6 w-6" />
             </Button>
           ) : (
@@ -58,33 +50,18 @@ export function JobListingWithAI({
                   <div>
                     <h3 className="font-semibold text-white text-sm">AI Job Assistant</h3>
                     <p className="text-xs text-muted-foreground">
-                      Analyzing {visibleJobs.length} {visibleJobs.length === 1 ? 'job' : 'jobs'}
+                      Analyzing {visibleJobs.length} {visibleJobs.length === 1 ? "job" : "jobs"}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowFullscreenAI(true)}
-                    className="h-8 w-8 text-muted-foreground hover:text-neon-cyan"
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => setShowFullscreenAI(true)} className="h-8 w-8 text-muted-foreground hover:text-neon-cyan">
                     <Maximize2 className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setMinimized(true)}
-                    className="h-8 w-8 text-muted-foreground hover:text-neon-cyan"
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => setMinimized(true)} className="h-8 w-8 text-muted-foreground hover:text-neon-cyan">
                     <Minimize2 className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowFloatingAI(false)}
-                    className="h-8 w-8 text-muted-foreground hover:text-neon-pink"
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => setShowFloatingAI(false)} className="h-8 w-8 text-muted-foreground hover:text-neon-pink">
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
@@ -92,11 +69,7 @@ export function JobListingWithAI({
 
               {/* Content */}
               <div className="overflow-y-auto p-4">
-                <JobContextAI
-                  jobs={visibleJobs}
-                  onAskQuestion={handleAskQuestion}
-                  onCompareJobs={handleCompareJobs}
-                />
+                <JobContextAI jobs={visibleJobs} onAskQuestion={handleAskQuestion} onCompareJobs={handleCompareJobs} />
               </div>
             </div>
           )}
@@ -107,21 +80,10 @@ export function JobListingWithAI({
       <Dialog open={showFullscreenAI} onOpenChange={setShowFullscreenAI}>
         <DialogContent className="max-w-6xl h-[90vh] p-0 gap-0 bg-background border-glass-border">
           <DialogTitle className="sr-only">AI Job Assistant</DialogTitle>
-          <DialogDescription className="sr-only">
-            Get personalized job insights, skill analysis, and career guidance powered by AI
-          </DialogDescription>
-          <ChatInterfaceEnhanced
-            contextJobs={visibleJobs}
-            onMenuClick={() => {}}
-            onProfileClick={() => {}}
-            onViewJob={onViewJob}
-            onApplyJob={onApplyJob}
-            onViewAllJobs={onViewAllJobs}
-          />
+          <DialogDescription className="sr-only">Get personalized job insights, skill analysis, and career guidance powered by AI</DialogDescription>
+          <ChatInterfaceEnhanced contextJobs={visibleJobs} onMenuClick={() => {}} onProfileClick={() => {}} onViewJob={onViewJob} onApplyJob={onApplyJob} onViewAllJobs={onViewAllJobs} />
         </DialogContent>
       </Dialog>
-
-
     </>
   );
 }

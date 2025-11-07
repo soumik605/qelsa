@@ -1,50 +1,19 @@
-import { useState } from 'react';
-import { 
-  ArrowLeft, 
-  Sparkles, 
-  FileText, 
-  Target,
-  TrendingUp,
-  Users,
-  DollarSign,
-  MapPin,
-  Briefcase,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Lightbulb,
-  Eye,
-  Send,
-  Save,
-  Wand2,
-  BarChart3,
-  Shield,
-  Zap,
-  HelpCircle,
-  Plus,
-  X,
-  Code,
-  MessageSquare,
-  CheckSquare,
-  Trash2,
-  Edit2
-} from 'lucide-react';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
-import { Badge } from './ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Progress } from './ui/progress';
-import { Separator } from './ui/separator';
-import { ScreeningQuestionsBuilder, ScreeningQuestion } from './ScreeningQuestionsBuilder';
+import { AlertCircle, ArrowLeft, CheckCircle2, Clock, DollarSign, Eye, FileText, HelpCircle, Lightbulb, Save, Send, Shield, Sparkles, TrendingUp, Users, Wand2, Zap } from "lucide-react";
+import { useState } from "react";
+import { ScreeningQuestion, ScreeningQuestionsBuilder } from "../ScreeningQuestionsBuilder";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { Input } from "../ui/input";
+import { Progress } from "../ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Separator } from "../ui/separator";
+import { Textarea } from "../ui/textarea";
 
-interface JobPostingPageProps {
-}
+interface JobPostingPageProps {}
 
-type PostingMode = 'select' | 'ai-copilot' | 'manual';
-type PostingStep = 'input' | 'review' | 'questions' | 'final-review' | 'published';
+type PostingMode = "select" | "ai-copilot" | "manual";
+type PostingStep = "input" | "review" | "questions" | "final-review" | "published";
 
 interface JobData {
   title: string;
@@ -61,86 +30,83 @@ interface JobData {
   screeningQuestions: ScreeningQuestion[];
 }
 
-export function JobPostingPage({ }: JobPostingPageProps) {
-  const [mode, setMode] = useState<PostingMode>('select');
-  const [step, setStep] = useState<PostingStep>('input');
-  const [aiPrompt, setAiPrompt] = useState('');
+export function JobPostingPage({}: JobPostingPageProps) {
+  const [mode, setMode] = useState<PostingMode>("select");
+  const [step, setStep] = useState<PostingStep>("input");
+  const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPremium] = useState(false); // Set to true for premium users
   const [jobData, setJobData] = useState<Partial<JobData>>({
-    title: '',
-    company: '',
-    location: '',
-    workType: 'Full-time',
-    experience: '',
-    salary: '',
-    description: '',
+    title: "",
+    company: "",
+    location: "",
+    workType: "Full-time",
+    experience: "",
+    salary: "",
+    description: "",
     responsibilities: [],
     requirements: [],
     skills: [],
     benefits: [],
-    screeningQuestions: []
+    screeningQuestions: [],
   });
 
   // AI Insights (mock data)
   const [aiInsights, setAiInsights] = useState({
     talentPoolSize: 2840,
-    salaryBenchmark: '$120k - $160k',
-    competitionLevel: 'Medium',
+    salaryBenchmark: "$120k - $160k",
+    competitionLevel: "Medium",
     diversityScore: 85,
     clarityScore: 92,
-    suggestions: [
-      'Add remote work flexibility to attract 40% more candidates',
-      'Mention learning opportunities to improve appeal',
-      'Consider adding benefits section for better conversion'
-    ]
+    suggestions: ["Add remote work flexibility to attract 40% more candidates", "Mention learning opportunities to improve appeal", "Consider adding benefits section for better conversion"],
   });
 
   const [postMetrics, setPostMetrics] = useState({
     views: 0,
     applications: 0,
-    avgTimeToApply: '0 days',
-    conversionRate: 0
+    avgTimeToApply: "0 days",
+    conversionRate: 0,
   });
 
   const handleAIGenerate = () => {
     if (!aiPrompt.trim()) return;
 
     setIsGenerating(true);
-    
+
     // Simulate AI generation
     setTimeout(() => {
       const generatedData: Partial<JobData> = {
-        title: 'Senior Backend Engineer',
-        company: 'Qelsa Technologies',
-        location: 'San Francisco, CA (Remote)',
-        workType: 'Full-time',
-        experience: '3-5 years',
-        salary: '$130k - $170k',
-        description: 'We are looking for a passionate Senior Backend Engineer to join our dynamic team. You will be responsible for building scalable microservices and APIs that power our career platform used by millions of professionals worldwide.',
+        title: "Senior Backend Engineer",
+        company: "Qelsa Technologies",
+        location: "San Francisco, CA (Remote)",
+        workType: "Full-time",
+        experience: "3-5 years",
+        salary: "$130k - $170k",
+        description:
+          "We are looking for a passionate Senior Backend Engineer to join our dynamic team. You will be responsible for building scalable microservices and APIs that power our career platform used by millions of professionals worldwide.",
         responsibilities: [
-          'Design and implement scalable backend services using Node.js and Python',
-          'Collaborate with frontend teams to create seamless API integrations',
-          'Optimize database queries and improve system performance',
-          'Mentor junior engineers and conduct code reviews',
-          'Participate in architectural decisions and technical planning'
+          "Design and implement scalable backend services using Node.js and Python",
+          "Collaborate with frontend teams to create seamless API integrations",
+          "Optimize database queries and improve system performance",
+          "Mentor junior engineers and conduct code reviews",
+          "Participate in architectural decisions and technical planning",
         ],
         requirements: [
-          '3+ years of experience in backend development',
-          'Strong proficiency in Node.js, Python, or similar',
-          'Experience with AWS, Docker, and microservices architecture',
-          'Solid understanding of database design (PostgreSQL, MongoDB)',
-          'Excellent problem-solving and communication skills'
+          "3+ years of experience in backend development",
+          "Strong proficiency in Node.js, Python, or similar",
+          "Experience with AWS, Docker, and microservices architecture",
+          "Solid understanding of database design (PostgreSQL, MongoDB)",
+          "Excellent problem-solving and communication skills",
         ],
-        skills: ['Node.js', 'Python', 'AWS', 'Docker', 'PostgreSQL', 'MongoDB', 'REST APIs', 'GraphQL'],
+        skills: ["Node.js", "Python", "AWS", "Docker", "PostgreSQL", "MongoDB", "REST APIs", "GraphQL"],
         benefits: [
-          'Competitive salary and equity package',
-          'Flexible remote work options',
-          'Health, dental, and vision insurance',
-          'Professional development budget',
-          '401(k) matching',
-          'Unlimited PTO'
-        ]
+          "Competitive salary and equity package",
+          "Flexible remote work options",
+          "Health, dental, and vision insurance",
+          "Professional development budget",
+          "401(k) matching",
+          "Unlimited PTO",
+        ],
       };
 
       setJobData(generatedData);
@@ -149,74 +115,71 @@ export function JobPostingPage({ }: JobPostingPageProps) {
   };
 
   const handleManualUpdate = (field: keyof JobData, value: any) => {
-    setJobData(prev => ({ ...prev, [field]: value }));
+    setJobData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleArrayAdd = (field: keyof JobData, value: string) => {
     if (!value.trim()) return;
-    setJobData(prev => ({
+    setJobData((prev) => ({
       ...prev,
-      [field]: [...(prev[field] as string[] || []), value]
+      [field]: [...((prev[field] as string[]) || []), value],
     }));
   };
 
   const handleArrayRemove = (field: keyof JobData, index: number) => {
-    setJobData(prev => ({
+    setJobData((prev) => ({
       ...prev,
-      [field]: (prev[field] as string[])?.filter((_, i) => i !== index) || []
+      [field]: (prev[field] as string[])?.filter((_, i) => i !== index) || [],
     }));
   };
 
   const handleOptimize = () => {
     setIsGenerating(true);
     setTimeout(() => {
-      setAiInsights(prev => ({
+      setAiInsights((prev) => ({
         ...prev,
         clarityScore: Math.min(100, prev.clarityScore + 5),
-        suggestions: prev.suggestions.slice(0, -1)
+        suggestions: prev.suggestions.slice(0, -1),
       }));
       setIsGenerating(false);
     }, 1500);
   };
 
   const handleScreeningQuestionsChange = (questions: ScreeningQuestion[]) => {
-    setJobData(prev => ({
+    setJobData((prev) => ({
       ...prev,
-      screeningQuestions: questions
+      screeningQuestions: questions,
     }));
   };
 
   const handlePublish = () => {
-    setStep('published');
+    setStep("published");
     // Simulate post-publish metrics
     setTimeout(() => {
       setPostMetrics({
         views: 45,
         applications: 3,
-        avgTimeToApply: '2 days',
-        conversionRate: 6.7
+        avgTimeToApply: "2 days",
+        conversionRate: 6.7,
       });
     }, 1000);
   };
 
   const handleSaveDraft = () => {
-    console.log('Saving draft:', jobData);
+    console.log("Saving draft:", jobData);
   };
 
   // ========================================
   // STEP-BASED RENDERING (checked first)
   // ========================================
-  
+
   // Published State
-  if (step === 'published') {
+  if (step === "published") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <div className="glass-strong border-b border-glass-border">
           <div className="max-w-5xl mx-auto px-6 py-6">
-            <Button
-              variant="ghost"
-              className="mb-4 text-muted-foreground hover:text-foreground"
-            >
+            <Button variant="ghost" className="mb-4 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Jobs
             </Button>
@@ -230,10 +193,8 @@ export function JobPostingPage({ }: JobPostingPageProps) {
               <CheckCircle2 className="w-8 h-8 text-neon-green" />
             </div>
             <h2 className="text-2xl font-bold mb-2">Job Posted Successfully! 🎉</h2>
-            <p className="text-muted-foreground mb-6">
-              Your job posting is now live and visible to {aiInsights.talentPoolSize.toLocaleString()} potential candidates
-            </p>
-            
+            <p className="text-muted-foreground mb-6">Your job posting is now live and visible to {aiInsights.talentPoolSize.toLocaleString()} potential candidates</p>
+
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button className="gradient-animated">
                 <Eye className="w-4 h-4 mr-2" />
@@ -311,9 +272,7 @@ export function JobPostingPage({ }: JobPostingPageProps) {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <h4 className="font-medium mb-1">Add Benefits Section</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Job posts with benefits listed get 35% more applications
-                    </p>
+                    <p className="text-sm text-muted-foreground">Job posts with benefits listed get 35% more applications</p>
                   </div>
                   <Button size="sm" className="gradient-animated">
                     Add Now
@@ -325,9 +284,7 @@ export function JobPostingPage({ }: JobPostingPageProps) {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <h4 className="font-medium mb-1">Specify Salary Range</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Posts with transparent salary get 2.3x more quality applicants
-                    </p>
+                    <p className="text-sm text-muted-foreground">Posts with transparent salary get 2.3x more quality applicants</p>
                   </div>
                   <Button size="sm" variant="outline" className="border-neon-cyan/30 text-neon-cyan">
                     Update
@@ -339,9 +296,7 @@ export function JobPostingPage({ }: JobPostingPageProps) {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <h4 className="font-medium mb-1">Make Title More Specific</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Try &quot;Senior Backend Engineer (Node.js)&quot; instead of generic title
-                    </p>
+                    <p className="text-sm text-muted-foreground">Try &quot;Senior Backend Engineer (Node.js)&quot; instead of generic title</p>
                   </div>
                   <Button size="sm" variant="outline" className="border-neon-cyan/30 text-neon-cyan">
                     Refine
@@ -356,33 +311,23 @@ export function JobPostingPage({ }: JobPostingPageProps) {
   }
 
   // Questions Step
-  if (step === 'questions') {
+  if (step === "questions") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <div className="glass-strong border-b border-glass-border">
           <div className="max-w-5xl mx-auto px-6 py-6">
-            <Button
-              variant="ghost"
-              onClick={() => setStep('review')}
-              className="mb-4 text-muted-foreground hover:text-foreground"
-            >
+            <Button variant="ghost" onClick={() => setStep("review")} className="mb-4 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Job Details
             </Button>
-            
+
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">
-                  Screening Questions
-                </h1>
-                <p className="text-muted-foreground mt-2">
-                  Pre-screen candidates with smart questions and AI-powered evaluation
-                </p>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Screening Questions</h1>
+                <p className="text-muted-foreground mt-2">Pre-screen candidates with smart questions and AI-powered evaluation</p>
               </div>
-              
-              <Badge className="bg-neon-cyan/20 text-neon-cyan border-0">
-                {jobData.screeningQuestions?.length || 0} Questions
-              </Badge>
+
+              <Badge className="bg-neon-cyan/20 text-neon-cyan border-0">{jobData.screeningQuestions?.length || 0} Questions</Badge>
             </div>
           </div>
         </div>
@@ -399,18 +344,11 @@ export function JobPostingPage({ }: JobPostingPageProps) {
 
             {/* Action Buttons */}
             <div className="flex gap-3 mt-6 pt-6 border-t border-glass-border">
-              <Button
-                variant="outline"
-                onClick={handleSaveDraft}
-                className="flex-1 border-neon-cyan/30 text-neon-cyan"
-              >
+              <Button variant="outline" onClick={handleSaveDraft} className="flex-1 border-neon-cyan/30 text-neon-cyan">
                 <Save className="w-4 h-4 mr-2" />
                 Save as Draft
               </Button>
-              <Button
-                onClick={() => setStep('final-review')}
-                className="flex-1 gradient-animated"
-              >
+              <Button onClick={() => setStep("final-review")} className="flex-1 gradient-animated">
                 Continue to Final Review
               </Button>
             </div>
@@ -421,30 +359,22 @@ export function JobPostingPage({ }: JobPostingPageProps) {
   }
 
   // Final Review Step (before publishing)
-  if (step === 'final-review') {
+  if (step === "final-review") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <div className="glass-strong border-b border-glass-border">
           <div className="max-w-5xl mx-auto px-6 py-6">
-            <Button
-              variant="ghost"
-              onClick={() => setStep('questions')}
-              className="mb-4 text-muted-foreground hover:text-foreground"
-            >
+            <Button variant="ghost" onClick={() => setStep("questions")} className="mb-4 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Questions
             </Button>
-            
+
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">
-                  Final Review
-                </h1>
-                <p className="text-muted-foreground mt-2">
-                  Review everything before publishing your job
-                </p>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Final Review</h1>
+                <p className="text-muted-foreground mt-2">Review everything before publishing your job</p>
               </div>
-              
+
               <Badge className="bg-neon-green/20 text-neon-green border-0">
                 <CheckCircle2 className="w-3 h-3 mr-1" />
                 Ready to Publish
@@ -484,9 +414,7 @@ export function JobPostingPage({ }: JobPostingPageProps) {
             <Card className="p-6 glass border-glass-border">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">Screening Questions</h3>
-                <Badge className="bg-neon-cyan/20 text-neon-cyan border-0">
-                  {jobData.screeningQuestions?.length || 0} Questions
-                </Badge>
+                <Badge className="bg-neon-cyan/20 text-neon-cyan border-0">{jobData.screeningQuestions?.length || 0} Questions</Badge>
               </div>
               {jobData.screeningQuestions && jobData.screeningQuestions.length > 0 ? (
                 <div className="space-y-2">
@@ -503,16 +431,10 @@ export function JobPostingPage({ }: JobPostingPageProps) {
                       <p className="text-sm">{q.question}</p>
                     </div>
                   ))}
-                  {jobData.screeningQuestions.length > 3 && (
-                    <p className="text-xs text-muted-foreground text-center py-2">
-                      +{jobData.screeningQuestions.length - 3} more questions
-                    </p>
-                  )}
+                  {jobData.screeningQuestions.length > 3 && <p className="text-xs text-muted-foreground text-center py-2">+{jobData.screeningQuestions.length - 3} more questions</p>}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No screening questions added
-                </p>
+                <p className="text-sm text-muted-foreground text-center py-4">No screening questions added</p>
               )}
             </Card>
 
@@ -537,18 +459,11 @@ export function JobPostingPage({ }: JobPostingPageProps) {
 
             {/* Action Buttons */}
             <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={handleSaveDraft}
-                className="flex-1 border-neon-cyan/30 text-neon-cyan"
-              >
+              <Button variant="outline" onClick={handleSaveDraft} className="flex-1 border-neon-cyan/30 text-neon-cyan">
                 <Save className="w-4 h-4 mr-2" />
                 Save as Draft
               </Button>
-              <Button
-                onClick={handlePublish}
-                className="flex-1 gradient-animated"
-              >
+              <Button onClick={handlePublish} className="flex-1 gradient-animated">
                 <Send className="w-4 h-4 mr-2" />
                 Publish Job Now
               </Button>
@@ -564,48 +479,37 @@ export function JobPostingPage({ }: JobPostingPageProps) {
   // ========================================
 
   // Mode Selection Screen
-  if (mode === 'select') {
+  if (mode === "select") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <div className="glass-strong border-b border-glass-border">
           <div className="max-w-5xl mx-auto px-6 py-6">
-            <Button
-              variant="ghost"
-              className="mb-4 text-muted-foreground hover:text-foreground"
-            >
+            <Button variant="ghost" className="mb-4 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Jobs
             </Button>
-            
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">
-              Post a Job
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Choose how you&apos;d like to create your job posting
-            </p>
+
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Post a Job</h1>
+            <p className="text-muted-foreground mt-2">Choose how you&apos;d like to create your job posting</p>
           </div>
         </div>
 
         <div className="max-w-5xl mx-auto px-6 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* AI Co-Pilot Option */}
-            <Card 
+            <Card
               className="p-8 glass border-glass-border cursor-pointer hover:border-neon-purple/50 transition-all duration-300 hover:shadow-lg hover:shadow-neon-purple/10 hover:-translate-y-1"
-              onClick={() => setMode('ai-copilot')}
+              onClick={() => setMode("ai-copilot")}
             >
               <div className="flex flex-col items-center text-center">
                 <div className="w-16 h-16 rounded-2xl gradient-animated flex items-center justify-center mb-4">
                   <Sparkles className="w-8 h-8 text-black" />
                 </div>
-                
+
                 <h3 className="text-xl font-semibold mb-2">AI Co-Pilot</h3>
-                <Badge className="mb-4 bg-neon-purple/20 text-neon-purple border-0">
-                  Recommended • 2-3 min
-                </Badge>
-                
-                <p className="text-muted-foreground text-sm mb-6">
-                  Describe your role in 1-2 sentences and let AI generate a complete job description with all the details.
-                </p>
+                <Badge className="mb-4 bg-neon-purple/20 text-neon-purple border-0">Recommended • 2-3 min</Badge>
+
+                <p className="text-muted-foreground text-sm mb-6">Describe your role in 1-2 sentences and let AI generate a complete job description with all the details.</p>
 
                 <div className="space-y-2 text-sm text-left w-full">
                   <div className="flex items-start gap-2">
@@ -634,23 +538,19 @@ export function JobPostingPage({ }: JobPostingPageProps) {
             </Card>
 
             {/* Manual Entry Option */}
-            <Card 
+            <Card
               className="p-8 glass border-glass-border cursor-pointer hover:border-neon-cyan/50 transition-all duration-300 hover:shadow-lg hover:shadow-neon-cyan/10 hover:-translate-y-1"
-              onClick={() => setMode('manual')}
+              onClick={() => setMode("manual")}
             >
               <div className="flex flex-col items-center text-center">
                 <div className="w-16 h-16 rounded-2xl bg-neon-cyan/20 border-2 border-neon-cyan/30 flex items-center justify-center mb-4">
                   <FileText className="w-8 h-8 text-neon-cyan" />
                 </div>
-                
+
                 <h3 className="text-xl font-semibold mb-2">Manual Entry</h3>
-                <Badge className="mb-4 bg-white/5 text-muted-foreground border-0">
-                  Classic • 5-10 min
-                </Badge>
-                
-                <p className="text-muted-foreground text-sm mb-6">
-                  Fill out standard fields with full control over every detail. AI will assist you along the way.
-                </p>
+                <Badge className="mb-4 bg-white/5 text-muted-foreground border-0">Classic • 5-10 min</Badge>
+
+                <p className="text-muted-foreground text-sm mb-6">Fill out standard fields with full control over every detail. AI will assist you along the way.</p>
 
                 <div className="space-y-2 text-sm text-left w-full">
                   <div className="flex items-start gap-2">
@@ -671,10 +571,7 @@ export function JobPostingPage({ }: JobPostingPageProps) {
                   </div>
                 </div>
 
-                <Button 
-                  variant="outline" 
-                  className="w-full mt-6 border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10"
-                >
+                <Button variant="outline" className="w-full mt-6 border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10">
                   <FileText className="w-4 h-4 mr-2" />
                   Manual Entry
                 </Button>
@@ -684,9 +581,7 @@ export function JobPostingPage({ }: JobPostingPageProps) {
 
           {/* Trust Indicators */}
           <div className="mt-12 text-center">
-            <p className="text-sm text-muted-foreground mb-4">
-              Trusted by 10,000+ companies worldwide
-            </p>
+            <p className="text-sm text-muted-foreground mb-4">Trusted by 10,000+ companies worldwide</p>
             <div className="flex items-center justify-center gap-8 flex-wrap">
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-neon-green" />
@@ -708,31 +603,23 @@ export function JobPostingPage({ }: JobPostingPageProps) {
   }
 
   // AI Co-Pilot Mode
-  if (mode === 'ai-copilot') {
+  if (mode === "ai-copilot") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <div className="glass-strong border-b border-glass-border">
           <div className="max-w-5xl mx-auto px-6 py-6">
-            <Button
-              variant="ghost"
-              onClick={() => step === 'input' ? setMode('select') : setStep('input')}
-              className="mb-4 text-muted-foreground hover:text-foreground"
-            >
+            <Button variant="ghost" onClick={() => (step === "input" ? setMode("select") : setStep("input"))} className="mb-4 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
-            
+
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">
-                  AI Co-Pilot
-                </h1>
-                <p className="text-muted-foreground mt-2">
-                  {step === 'input' ? 'Describe your role and let AI do the rest' : 'Review and refine your job posting'}
-                </p>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">AI Co-Pilot</h1>
+                <p className="text-muted-foreground mt-2">{step === "input" ? "Describe your role and let AI do the rest" : "Review and refine your job posting"}</p>
               </div>
-              
-              {step === 'review' && (
+
+              {step === "review" && (
                 <Badge className="bg-neon-green/20 text-neon-green border-0">
                   <CheckCircle2 className="w-3 h-3 mr-1" />
                   Ready to Publish
@@ -743,7 +630,7 @@ export function JobPostingPage({ }: JobPostingPageProps) {
         </div>
 
         <div className="max-w-5xl mx-auto px-6 py-8">
-          {step === 'input' ? (
+          {step === "input" ? (
             <>
               {/* AI Prompt Input */}
               <Card className="p-6 glass border-glass-border mb-6">
@@ -760,15 +647,9 @@ export function JobPostingPage({ }: JobPostingPageProps) {
                 />
 
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">
-                    💡 Tip: Include experience level, key skills, and main responsibilities
-                  </p>
-                  
-                  <Button
-                    onClick={handleAIGenerate}
-                    disabled={!aiPrompt.trim() || isGenerating}
-                    className="gradient-animated"
-                  >
+                  <p className="text-sm text-muted-foreground">💡 Tip: Include experience level, key skills, and main responsibilities</p>
+
+                  <Button onClick={handleAIGenerate} disabled={!aiPrompt.trim() || isGenerating} className="gradient-animated">
                     {isGenerating ? (
                       <>
                         <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin mr-2" />
@@ -790,20 +671,11 @@ export function JobPostingPage({ }: JobPostingPageProps) {
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="font-semibold">Generated Job Description</h3>
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={handleAIGenerate}
-                        className="border-neon-purple/30 text-neon-purple"
-                      >
+                      <Button size="sm" variant="outline" onClick={handleAIGenerate} className="border-neon-purple/30 text-neon-purple">
                         <Wand2 className="w-3 h-3 mr-2" />
                         Regenerate
                       </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => setStep('review')}
-                        className="gradient-animated"
-                      >
+                      <Button size="sm" onClick={() => setStep("review")} className="gradient-animated">
                         Continue to Review
                       </Button>
                     </div>
@@ -887,25 +759,17 @@ export function JobPostingPage({ }: JobPostingPageProps) {
                   <div className="space-y-4">
                     <div>
                       <label className="text-sm font-medium mb-2 block">Job Title</label>
-                      <Input
-                        value={jobData.title}
-                        onChange={(e) => handleManualUpdate('title', e.target.value)}
-                        className="glass border-glass-border"
-                      />
+                      <Input value={jobData.title} onChange={(e) => handleManualUpdate("title", e.target.value)} className="glass border-glass-border" />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="text-sm font-medium mb-2 block">Location</label>
-                        <Input
-                          value={jobData.location}
-                          onChange={(e) => handleManualUpdate('location', e.target.value)}
-                          className="glass border-glass-border"
-                        />
+                        <Input value={jobData.location} onChange={(e) => handleManualUpdate("location", e.target.value)} className="glass border-glass-border" />
                       </div>
                       <div>
                         <label className="text-sm font-medium mb-2 block">Work Type</label>
-                        <Select value={jobData.workType} onValueChange={(value) => handleManualUpdate('workType', value)}>
+                        <Select value={jobData.workType} onValueChange={(value) => handleManualUpdate("workType", value)}>
                           <SelectTrigger className="glass border-glass-border">
                             <SelectValue />
                           </SelectTrigger>
@@ -921,28 +785,17 @@ export function JobPostingPage({ }: JobPostingPageProps) {
 
                     <div>
                       <label className="text-sm font-medium mb-2 block">Description</label>
-                      <Textarea
-                        value={jobData.description}
-                        onChange={(e) => handleManualUpdate('description', e.target.value)}
-                        className="glass border-glass-border min-h-24"
-                      />
+                      <Textarea value={jobData.description} onChange={(e) => handleManualUpdate("description", e.target.value)} className="glass border-glass-border min-h-24" />
                     </div>
 
                     <Separator />
 
                     <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={handleSaveDraft}
-                        className="flex-1 border-neon-cyan/30 text-neon-cyan"
-                      >
+                      <Button variant="outline" onClick={handleSaveDraft} className="flex-1 border-neon-cyan/30 text-neon-cyan">
                         <Save className="w-4 h-4 mr-2" />
                         Save as Draft
                       </Button>
-                      <Button
-                        onClick={() => setStep('questions')}
-                        className="flex-1 gradient-animated"
-                      >
+                      <Button onClick={() => setStep("questions")} className="flex-1 gradient-animated">
                         <HelpCircle className="w-4 h-4 mr-2" />
                         Add Screening Questions
                       </Button>
@@ -960,14 +813,9 @@ export function JobPostingPage({ }: JobPostingPageProps) {
                     <span className="text-xl font-bold text-neon-purple">{aiInsights.clarityScore}%</span>
                   </div>
                   <Progress value={aiInsights.clarityScore} className="h-2 mb-4" />
-                  
-                  <Button
-                    size="sm"
-                    onClick={handleOptimize}
-                    disabled={isGenerating}
-                    className="w-full gradient-animated"
-                  >
-                    {isGenerating ? 'Optimizing...' : 'Run AI Optimization'}
+
+                  <Button size="sm" onClick={handleOptimize} disabled={isGenerating} className="w-full gradient-animated">
+                    {isGenerating ? "Optimizing..." : "Run AI Optimization"}
                   </Button>
                 </Card>
 
@@ -999,9 +847,7 @@ export function JobPostingPage({ }: JobPostingPageProps) {
                   </div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xl font-bold">{aiInsights.diversityScore}%</span>
-                    <Badge className="bg-neon-green/20 text-neon-green border-0 text-xs">
-                      Excellent
-                    </Badge>
+                    <Badge className="bg-neon-green/20 text-neon-green border-0 text-xs">Excellent</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">No bias detected</p>
                 </Card>
@@ -1035,21 +881,13 @@ export function JobPostingPage({ }: JobPostingPageProps) {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
       <div className="glass-strong border-b border-glass-border">
         <div className="max-w-5xl mx-auto px-6 py-6">
-          <Button
-            variant="ghost"
-            onClick={() => setMode('select')}
-            className="mb-4 text-muted-foreground hover:text-foreground"
-          >
+          <Button variant="ghost" onClick={() => setMode("select")} className="mb-4 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
-          
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">
-            Manual Entry
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Fill out the job details with AI assistance
-          </p>
+
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Manual Entry</h1>
+          <p className="text-muted-foreground mt-2">Fill out the job details with AI assistance</p>
         </div>
       </div>
 
@@ -1062,34 +900,19 @@ export function JobPostingPage({ }: JobPostingPageProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Job Title *</label>
-                  <Input
-                    placeholder="e.g., Senior Backend Engineer"
-                    value={jobData.title}
-                    onChange={(e) => handleManualUpdate('title', e.target.value)}
-                    className="glass border-glass-border"
-                  />
+                  <Input placeholder="e.g., Senior Backend Engineer" value={jobData.title} onChange={(e) => handleManualUpdate("title", e.target.value)} className="glass border-glass-border" />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Company *</label>
-                  <Input
-                    placeholder="e.g., Qelsa Technologies"
-                    value={jobData.company}
-                    onChange={(e) => handleManualUpdate('company', e.target.value)}
-                    className="glass border-glass-border"
-                  />
+                  <Input placeholder="e.g., Qelsa Technologies" value={jobData.company} onChange={(e) => handleManualUpdate("company", e.target.value)} className="glass border-glass-border" />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Location *</label>
-                  <Input
-                    placeholder="e.g., San Francisco, CA"
-                    value={jobData.location}
-                    onChange={(e) => handleManualUpdate('location', e.target.value)}
-                    className="glass border-glass-border"
-                  />
+                  <Input placeholder="e.g., San Francisco, CA" value={jobData.location} onChange={(e) => handleManualUpdate("location", e.target.value)} className="glass border-glass-border" />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Work Type *</label>
-                  <Select value={jobData.workType} onValueChange={(value) => handleManualUpdate('workType', value)}>
+                  <Select value={jobData.workType} onValueChange={(value) => handleManualUpdate("workType", value)}>
                     <SelectTrigger className="glass border-glass-border">
                       <SelectValue />
                     </SelectTrigger>
@@ -1110,11 +933,7 @@ export function JobPostingPage({ }: JobPostingPageProps) {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium">Job Description *</label>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-neon-purple text-xs"
-                >
+                <Button size="sm" variant="ghost" className="text-neon-purple text-xs">
                   <Wand2 className="w-3 h-3 mr-1" />
                   AI Improve
                 </Button>
@@ -1122,7 +941,7 @@ export function JobPostingPage({ }: JobPostingPageProps) {
               <Textarea
                 placeholder="Describe the role, responsibilities, and what makes this position unique..."
                 value={jobData.description}
-                onChange={(e) => handleManualUpdate('description', e.target.value)}
+                onChange={(e) => handleManualUpdate("description", e.target.value)}
                 className="glass border-glass-border min-h-32"
               />
               {jobData.description && jobData.description.length < 100 && (
@@ -1134,19 +953,11 @@ export function JobPostingPage({ }: JobPostingPageProps) {
             </div>
 
             <div className="flex gap-3 pt-4">
-              <Button
-                variant="outline"
-                onClick={handleSaveDraft}
-                className="flex-1 border-neon-cyan/30 text-neon-cyan"
-              >
+              <Button variant="outline" onClick={handleSaveDraft} className="flex-1 border-neon-cyan/30 text-neon-cyan">
                 <Save className="w-4 h-4 mr-2" />
                 Save Draft
               </Button>
-              <Button
-                onClick={() => setStep('review')}
-                disabled={!jobData.title || !jobData.description}
-                className="flex-1 gradient-animated"
-              >
+              <Button onClick={() => setStep("review")} disabled={!jobData.title || !jobData.description} className="flex-1 gradient-animated">
                 Continue to Review
               </Button>
             </div>

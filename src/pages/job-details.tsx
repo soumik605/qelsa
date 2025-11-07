@@ -1,13 +1,7 @@
-import React from 'react'
-import Layout from '../layout'
-import { JobDetailPage } from '../components/JobDetailPage'
+import Layout from "../layout";
 
 const JobDetails = () => {
-  return (
-    <Layout activeSection={"jobs"}>
-      {/* <JobDetailPage job={selectedJob} /> */}
-    </Layout>
-  )
-}
+  return <Layout activeSection={"jobs"}>{/* <JobDetailPage job={selectedJob} /> */}</Layout>;
+};
 
-export default JobDetails
+export default JobDetails;
