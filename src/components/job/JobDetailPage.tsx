@@ -1,5 +1,4 @@
 import {
-  AlertCircle,
   AlertTriangle,
   ArrowLeft,
   Bookmark,
@@ -22,16 +21,17 @@ import {
   Play,
   Send,
   Share2,
-  Shield,
   Sparkles,
-  Star,
   Target,
   TrendingUp,
   Upload,
   X,
   Zap,
 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import DOMPurify from "dompurify";
+import { useGetJobByIdQuery } from "../../features/api/jobsApi";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
@@ -40,24 +40,32 @@ import { Input } from "../ui/input";
 import { Progress } from "../ui/progress";
 import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import type { Job } from "./JobListingPage";
 
-interface JobDetailPageProps {
-  job: Job;
-  onBack: () => void;
-  onApply?: (jobId: string) => void;
-  onSave?: (jobId: string) => void;
-  onShare?: (jobId: string) => void;
-}
-
-export function JobDetailPage({ job, onBack, onApply, onSave, onShare }: JobDetailPageProps) {
-  const [isSaved, setIsSaved] = useState(job.isSaved);
-  const [isApplied, setIsApplied] = useState(job.isApplied || false);
+export function JobDetailPage() {
+  const [isSaved, setIsSaved] = useState(false);
+  const [isApplied, setIsApplied] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [showChatWidget, setShowChatWidget] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
   const [resumeAnalysis, setResumeAnalysis] = useState<any>(null);
   const [selectedSkillsTab, setSelectedSkillsTab] = useState("match");
+
+  const router = useRouter();
+
+  const params = useParams<{ id: string }>();
+  const id = params?.id;
+
+  const {
+    data: job,
+    error,
+    isLoading,
+  } = useGetJobByIdQuery(id!, {
+    skip: !id,
+  });
+
+  if (!id || isLoading) return <p>Loading job...</p>;
+  if (error) return <p>Error loading job.</p>;
+  if (!job) return <p>No job found.</p>;
 
   const getWorkTypeIcon = (workType: string) => {
     switch (workType) {
@@ -87,17 +95,13 @@ export function JobDetailPage({ job, onBack, onApply, onSave, onShare }: JobDeta
 
   const handleSaveJob = () => {
     setIsSaved(!isSaved);
-    onSave?.(job.id);
   };
 
   const handleApplyJob = () => {
     setIsApplied(true);
-    onApply?.(job.id);
   };
 
-  const handleShareJob = () => {
-    onShare?.(job.id);
-  };
+  const handleShareJob = () => {};
 
   const handleUploadResume = () => {
     // Mock resume analysis
@@ -183,7 +187,7 @@ export function JobDetailPage({ job, onBack, onApply, onSave, onShare }: JobDeta
       <div className="glass-strong border-b border-glass-border sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={onBack} className="hover:bg-neon-cyan/10 hover:text-neon-cyan">
+            <Button variant="ghost" onClick={() => router.push("/jobs")} size="sm" className="hover:bg-neon-cyan/10 hover:text-neon-cyan">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Jobs
             </Button>
@@ -204,14 +208,14 @@ export function JobDetailPage({ job, onBack, onApply, onSave, onShare }: JobDeta
         {/* Core Information Section */}
         <Card className="glass border-glass-border p-8">
           <div className="flex items-start gap-6 mb-6">
-            {job.companyLogo && (
+            {job.company_logo && (
               <div className="relative flex-shrink-0">
-                <img src={job.companyLogo} alt={job.company} className="w-16 h-16 rounded-xl object-cover border border-glass-border" />
-                {job.source.verified && (
+                <img src={job.company_logo} alt={job.company_name} className="w-16 h-16 rounded-xl object-cover border border-glass-border" />
+                {/* {job.source.verified && (
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-neon-green rounded-full flex items-center justify-center">
                     <Shield className="w-3 h-3 text-black" />
                   </div>
-                )}
+                )} */}
               </div>
             )}
 
@@ -220,25 +224,25 @@ export function JobDetailPage({ job, onBack, onApply, onSave, onShare }: JobDeta
                 <div>
                   <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">{job.title}</h1>
                   <div className="flex items-center gap-3 mb-3">
-                    <h2 className="text-xl text-muted-foreground">{job.company}</h2>
-                    {job.companyRating && (
+                    <h2 className="text-xl text-muted-foreground">{job.company_name}</h2>
+                    {/* {job.companyRating && (
                       <div className="flex items-center gap-1">
                         <Star className="w-4 h-4 text-yellow-500 fill-current" />
                         <span className="text-sm">{job.companyRating}</span>
                         {job.companyReviews && <span className="text-sm text-muted-foreground">({job.companyReviews} reviews)</span>}
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
 
-                {job.isFraudulent && (
+                {/* {job.isFraudulent && (
                   <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
                     <div className="flex items-center gap-2 text-red-400">
                       <AlertCircle className="w-4 h-4" />
                       <span className="text-sm font-medium">Fraud Alert</span>
                     </div>
                   </div>
-                )}
+                )} */}
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -247,17 +251,17 @@ export function JobDetailPage({ job, onBack, onApply, onSave, onShare }: JobDeta
                   <span>{job.location}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  {getWorkTypeIcon(job.workType)}
-                  <span>{job.workType}</span>
+                  {getWorkTypeIcon(job.other_info.types.map((type) => type.name))}
+                  <span>{job.other_info.types.map((type) => type.name)}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Clock className="w-4 h-4 text-neon-purple" />
                   <span>{job.experience}</span>
                 </div>
-                {job.salary && (
+                {(job.max_salary || job.min_salary) && (
                   <div className="flex items-center gap-2 text-sm">
                     <DollarSign className="w-4 h-4 text-neon-green" />
-                    <span>{job.salary}</span>
+                    <span>{job.max_salary || job.min_salary}</span>
                   </div>
                 )}
               </div>
@@ -276,7 +280,7 @@ export function JobDetailPage({ job, onBack, onApply, onSave, onShare }: JobDeta
                   )}
                 </div>
 
-                <div className="flex items-center gap-2">
+                {/* <div className="flex items-center gap-2">
                   {getSourceIcon(job.source.platform)}
                   <span>{job.source.platform}</span>
                   {job.source.exclusive && (
@@ -284,7 +288,7 @@ export function JobDetailPage({ job, onBack, onApply, onSave, onShare }: JobDeta
                       Exclusive
                     </Badge>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -308,7 +312,7 @@ export function JobDetailPage({ job, onBack, onApply, onSave, onShare }: JobDeta
               </div>
             )}
             <div className="text-center">
-              <div className="text-2xl font-bold text-neon-yellow">{job.source.platform === "Qelsa" ? "High" : "Medium"}</div>
+              {/* <div className="text-2xl font-bold text-neon-yellow">{job.source.platform === "Qelsa" ? "High" : "Medium"}</div> */}
               <div className="text-sm text-muted-foreground">Priority</div>
             </div>
           </div>
@@ -506,8 +510,12 @@ export function JobDetailPage({ job, onBack, onApply, onSave, onShare }: JobDeta
           <div className="space-y-6">
             <div>
               <h4 className="font-medium text-neon-cyan mb-3">About the Role</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-4">{job.description || "Job description not available."}</p>
-
+<p
+  className="text-sm text-muted-foreground leading-relaxed mb-4"
+  dangerouslySetInnerHTML={{
+    __html: DOMPurify.sanitize(job.description || "Job description not available."),
+  }}
+/>
               {job.responsibilities && job.responsibilities.length > 0 && (
                 <ul className="space-y-2">
                   {job.responsibilities.map((responsibility, index) => (
@@ -699,7 +707,7 @@ export function JobDetailPage({ job, onBack, onApply, onSave, onShare }: JobDeta
                 ) : (
                   <Button onClick={handleApplyJob} className="w-full bg-neon-cyan hover:bg-neon-cyan/90 text-black font-medium">
                     <ExternalLink className="w-4 h-4 mr-2" />
-                    Apply on {job.source.platform}
+                    {/* Apply on {job.source.platform} */}
                   </Button>
                 )}
               </div>

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { JobAIAssistantDrawer } from "./JobAIAssistantDrawer";
 import { JobDiscoveryRails } from "./JobDiscoveryRails";
+import { useRouter } from "next/navigation";
 
 interface JobListingPageProps {
   jobs: any;
@@ -29,6 +30,8 @@ export function JobListingPage({ jobs }: JobListingPageProps) {
   const [viewMode, setViewMode] = useState<"discovery" | "all" | "my-jobs">("discovery");
   const [myJobsActiveTab, setMyJobsActiveTab] = useState<string>("saved");
 
+  const router = useRouter();
+
   // const filteredJobs = jobs.filter((job) => {
   //   const matchesSearch =
   //     job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -45,6 +48,8 @@ export function JobListingPage({ jobs }: JobListingPageProps) {
   const filteredJobs = [];
 
   const handleJobClick = (job) => {
+
+    router.push(`/jobs/${job.id}`)
     // Add to viewed jobs if not already viewed
     if (!viewedJobs.includes(job.id)) {
       setViewedJobs((prev) => [job.id, ...prev.slice(0, 4)]); // Keep last 5 viewed

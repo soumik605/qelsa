@@ -1,6 +1,6 @@
-import { JobListingPage } from "../components/job/JobListingPage";
-import { useGetJobsQuery } from "../features/api/jobsApi";
-import Layout from "../layout";
+import { JobListingPage } from "../../components/job/JobListingPage";
+import { useGetJobsQuery } from "../../features/api/jobsApi";
+import Layout from "../../layout";
 
 const Jobs = () => {
   const { data: jobs, error, isLoading } = useGetJobsQuery();

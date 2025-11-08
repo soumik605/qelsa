@@ -16,6 +16,7 @@ export const jobsApi = createApi({
     }),
     getJobById: builder.query<Job, string>({
       query: (id) => `jobs/${id}`,
+      transformResponse: (response: { success: boolean; data: Job }) => response.data,
     }),
     // Add more endpoints as needed for mutations, etc.
   }),
