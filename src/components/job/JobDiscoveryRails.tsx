@@ -12,7 +12,7 @@ interface Rail {
   description: string;
   icon: any;
   color: "cyan" | "purple" | "pink" | "green" | "yellow";
-  jobs: Job[];
+  jobs?: Job[];
   isPinned: boolean;
   isHidden: boolean;
   category: "personalized" | "momentum" | "strategic" | "context" | "social" | "hygiene";
@@ -66,7 +66,6 @@ export function JobDiscoveryRails({ onJobClick, onToggleCompare, comparedJobs = 
         category: "personalized",
         isPinned: true,
         isHidden: false,
-        jobs: jobs,
       },
       {
         id: "based-skills",
@@ -77,7 +76,6 @@ export function JobDiscoveryRails({ onJobClick, onToggleCompare, comparedJobs = 
         category: "personalized",
         isPinned: false,
         isHidden: false,
-        jobs: jobs,
       },
     ];
   }
@@ -96,6 +94,7 @@ export function JobDiscoveryRails({ onJobClick, onToggleCompare, comparedJobs = 
           onScroll={scroll}
           onTogglePin={togglePin}
           onToggleHide={toggleHide}
+          jobs={jobs}
         />
       ))}
 
@@ -118,9 +117,10 @@ interface RailSectionProps {
   onScroll: (railId: string, direction: "left" | "right") => void;
   onTogglePin: (railId: string) => void;
   onToggleHide: (railId: string) => void;
+  jobs: Job[]
 }
 
-function RailSection({ rail, onJobClick, onToggleCompare, comparedJobs, onScroll, onTogglePin, onToggleHide }: RailSectionProps) {
+function RailSection({ rail, onJobClick, onToggleCompare, comparedJobs, onScroll, onTogglePin, onToggleHide, jobs }: RailSectionProps) {
   const Icon = rail.icon;
   const colorClasses = {
     cyan: "text-neon-cyan",
@@ -180,7 +180,7 @@ function RailSection({ rail, onJobClick, onToggleCompare, comparedJobs, onScroll
       {/* Job Cards Carousel */}
       <div className="relative">
         <div id={`rail-${rail.id}`} className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-          {rail.jobs.map((job) => (
+          {jobs.map((job) => (
             <JobRailCard key={job.id} job={job} onClick={() => onJobClick(job)} onToggleCompare={onToggleCompare} isCompared={comparedJobs.some((j) => j.id === job.id)} />
           ))}
         </div>

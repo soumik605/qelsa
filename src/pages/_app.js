@@ -1,11 +1,14 @@
 import { Provider } from "react-redux";
-import "../../src/styles/globals.css";
+import "../styles/globals.css";
 import { store } from "../store";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function App({ Component, pageProps }) {
   return (
     <Provider store={store}>
-      <Component {...pageProps} />;
+      <ProtectedRoute>
+        <Component {...pageProps} />
+      </ProtectedRoute>
     </Provider>
   );
 }

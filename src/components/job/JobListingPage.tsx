@@ -13,10 +13,11 @@ import { useRouter } from "next/navigation";
 
 interface JobListingPageProps {
   jobs: any;
+  filters: any;
+  setFilters: any;
 }
 
-export function JobListingPage({ jobs }: JobListingPageProps) {
-  console.log("🚀 ~ JobListingPage ~ jobs:", jobs);
+export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
   const [experienceFilter, setExperienceFilter] = useState("all");
@@ -48,8 +49,7 @@ export function JobListingPage({ jobs }: JobListingPageProps) {
   const filteredJobs = [];
 
   const handleJobClick = (job) => {
-
-    router.push(`/jobs/${job.id}`)
+    router.push(`/jobs/${job.id}`);
     // Add to viewed jobs if not already viewed
     if (!viewedJobs.includes(job.id)) {
       setViewedJobs((prev) => [job.id, ...prev.slice(0, 4)]); // Keep last 5 viewed
@@ -139,7 +139,12 @@ export function JobListingPage({ jobs }: JobListingPageProps) {
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input placeholder="Search for jobs, companies, or skills..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 glass border-glass-border" />
+                <Input
+                  placeholder="Search for jobs, companies, or skills..."
+                  value={filters.search}
+                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                  className="pl-10 glass border-glass-border"
+                />
               </div>
             </div>
 

@@ -8,6 +8,7 @@ import { SocialFeed } from "../components/SocialFeed";
 import { MySpacePage } from "../components/MySpacePage";
 import { Provider } from "react-redux";
 import { store } from "../store";
+import { useGetProfileQuery } from "../features/api/authApi";
 
 interface ResponseData {
   id: string;
@@ -46,6 +47,22 @@ export default function App() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(true);
   const scrollTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const [token, setToken] = useState(null);
+
+  // ✅ Access localStorage safely in client
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setToken(localStorage.getItem("accessToken"));
+    }
+  }, []);
+
+  // ✅ Only call query once token is available
+  const { data: user, isFetching } = useGetProfileQuery(undefined, {
+    skip: !token,
+  });
+
+
 
   useEffect(() => {
     const hasCompletedOnboarding = localStorage.getItem("qelsa-onboarding-completed");
