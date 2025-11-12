@@ -1,4 +1,6 @@
+import { useGetCitiesQuery, useGetJobsQuery, useGetJobTypesQuery } from "@/features/api/jobsApi";
 import { Bookmark, BookmarkCheck, Briefcase, Building2, Eye, Filter, Globe, Home, MapPin, Plus, Search, Sparkles, Target } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { MyJobsPage } from "../MyJobsPage";
 import { Badge } from "../ui/badge";
@@ -9,15 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { JobAIAssistantDrawer } from "./JobAIAssistantDrawer";
 import { JobDiscoveryRails } from "./JobDiscoveryRails";
-import { useRouter } from "next/navigation";
+import { JobSearchSuggestions } from "./JobSearchSuggestions";
 
-interface JobListingPageProps {
-  jobs: any;
-  filters: any;
-  setFilters: any;
-}
-
-export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProps) {
+export function JobListingPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
   const [experienceFilter, setExperienceFilter] = useState("all");
@@ -28,10 +24,30 @@ export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProp
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [aiAssistantJob, setAiAssistantJob] = useState(null);
-  const [viewMode, setViewMode] = useState<"discovery" | "all" | "my-jobs">("discovery");
+  const [viewMode, setViewMode] = useState<"discover" | "all" | "my-jobs">("discover");
   const [myJobsActiveTab, setMyJobsActiveTab] = useState<string>("saved");
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
 
   const router = useRouter();
+
+  const {
+    data: jobResp,
+    error,
+    isLoading,
+  } = useGetJobsQuery({
+    search: searchQuery,
+    city: locationFilter,
+    company: "",
+  });
+
+  const { data: cities, error: cityError, isLoading: cityLoading } = useGetCitiesQuery({});
+  const { data: jobTypes, error: typeError, isLoading: typeLoading } = useGetJobTypesQuery({});
+
+  const jobs = jobResp?.data;
+
+  if (isLoading) return <p>Loading jobs...</p>;
+  if (error) return <p>Error loading jobs.</p>;
+  if (!jobs) return <>No jobs</>;
 
   // const filteredJobs = jobs.filter((job) => {
   //   const matchesSearch =
@@ -62,14 +78,7 @@ export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProp
     // onJobClick?.(job);
   };
 
-  const handleSaveJob = (jobId: string) => {
-    setSavedJobs((prev) => (prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [...prev, jobId]));
-
-    // Update the job's saved status
-    const jobIndex = jobs.findIndex((job) => job.id === jobId);
-    if (jobIndex !== -1) {
-      jobs[jobIndex].isSaved = !jobs[jobIndex].isSaved;
-    }
+  const handleSaveJob = (jobId: number) => {
   };
 
   const handleSelectJob = (jobId: string) => {
@@ -136,16 +145,30 @@ export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProp
 
           {/* Search and Filters */}
           <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
+            <div className="flex-1 relative search-container z-[9999]">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Search for jobs, companies, or skills..."
-                  value={filters.search}
-                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                  className="pl-10 glass border-glass-border"
-                />
+                <Input placeholder="Search for jobs, companies, or skills..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 glass border-glass-border" />
               </div>
+
+              {/* Search Suggestions Dropdown */}
+              {showSearchSuggestions && searchQuery.length >= 2 && (
+                <JobSearchSuggestions
+                  query={searchQuery}
+                  allJobs={jobs}
+                  onSelectSuggestion={(suggestion) => {
+                    if (Search) {
+                      // onSearch(suggestion, jobs);
+                      setShowSearchSuggestions(false);
+                      setSearchQuery("");
+                    }
+                  }}
+                  onSelectJob={(job) => {
+                    handleJobClick(job);
+                    setShowSearchSuggestions(false);
+                  }}
+                />
+              )}
             </div>
 
             <div className="flex gap-3">
@@ -153,11 +176,13 @@ export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProp
                 <SelectTrigger className="w-40 glass border-glass-border">
                   <SelectValue placeholder="Location" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="glass-strong border-glass-border z-50">
                   <SelectItem value="all">All Locations</SelectItem>
-                  <SelectItem value="san francisco">San Francisco</SelectItem>
-                  <SelectItem value="new york">New York</SelectItem>
-                  <SelectItem value="remote">Remote</SelectItem>
+                  {cities?.map((city: string) => (
+                    <SelectItem key={city} value={city}>
+                      {city}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -165,24 +190,25 @@ export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProp
                 <SelectTrigger className="w-32 glass border-glass-border">
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="glass-strong border-glass-border z-50">
                   <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="Full-time">Full-time</SelectItem>
-                  <SelectItem value="Part-time">Part-time</SelectItem>
-                  <SelectItem value="Contract">Contract</SelectItem>
-                  <SelectItem value="Remote">Remote</SelectItem>
+                  {jobTypes.map((type: string) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
-              <Select value={sortBy} onValueChange={setSortBy}>
+              <Select value={experienceFilter} onValueChange={setExperienceFilter}>
                 <SelectTrigger className="w-32 glass border-glass-border">
-                  <SelectValue placeholder="Sort by" />
+                  <SelectValue placeholder="Experience" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="relevance">Relevance</SelectItem>
-                  <SelectItem value="date">Date Posted</SelectItem>
-                  <SelectItem value="salary">Salary</SelectItem>
-                  <SelectItem value="fit">AI Fit Score</SelectItem>
+                <SelectContent className="glass-strong border-glass-border z-50">
+                  <SelectItem value="all">All Experience Levels</SelectItem>
+                  <SelectItem value="1-3 years">1-3 years</SelectItem>
+                  <SelectItem value="3-5 years">3-5 years</SelectItem>
+                  <SelectItem value="5-7 years">5-7 years</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -190,9 +216,9 @@ export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProp
 
           {/* View Mode Tabs */}
           <div className="mt-6">
-            <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "discovery" | "all" | "my-jobs")}>
+            <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "discover" | "all" | "my-jobs")}>
               <TabsList className="glass-strong border-glass-border">
-                <TabsTrigger value="discovery" className="data-[state=active]:bg-neon-cyan/20 data-[state=active]:text-neon-cyan">
+                <TabsTrigger value="discover" className="data-[state=active]:bg-neon-cyan/20 data-[state=active]:text-neon-cyan">
                   <Sparkles className="w-4 h-4 mr-2" />
                   Discover
                 </TabsTrigger>
@@ -218,7 +244,7 @@ export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProp
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {viewMode === "discovery" ? (
+        {viewMode === "discover" ? (
           /* Discovery Rails View - Full Width */
           <JobDiscoveryRails onJobClick={handleJobClick} jobs={jobs} />
         ) : viewMode === "my-jobs" ? (
@@ -242,6 +268,7 @@ export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProp
                   {searchQuery && <div>Search: &quot;{searchQuery}&quot;</div>}
                   {locationFilter && locationFilter !== "all" && <div>Location: {locationFilter}</div>}
                   {workTypeFilter && workTypeFilter !== "all" && <div>Type: {workTypeFilter}</div>}
+                  {experienceFilter && experienceFilter !== "all" && <div>Experience: {experienceFilter}</div>}
                 </div>
               </Card>
 
@@ -259,7 +286,7 @@ export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProp
                       return (
                         <div key={job.id} className="text-sm p-2 rounded glass-strong border border-glass-border">
                           <div className="font-medium line-clamp-1">{job.title}</div>
-                          <div className="text-muted-foreground text-xs">{job.company}</div>
+                          <div className="text-muted-foreground text-xs">{job.company_name}</div>
                         </div>
                       );
                     })}
@@ -289,10 +316,10 @@ export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProp
                           style={{ minHeight: "140px" }}
                         >
                           <div className="flex items-start gap-3 mb-3">
-                            {job.companyLogo && <img src={job.companyLogo} alt={job.company} className="w-10 h-10 rounded-lg object-cover border border-glass-border flex-shrink-0" />}
+                            {job.company_logo && <img src={job.company_logo} alt={job.company_name} className="w-10 h-10 rounded-lg object-cover border border-glass-border flex-shrink-0" />}
                             <div className="flex-1 min-w-0">
                               <h4 className="font-medium text-sm line-clamp-2 mb-1">{job.title}</h4>
-                              <p className="text-xs text-muted-foreground line-clamp-1">{job.company}</p>
+                              <p className="text-xs text-muted-foreground line-clamp-1">{job.company_name}</p>
                             </div>
                           </div>
                           <div className="flex items-center justify-between">
@@ -326,14 +353,14 @@ export function JobListingPage({ jobs, filters, setFilters }: JobListingPageProp
                     <div className="p-5 flex flex-col flex-1">
                       {/* Header - Company Logo, Title, Company Name */}
                       <div className="flex items-start gap-3 mb-4">
-                        {job.companyLogo && (
+                        {job.company_logo && (
                           <div className="flex-shrink-0">
-                            <img src={job.companyLogo} alt={job.company} className="w-12 h-12 rounded-xl object-cover border border-glass-border shadow-sm" />
+                            <img src={job.company_logo} alt={job.company_name} className="w-12 h-12 rounded-xl object-cover border border-glass-border shadow-sm" />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-base line-clamp-2 mb-1 group-hover:text-neon-cyan transition-colors">{job.title}</h3>
-                          <p className="text-sm text-muted-foreground line-clamp-1">{job.company}</p>
+                          <p className="text-sm text-muted-foreground line-clamp-1">{job.company_name}</p>
                         </div>
                         <div className="flex flex-col gap-1 flex-shrink-0">
                           {/* {onToggleCompare && (
