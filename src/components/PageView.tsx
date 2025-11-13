@@ -1,152 +1,49 @@
-import { useState } from 'react';
-import {
-  ArrowLeft,
-  Globe,
-  MapPin,
-  Users,
-  Briefcase,
-  FileText,
-  FolderOpen,
-  UserPlus,
-  Share2,
-  Building2,
-  Linkedin,
-  Twitter,
-  Instagram,
-  Facebook,
-  Youtube,
-  CheckCircle2,
-  Eye,
-  MessageCircle,
-  Sparkles,
-  Send
-} from 'lucide-react';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Separator } from './ui/separator';
-import { Avatar } from './ui/avatar';
-import { Input } from './ui/input';
+import { useGetPageByIdQuery } from "@/features/api/pagesApi";
+import { ArrowLeft, Building2, CheckCircle2, Eye, Globe, Instagram, Linkedin, MapPin, MessageCircle, Send, Share2, Sparkles, Twitter, UserPlus, Users } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Card } from "./ui/card";
+import { Input } from "./ui/input";
+import { Separator } from "./ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
-interface PageViewProps {
-  pageId: string;
-  isAdmin?: boolean;
-}
+export function PageView() {
+  const router = useRouter();
+  const params = useParams();
 
-export function PageView({ pageId, isAdmin = false }: PageViewProps) {
+  // ✅ Normalize id (handle both string and array cases)
+  const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
+
   const [isFollowing, setIsFollowing] = useState(false);
   const [showAIChat, setShowAIChat] = useState(false);
-  const [aiQuestion, setAiQuestion] = useState('');
+  const [aiQuestion, setAiQuestion] = useState("");
 
-  // Mock page data
-  const pageData = {
-    id: pageId,
-    name: 'TechCorp Solutions',
-    type: 'company',
-    tagline: 'Building the future of enterprise software',
-    description: `TechCorp Solutions is a forward-thinking technology company dedicated to creating innovative solutions that empower businesses and individuals. With a focus on cutting-edge technology and exceptional user experience, we're building products that make a difference.
+  const {
+    data: pageData,
+    isLoading,
+    error,
+  } = useGetPageByIdQuery(id ?? "", {
+    skip: !id,
+  });
 
-Our mission is to leverage technology to solve complex problems and create meaningful impact. We believe in fostering a culture of innovation, collaboration, and continuous learning.`,
-    industry: 'Technology',
-    location: 'San Francisco, CA',
-    founded: '2018',
-    size: '50-200 employees',
-    website: 'https://techcorp.example.com',
-    followers: 12450,
-    socialLinks: {
-      linkedin: 'https://linkedin.com/company/techcorp',
-      twitter: 'https://twitter.com/techcorp',
-      instagram: 'https://instagram.com/techcorp'
-    },
-    stats: {
-      activeJobs: 8,
-      totalUpdates: 145,
-      teamMembers: 12
-    }
-  };
+  console.log("🚀 ~ PageView ~ pageData:", pageData);
 
-  const jobs = [
-    {
-      id: '1',
-      title: 'Senior Backend Engineer',
-      location: 'San Francisco, CA (Remote)',
-      type: 'Full-time',
-      experience: '3-5 years',
-      salary: '$130k - $170k',
-      postedDate: '2 days ago',
-      applicants: 45
-    },
-    {
-      id: '2',
-      title: 'Product Designer',
-      location: 'Remote',
-      type: 'Full-time',
-      experience: '2-4 years',
-      salary: '$110k - $150k',
-      postedDate: '1 week ago',
-      applicants: 32
-    },
-    {
-      id: '3',
-      title: 'DevOps Engineer',
-      location: 'New York, NY (Hybrid)',
-      type: 'Full-time',
-      experience: '4-6 years',
-      salary: '$140k - $180k',
-      postedDate: '3 days ago',
-      applicants: 28
-    }
-  ];
+  if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading page details...</div>;
 
-  const updates = [
-    {
-      id: '1',
-      type: 'announcement',
-      title: 'Excited to announce our Series B funding round!',
-      content: 'We\'re thrilled to share that TechCorp has raised $25M in Series B funding to accelerate our growth and expand our product offerings.',
-      date: '3 days ago',
-      likes: 234,
-      comments: 45
-    },
-    {
-      id: '2',
-      type: 'culture',
-      title: 'Team offsite in Lake Tahoe',
-      content: 'Our engineering team had an amazing time at our quarterly offsite. Great discussions, team bonding, and beautiful views!',
-      date: '1 week ago',
-      likes: 156,
-      comments: 23
-    }
-  ];
+  if (error) return <div className="p-8 text-center text-destructive">Failed to load page details.</div>;
 
-  const projects = [
-    {
-      id: '1',
-      title: 'Enterprise Cloud Platform',
-      description: 'A scalable cloud infrastructure solution for enterprise clients',
-      tech: ['AWS', 'Kubernetes', 'Terraform'],
-      image: null
-    },
-    {
-      id: '2',
-      title: 'AI Analytics Dashboard',
-      description: 'Real-time analytics powered by machine learning',
-      tech: ['Python', 'TensorFlow', 'React'],
-      image: null
-    }
-  ];
+  if (!pageData) return <div className="p-8 text-center text-muted-foreground">Page not found.</div>;
 
-  const teamMembers = [
-    { id: '1', name: 'Sarah Chen', role: 'CEO & Founder', avatar: null },
-    { id: '2', name: 'Marcus Johnson', role: 'CTO', avatar: null },
-    { id: '3', name: 'Elena Rodriguez', role: 'Head of Product', avatar: null },
-    { id: '4', name: 'David Park', role: 'Engineering Lead', avatar: null }
-  ];
+  const jobs = [];
+  const updates = [];
+  const projects = [];
+  const teamMembers = [];
 
   const handleAIAsk = () => {
-    console.log('AI Question:', aiQuestion);
-    setAiQuestion('');
+    console.log("AI Question:", aiQuestion);
+    setAiQuestion("");
   };
 
   return (
@@ -154,21 +51,16 @@ Our mission is to leverage technology to solve complex problems and create meani
       {/* Banner */}
       <div className="relative h-64 bg-gradient-to-r from-neon-cyan/20 via-neon-purple/20 to-neon-pink/20 border-b border-glass-border">
         <div className="absolute top-6 left-6">
-          <Button
-            variant="ghost"
-            className="glass-strong text-white hover:text-foreground"
-          >
+          <Button variant="ghost" className="glass-strong text-white hover:text-foreground" onClick={() => router.push("/pages")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
         </div>
-        {isAdmin && (
+        {/* {isAdmin && (
           <div className="absolute top-6 right-6">
-            <Button className="gradient-animated">
-              Edit Page
-            </Button>
+            <Button className="gradient-animated">Edit Page</Button>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Header */}
@@ -192,21 +84,17 @@ Our mission is to leverage technology to solve complex problems and create meani
                   </div>
                   <div className="flex items-center gap-1">
                     <MapPin className="w-4 h-4" />
-                    <span>{pageData.location}</span>
+                    {/* <span>{pageData.location}</span> */}
                   </div>
                   <div className="flex items-center gap-1">
                     <Users className="w-4 h-4" />
-                    <span>{pageData.followers.toLocaleString()} followers</span>
+                    {/* <span>{pageData.followers.toLocaleString()} followers</span> */}
                   </div>
                 </div>
               </div>
 
               <div className="flex gap-2">
-                <Button
-                  variant={isFollowing ? "outline" : "default"}
-                  onClick={() => setIsFollowing(!isFollowing)}
-                  className={isFollowing ? "border-neon-cyan/30 text-neon-cyan" : "gradient-animated"}
-                >
+                <Button variant={isFollowing ? "outline" : "default"} onClick={() => setIsFollowing(!isFollowing)} className={isFollowing ? "border-neon-cyan/30 text-neon-cyan" : "gradient-animated"}>
                   {isFollowing ? (
                     <>
                       <CheckCircle2 className="w-4 h-4 mr-2" />
@@ -235,17 +123,17 @@ Our mission is to leverage technology to solve complex problems and create meani
               Website
             </Button>
           )}
-          {pageData.socialLinks.linkedin && (
+          {pageData.linkedin_url && (
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-[#0077B5]">
               <Linkedin className="w-4 h-4" />
             </Button>
           )}
-          {pageData.socialLinks.twitter && (
+          {pageData.twitter_url && (
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-[#1DA1F2]">
               <Twitter className="w-4 h-4" />
             </Button>
           )}
-          {pageData.socialLinks.instagram && (
+          {pageData.instagram_url && (
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-[#E4405F]">
               <Instagram className="w-4 h-4" />
             </Button>
@@ -284,17 +172,17 @@ Our mission is to leverage technology to solve complex problems and create meani
                     <Separator />
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Company Size</span>
-                      <span className="font-medium">{pageData.size}</span>
+                      {/* <span className="font-medium">{pageData.size}</span> */}
                     </div>
                     <Separator />
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Founded</span>
-                      <span className="font-medium">{pageData.founded}</span>
+                      {/* <span className="font-medium">{pageData.founded}</span> */}
                     </div>
                     <Separator />
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Location</span>
-                      <span className="font-medium">{pageData.location}</span>
+                      {/* <span className="font-medium">{pageData.location}</span> */}
                     </div>
                   </div>
                 </Card>
@@ -303,18 +191,13 @@ Our mission is to leverage technology to solve complex problems and create meani
               {/* Jobs Tab */}
               <TabsContent value="jobs" className="space-y-4">
                 {jobs.map((job) => (
-                  <Card
-                    key={job.id}
-                    className="p-6 glass border-glass-border hover:border-neon-cyan/50 transition-all cursor-pointer"
-                  >
+                  <Card key={job.id} className="p-6 glass border-glass-border hover:border-neon-cyan/50 transition-all cursor-pointer">
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <h3 className="font-semibold mb-1">{job.title}</h3>
                         <p className="text-sm text-muted-foreground">{job.location}</p>
                       </div>
-                      <Badge className="bg-neon-green/20 text-neon-green border-0">
-                        {job.salary}
-                      </Badge>
+                      <Badge className="bg-neon-green/20 text-neon-green border-0">{job.salary}</Badge>
                     </div>
 
                     <div className="flex flex-wrap gap-2 mb-3">
@@ -345,7 +228,7 @@ Our mission is to leverage technology to solve complex problems and create meani
                         </div>
                         <h4 className="font-semibold mb-2">{update.title}</h4>
                         <p className="text-sm text-muted-foreground mb-3">{update.content}</p>
-                        
+
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <button className="flex items-center gap-1 hover:text-neon-pink transition-colors">
                             <Eye className="w-4 h-4" />
@@ -389,44 +272,29 @@ Our mission is to leverage technology to solve complex problems and create meani
                 <Sparkles className="w-5 h-5 text-neon-purple" />
                 <h3 className="font-semibold">AI Assistant</h3>
               </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                Ask me anything about our company, culture, hiring process, or benefits.
-              </p>
-              
+              <p className="text-sm text-muted-foreground mb-4">Ask me anything about our company, culture, hiring process, or benefits.</p>
+
               {showAIChat ? (
                 <div className="space-y-3">
                   <Input
                     placeholder="Ask a question..."
                     value={aiQuestion}
                     onChange={(e) => setAiQuestion(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAIAsk()}
+                    onKeyPress={(e) => e.key === "Enter" && handleAIAsk()}
                     className="glass border-glass-border"
                   />
                   <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={handleAIAsk}
-                      disabled={!aiQuestion.trim()}
-                      className="flex-1 gradient-animated"
-                    >
+                    <Button size="sm" onClick={handleAIAsk} disabled={!aiQuestion.trim()} className="flex-1 gradient-animated">
                       <Send className="w-3 h-3 mr-1" />
                       Ask
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setShowAIChat(false)}
-                      className="border-glass-border"
-                    >
+                    <Button size="sm" variant="outline" onClick={() => setShowAIChat(false)} className="border-glass-border">
                       Close
                     </Button>
                   </div>
                 </div>
               ) : (
-                <Button
-                  onClick={() => setShowAIChat(true)}
-                  className="w-full gradient-animated"
-                >
+                <Button onClick={() => setShowAIChat(true)} className="w-full gradient-animated">
                   <Sparkles className="w-4 h-4 mr-2" />
                   Ask AI
                 </Button>
@@ -440,9 +308,7 @@ Our mission is to leverage technology to solve complex problems and create meani
                 {teamMembers.slice(0, 4).map((member) => (
                   <div key={member.id} className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-r from-neon-cyan to-neon-purple flex items-center justify-center">
-                      <span className="text-sm font-bold text-black">
-                        {member.name.charAt(0)}
-                      </span>
+                      <span className="text-sm font-bold text-black">{member.name.charAt(0)}</span>
                     </div>
                     <div>
                       <p className="text-sm font-medium">{member.name}</p>
@@ -459,17 +325,17 @@ Our mission is to leverage technology to solve complex problems and create meani
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Followers</span>
-                  <span className="font-medium text-neon-cyan">{pageData.followers.toLocaleString()}</span>
+                  {/* <span className="font-medium text-neon-cyan">{pageData.followers.toLocaleString()}</span> */}
                 </div>
                 <Separator />
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Active Jobs</span>
-                  <span className="font-medium text-neon-purple">{pageData.stats.activeJobs}</span>
+                  {/* <span className="font-medium text-neon-purple">{pageData.stats.activeJobs}</span> */}
                 </div>
                 <Separator />
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Total Updates</span>
-                  <span className="font-medium text-neon-green">{pageData.stats.totalUpdates}</span>
+                  {/* <span className="font-medium text-neon-green">{pageData.stats.totalUpdates}</span> */}
                 </div>
               </div>
             </Card>

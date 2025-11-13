@@ -26,7 +26,7 @@ export default function Login() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-80 mx-auto mt-10">
       {message && <p className="text-red-500">{message}</p>}
-      <input name="email" placeholder="Email" onChange={handleChange} className="border p-2 rounded" />
+      <input name="email" type="email" placeholder="Email" onChange={handleChange} className="border p-2 rounded" />
       <input name="password" type="password" placeholder="Password" onChange={handleChange} className="border p-2 rounded" />
       <button type="submit" disabled={isLoading} className="bg-blue-600 text-white py-2 rounded disabled:opacity-50">
         {isLoading ? "Logging in..." : "Login"}

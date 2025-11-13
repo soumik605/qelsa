@@ -1,6 +1,6 @@
+import { PagesHub } from '@/components/PagesHub'
+import Layout from '@/layout'
 import React from 'react'
-import Layout from '../layout'
-import { PagesHub } from '../components/PagesHub'
 
 const Pages = () => {
   return (
