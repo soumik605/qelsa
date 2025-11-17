@@ -19,9 +19,9 @@ export function JobListingPage() {
   const [experienceFilter, setExperienceFilter] = useState("all");
   const [workTypeFilter, setWorkTypeFilter] = useState("all");
   const [sortBy, setSortBy] = useState("relevance");
-  const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
-  const [viewedJobs, setViewedJobs] = useState<string[]>([]);
-  const [savedJobs, setSavedJobs] = useState<string[]>([]);
+  const [selectedJobs, setSelectedJobs] = useState<number[]>([]);
+  const [viewedJobs, setViewedJobs] = useState<number[]>([]);
+  const [savedJobs, setSavedJobs] = useState<number[]>([]);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [aiAssistantJob, setAiAssistantJob] = useState(null);
   const [viewMode, setViewMode] = useState<"discover" | "all" | "my-jobs">("discover");
@@ -31,19 +31,17 @@ export function JobListingPage() {
   const router = useRouter();
 
   const {
-    data: jobResp,
+    data: jobs,
     error,
     isLoading,
   } = useGetJobsQuery({
     search: searchQuery,
     city: locationFilter,
-    company: "",
+    // company: "",
   });
 
-  const { data: cities, error: cityError, isLoading: cityLoading } = useGetCitiesQuery({});
-  const { data: jobTypes, error: typeError, isLoading: typeLoading } = useGetJobTypesQuery({});
-
-  const jobs = jobResp?.data;
+  const { data: cities, error: cityError, isLoading: cityLoading } = useGetCitiesQuery();
+  const { data: jobTypes, error: typeError, isLoading: typeLoading } = useGetJobTypesQuery();
 
   if (isLoading) return <p>Loading jobs...</p>;
   if (error) return <p>Error loading jobs.</p>;
@@ -78,10 +76,9 @@ export function JobListingPage() {
     // onJobClick?.(job);
   };
 
-  const handleSaveJob = (jobId: number) => {
-  };
+  const handleSaveJob = (jobId: number) => {};
 
-  const handleSelectJob = (jobId: string) => {
+  const handleSelectJob = (jobId: number) => {
     setSelectedJobs((prev) => (prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [...prev, jobId]));
   };
 
@@ -136,7 +133,10 @@ export function JobListingPage() {
                 <span className="bg-gradient-to-r from-neon-cyan to-neon-purple bg-clip-text text-transparent">AI Assistant</span>
               </Button>
 
-              <Button className="gradient-animated text-white font-bold shadow-lg hover:shadow-xl hover:shadow-neon-purple/30 transition-all duration-300 hover:scale-105 border-0">
+              <Button
+                onClick={() => router.push("/jobs/create-job")}
+                className="gradient-animated text-white font-bold shadow-lg hover:shadow-xl hover:shadow-neon-purple/30 transition-all duration-300 hover:scale-105 border-0"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Post Job
               </Button>
@@ -192,7 +192,7 @@ export function JobListingPage() {
                 </SelectTrigger>
                 <SelectContent className="glass-strong border-glass-border z-50">
                   <SelectItem value="all">All Types</SelectItem>
-                  {jobTypes.map((type: string) => (
+                  {jobTypes?.map((type: string) => (
                     <SelectItem key={type} value={type}>
                       {type}
                     </SelectItem>
@@ -281,7 +281,7 @@ export function JobListingPage() {
                   </h3>
                   <div className="space-y-2">
                     {savedJobs.slice(0, 3).map((jobId) => {
-                      const job = jobs.find((j) => j.id === jobId);
+                      const job = jobs.find((j) => j.id === Number(jobId));
                       if (!job) return null;
                       return (
                         <div key={job.id} className="text-sm p-2 rounded glass-strong border border-glass-border">
@@ -306,7 +306,7 @@ export function JobListingPage() {
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {viewedJobs.slice(0, 3).map((jobId) => {
-                      const job = jobs.find((j) => j.id === jobId);
+                      const job = jobs.find((j) => j.id === Number(jobId));
                       if (!job) return null;
                       return (
                         <Card
@@ -324,14 +324,14 @@ export function JobListingPage() {
                           </div>
                           <div className="flex items-center justify-between">
                             <Badge variant="secondary" className="text-xs px-2.5 py-1 rounded-full">
-                              {job.workType}
+                              {job.work_type}
                             </Badge>
-                            {job.fitScore && (
+                            {/* {job.fitScore && (
                               <div className="flex items-center gap-1">
                                 <Target className="w-3 h-3 text-neon-cyan" />
                                 <span className="text-xs font-semibold text-neon-cyan">{job.fitScore}%</span>
                               </div>
-                            )}
+                            )} */}
                           </div>
                         </Card>
                       );

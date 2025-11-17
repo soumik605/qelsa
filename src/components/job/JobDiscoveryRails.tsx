@@ -255,7 +255,7 @@ function JobRailCard({ job, onClick, onToggleCompare, isCompared }: JobRailCardP
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Briefcase className="w-4 h-4" />
-            <span>{job.other_info.types?.map((type) => type.name)}</span>
+            <span>{job.other_info?.types?.map((type) => type.name)}</span>
             <span className="text-muted-foreground/50">•</span>
             <span>{job["experience_level"]}</span>
           </div>

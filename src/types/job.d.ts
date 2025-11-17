@@ -1,3 +1,5 @@
+import { Page } from "./page";
+
 export type Job = {
   id: number;
   external_id: string;
@@ -13,6 +15,9 @@ export type Job = {
   salary_min?: number | null;
   salary?: number | null;
   title: string;
+  work_type?: string | null;
+  experience?: number | null;
+  screening_questions?: ScreeningQuestion[];
 
   // Company fields
   company_name?: string | null;
@@ -28,4 +33,22 @@ export type Job = {
 
   createdAt?: Date;
   updatedAt?: Date;
+
+  page?: Page;
 };
+
+export interface ScreeningQuestion {
+  id?: any;
+  type: "multiple_choice" | "yes_no" | "scale" | "short_text" | "short-answer" | "coding" | "behavioral";
+  title: string;
+  required: boolean;
+  is_knockout: boolean;
+  weight: number;
+  options?: string[];
+  correct_answer_id?: string | number;
+  min_value?: number;
+  max_value?: number;
+  knockout_condition?: "equals" | "less-than" | "greater-than" | "contains";
+  knockout_value?: string | number;
+  max_length?: number;
+}

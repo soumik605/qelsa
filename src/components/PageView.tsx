@@ -1,3 +1,4 @@
+import { useGetJobsQuery } from "@/features/api/jobsApi";
 import { useGetPageByIdQuery } from "@/features/api/pagesApi";
 import { ArrowLeft, Building2, CheckCircle2, Eye, Globe, Instagram, Linkedin, MapPin, MessageCircle, Send, Share2, Sparkles, Twitter, UserPlus, Users } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -28,7 +29,8 @@ export function PageView() {
     skip: !id,
   });
 
-  console.log("🚀 ~ PageView ~ pageData:", pageData);
+  const { data: pageJobs, isLoading: jobsLoading, error: jobsError } = useGetJobsQuery({ page_id: id });
+  console.log("🚀 ~ PageView ~ pageJobs:", pageJobs);
 
   if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading page details...</div>;
 
@@ -150,7 +152,7 @@ export function PageView() {
             <Tabs defaultValue="about" className="w-full">
               <TabsList className="glass border-glass-border w-full grid grid-cols-4">
                 <TabsTrigger value="about">About</TabsTrigger>
-                <TabsTrigger value="jobs">Jobs ({jobs.length})</TabsTrigger>
+                <TabsTrigger value="jobs">Jobs ({pageJobs?.length || 0})</TabsTrigger>
                 <TabsTrigger value="updates">Updates</TabsTrigger>
                 <TabsTrigger value="projects">Projects</TabsTrigger>
               </TabsList>
@@ -190,7 +192,7 @@ export function PageView() {
 
               {/* Jobs Tab */}
               <TabsContent value="jobs" className="space-y-4">
-                {jobs.map((job) => (
+                {pageJobs.map((job) => (
                   <Card key={job.id} className="p-6 glass border-glass-border hover:border-neon-cyan/50 transition-all cursor-pointer">
                     <div className="flex items-start justify-between mb-3">
                       <div>
@@ -201,13 +203,13 @@ export function PageView() {
                     </div>
 
                     <div className="flex flex-wrap gap-2 mb-3">
-                      <Badge variant="secondary">{job.type}</Badge>
+                      <Badge variant="secondary">{job.work_type}</Badge>
                       <Badge variant="secondary">{job.experience}</Badge>
                     </div>
 
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{job.postedDate}</span>
-                      <span>{job.applicants} applicants</span>
+                      <span>{job.published_date}</span>
+                      {/* <span>{job.applicants} applicants</span> */}
                     </div>
                   </Card>
                 ))}

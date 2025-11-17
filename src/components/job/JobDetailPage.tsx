@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -7,9 +8,7 @@ import {
   BrainCircuit,
   Briefcase,
   Building2,
-  Calendar,
   CheckCircle,
-  ChevronRight,
   Clock,
   DollarSign,
   ExternalLink,
@@ -30,14 +29,12 @@ import {
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import DOMPurify from "dompurify";
 import { useGetJobByIdQuery } from "../../features/api/jobsApi";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { Progress } from "../ui/progress";
 import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
@@ -45,7 +42,6 @@ export function JobDetailPage() {
   const [isSaved, setIsSaved] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
-  const [showChatWidget, setShowChatWidget] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
   const [resumeAnalysis, setResumeAnalysis] = useState<any>(null);
   const [selectedSkillsTab, setSelectedSkillsTab] = useState("match");
@@ -251,24 +247,24 @@ export function JobDetailPage() {
                   <span>{job.location}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  {getWorkTypeIcon(job.other_info.types.map((type) => type.name))}
-                  <span>{job.other_info.types.map((type) => type.name)}</span>
+                  {getWorkTypeIcon(job.other_info?.types.map((type) => type.name))}
+                  <span>{job.other_info?.types.map((type) => type.name)}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Clock className="w-4 h-4 text-neon-purple" />
                   <span>{job.experience}</span>
                 </div>
-                {(job.max_salary || job.min_salary) && (
+                {(job.salary_max || job.salary_min) && (
                   <div className="flex items-center gap-2 text-sm">
                     <DollarSign className="w-4 h-4 text-neon-green" />
-                    <span>{job.max_salary || job.min_salary}</span>
+                    <span>{job.salary_max || job.salary_min}</span>
                   </div>
                 )}
               </div>
 
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1">
+                  {/* <div className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
                     <span>Posted {new Date(job.postedDate).toLocaleDateString()}</span>
                   </div>
@@ -277,7 +273,7 @@ export function JobDetailPage() {
                       <Clock className="w-4 h-4" />
                       <span>Deadline {new Date(job.applicationDeadline).toLocaleDateString()}</span>
                     </div>
-                  )}
+                  )} */}
                 </div>
 
                 {/* <div className="flex items-center gap-2">
@@ -295,7 +291,7 @@ export function JobDetailPage() {
 
           {/* Job Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-glass-border">
-            <div className="text-center">
+            {/* <div className="text-center">
               <div className="text-2xl font-bold text-neon-cyan">{job.views}</div>
               <div className="text-sm text-muted-foreground">Views</div>
             </div>
@@ -310,7 +306,7 @@ export function JobDetailPage() {
                 <div className="text-2xl font-bold text-neon-green">{job.fitScore}%</div>
                 <div className="text-sm text-muted-foreground">Match Score</div>
               </div>
-            )}
+            )} */}
             <div className="text-center">
               {/* <div className="text-2xl font-bold text-neon-yellow">{job.source.platform === "Qelsa" ? "High" : "Medium"}</div> */}
               <div className="text-sm text-muted-foreground">Priority</div>
@@ -321,7 +317,7 @@ export function JobDetailPage() {
         {/* AI Insights Section */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* AI Skill Match */}
-          {job.fitScore && (
+          {/* {job.fitScore && (
             <Card className="glass border-glass-border p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Target className="w-5 h-5 text-neon-purple" />
@@ -377,7 +373,7 @@ export function JobDetailPage() {
                 </TabsContent>
               </Tabs>
             </Card>
-          )}
+          )} */}
 
           {/* AI Job Summary */}
           <Card className="glass border-glass-border p-6">
@@ -386,7 +382,7 @@ export function JobDetailPage() {
               <h3 className="text-lg font-semibold">AI Job Summary</h3>
             </div>
 
-            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{job.aiSummary}</p>
+            {/* <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{job.aiSummary}</p> */}
 
             <div className="p-3 rounded-lg bg-neon-cyan/5 border border-neon-cyan/20">
               <p className="text-sm text-neon-cyan font-medium">💡 This role is best suited for candidates with strong React skills, 2+ years experience, and passion for user experience.</p>
@@ -510,13 +506,13 @@ export function JobDetailPage() {
           <div className="space-y-6">
             <div>
               <h4 className="font-medium text-neon-cyan mb-3">About the Role</h4>
-<p
-  className="text-sm text-muted-foreground leading-relaxed mb-4"
-  dangerouslySetInnerHTML={{
-    __html: DOMPurify.sanitize(job.description || "Job description not available."),
-  }}
-/>
-              {job.responsibilities && job.responsibilities.length > 0 && (
+              <p
+                className="text-sm text-muted-foreground leading-relaxed mb-4"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(job.description || "Job description not available."),
+                }}
+              />
+              {/* {job.responsibilities && job.responsibilities.length > 0 && (
                 <ul className="space-y-2">
                   {job.responsibilities.map((responsibility, index) => (
                     <li key={index} className="flex items-start gap-2 text-sm">
@@ -525,13 +521,13 @@ export function JobDetailPage() {
                     </li>
                   ))}
                 </ul>
-              )}
+              )} */}
             </div>
 
             <Separator />
 
             <div className="grid md:grid-cols-2 gap-6">
-              {job.requiredSkills && job.requiredSkills.length > 0 && (
+              {/* {job.requiredSkills && job.requiredSkills.length > 0 && (
                 <div>
                   <h4 className="font-medium text-neon-purple mb-3">Required Skills</h4>
                   <div className="flex flex-wrap gap-2">
@@ -542,9 +538,9 @@ export function JobDetailPage() {
                     ))}
                   </div>
                 </div>
-              )}
+              )} */}
 
-              {job.preferredSkills && job.preferredSkills.length > 0 && (
+              {/* {job.preferredSkills && job.preferredSkills.length > 0 && (
                 <div>
                   <h4 className="font-medium text-neon-green mb-3">Preferred Skills</h4>
                   <div className="flex flex-wrap gap-2">
@@ -555,9 +551,9 @@ export function JobDetailPage() {
                     ))}
                   </div>
                 </div>
-              )}
+              )} */}
 
-              {!job.requiredSkills && !job.preferredSkills && job.skills && job.skills.length > 0 && (
+              {/* {!job.requiredSkills && !job.preferredSkills && job.skills && job.skills.length > 0 && (
                 <div>
                   <h4 className="font-medium text-neon-purple mb-3">Skills</h4>
                   <div className="flex flex-wrap gap-2">
@@ -568,12 +564,12 @@ export function JobDetailPage() {
                     ))}
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
 
             <Separator />
 
-            {job.techStack && job.techStack.length > 0 && (
+            {/* {job.techStack && job.techStack.length > 0 && (
               <div>
                 <h4 className="font-medium text-neon-yellow mb-3">Tech Stack</h4>
                 <div className="flex flex-wrap gap-2">
@@ -584,23 +580,23 @@ export function JobDetailPage() {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
 
             <Separator />
 
             <div>
-              <h4 className="font-medium text-neon-pink mb-3">About {job.company}</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">{job.companyDescription || "Company description not available."}</p>
+              <h4 className="font-medium text-neon-pink mb-3">About {job.page?.name}</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">{job.page?.description || "Company description not available."}</p>
 
-              {job.careerGrowth && (
+              {/* {job.careerGrowth && (
                 <div className="mt-4 p-3 rounded-lg bg-neon-pink/5 border border-neon-pink/20">
                   <h5 className="font-medium text-neon-pink mb-2">Career Growth Opportunities</h5>
                   <p className="text-sm text-muted-foreground">{job.careerGrowth}</p>
                 </div>
-              )}
+              )} */}
             </div>
 
-            {job.benefits && job.benefits.length > 0 && (
+            {/* {job.benefits && job.benefits.length > 0 && (
               <>
                 <Separator />
                 <div>
@@ -615,7 +611,7 @@ export function JobDetailPage() {
                   </div>
                 </div>
               </>
-            )}
+            )} */}
           </div>
         </Card>
 
@@ -687,13 +683,13 @@ export function JobDetailPage() {
         <Card className="glass border-glass-border p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold">Apply for this Role</h3>
-            {isApplied && <Badge className="bg-neon-green/10 text-neon-green border-neon-green/30">Applied {job.appliedDate && `on ${new Date(job.appliedDate).toLocaleDateString()}`}</Badge>}
+            {/* {isApplied && <Badge className="bg-neon-green/10 text-neon-green border-neon-green/30">Applied {job.appliedDate && `on ${new Date(job.appliedDate).toLocaleDateString()}`}</Badge>} */}
           </div>
 
           <div className="space-y-4">
             {!isApplied ? (
               <div className="grid gap-3">
-                {job.isQuickApplyAvailable ? (
+                {/* {job.isQuickApplyAvailable ? (
                   <div className="grid md:grid-cols-2 gap-3">
                     <Button onClick={handleApplyJob} className="bg-neon-green hover:bg-neon-green/90 text-black font-medium">
                       <Zap className="w-4 h-4 mr-2" />
@@ -707,9 +703,9 @@ export function JobDetailPage() {
                 ) : (
                   <Button onClick={handleApplyJob} className="w-full bg-neon-cyan hover:bg-neon-cyan/90 text-black font-medium">
                     <ExternalLink className="w-4 h-4 mr-2" />
-                    {/* Apply on {job.source.platform} */}
+                    Apply on {job.source.platform}
                   </Button>
-                )}
+                )} */}
               </div>
             ) : (
               <div className="text-center p-4 rounded-lg bg-neon-green/5 border border-neon-green/20">
@@ -718,7 +714,7 @@ export function JobDetailPage() {
               </div>
             )}
 
-            <div className="text-xs text-muted-foreground text-center">By applying, you agree to share your profile with {job.company}</div>
+            <div className="text-xs text-muted-foreground text-center">By applying, you agree to share your profile with {job.page?.name}</div>
           </div>
         </Card>
 

@@ -1,13 +1,12 @@
-import { PageView } from '@/components/PageView'
-import Layout from '@/layout'
-import React from 'react'
+import { PageView } from "@/components/PageView";
+import Layout from "@/layout";
 
 const PageDetails = () => {
   return (
     <Layout activeSection={"pages"}>
-      <PageView pageId="1" isAdmin={false} />;
+      <PageView />;
     </Layout>
-  )
-}
+  );
+};
 
-export default PageDetails
+export default PageDetails;

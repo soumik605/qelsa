@@ -1,61 +1,17 @@
-import { useState } from 'react';
-import { 
-  Plus, 
-  Trash2, 
-  GripVertical, 
-  Sparkles, 
-  Eye, 
-  Save, 
-  AlertCircle,
-  CheckCircle,
-  XCircle,
-  ChevronDown,
-  ChevronUp,
-  Zap,
-  RefreshCw,
-  TrendingUp,
-  CheckCircle2
-} from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
-import { Switch } from './ui/switch';
-import { Badge } from './ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from './ui/dialog';
-import { ScrollArea } from './ui/scroll-area';
-import { Slider } from './ui/slider';
-import { Card } from './ui/card';
-
-export interface ScreeningQuestion {
-  id: string;
-  type: 'multiple-choice' | 'yes-no' | 'scale' | 'short-text' | 'short-answer' | 'coding' | 'behavioral';
-  question: string;
-  required: boolean;
-  isKnockout: boolean;
-  weight: number;
-  options?: string[];
-  correctAnswer?: string | number;
-  minValue?: number;
-  maxValue?: number;
-  knockoutCondition?: 'equals' | 'less-than' | 'greater-than' | 'contains';
-  knockoutValue?: string | number;
-  maxLength?: number;
-}
+import { ScreeningQuestion } from "@/types/job";
+import { AlertCircle, CheckCircle, CheckCircle2, ChevronDown, ChevronUp, Eye, GripVertical, Plus, Sparkles, Trash2, TrendingUp, XCircle, Zap } from "lucide-react";
+import { useState } from "react";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Card } from "./ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { ScrollArea } from "./ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Slider } from "./ui/slider";
+import { Switch } from "./ui/switch";
+import { Textarea } from "./ui/textarea";
 
 interface ScreeningQuestionsBuilderProps {
   questions: ScreeningQuestion[];
@@ -68,96 +24,90 @@ interface ScreeningQuestionsBuilderProps {
 interface QuestionTemplate {
   id: string;
   name: string;
-  category: 'essentials' | 'skills' | 'logistics';
-  questions: Omit<ScreeningQuestion, 'id'>[];
+  category: "essentials" | "skills" | "logistics";
+  questions: Omit<ScreeningQuestion, "id">[];
   description: string;
 }
 
 const QUESTION_TEMPLATES: QuestionTemplate[] = [
   {
-    id: 'essentials-1',
-    name: 'Essential Requirements',
-    category: 'essentials',
-    description: 'Core eligibility questions',
+    id: "essentials-1",
+    name: "Essential Requirements",
+    category: "essentials",
+    description: "Core eligibility questions",
     questions: [
       {
-        type: 'yes-no',
-        question: 'Are you legally authorized to work in this country?',
+        type: "yes_no",
+        title: "Are you legally authorized to work in this country?",
         required: true,
-        isKnockout: true,
+        is_knockout: true,
         weight: 0,
-        knockoutCondition: 'equals',
-        knockoutValue: 'no'
+        knockout_condition: "equals",
+        knockout_value: "no",
       },
       {
-        type: 'yes-no',
-        question: 'Do you meet the minimum experience requirement for this role?',
+        type: "yes_no",
+        title: "Do you meet the minimum experience requirement for this role?",
         required: true,
-        isKnockout: true,
+        is_knockout: true,
         weight: 0,
-        knockoutCondition: 'equals',
-        knockoutValue: 'no'
-      }
-    ]
+        knockout_condition: "equals",
+        knockout_value: "no",
+      },
+    ],
   },
   {
-    id: 'skills-1',
-    name: 'Skills Assessment',
-    category: 'skills',
-    description: 'Technical and soft skills evaluation',
+    id: "skills-1",
+    name: "Skills Assessment",
+    category: "skills",
+    description: "Technical and soft skills evaluation",
     questions: [
       {
-        type: 'scale',
-        question: 'Rate your proficiency in [primary skill]',
+        type: "scale",
+        title: "Rate your proficiency in [primary skill]",
         required: true,
-        isKnockout: false,
+        is_knockout: false,
         weight: 30,
-        minValue: 1,
-        maxValue: 5
+        min_value: 1,
+        max_value: 5,
       },
       {
-        type: 'multiple-choice',
-        question: 'Which tools/technologies are you proficient in?',
+        type: "multiple_choice",
+        title: "Which tools/technologies are you proficient in?",
         required: true,
-        isKnockout: false,
+        is_knockout: false,
         weight: 25,
-        options: ['Option 1', 'Option 2', 'Option 3', 'Option 4']
-      }
-    ]
+        options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+      },
+    ],
   },
   {
-    id: 'logistics-1',
-    name: 'Logistics & Availability',
-    category: 'logistics',
-    description: 'Work arrangement preferences',
+    id: "logistics-1",
+    name: "Logistics & Availability",
+    category: "logistics",
+    description: "Work arrangement preferences",
     questions: [
       {
-        type: 'multiple-choice',
-        question: 'What is your preferred work arrangement?',
+        type: "multiple_choice",
+        title: "What is your preferred work arrangement?",
         required: true,
-        isKnockout: false,
+        is_knockout: false,
         weight: 15,
-        options: ['Remote', 'Hybrid', 'On-site', 'Flexible']
+        options: ["Remote", "Hybrid", "On-site", "Flexible"],
       },
       {
-        type: 'short-text',
-        question: 'What is your expected salary range?',
+        type: "short_text",
+        title: "What is your expected salary range?",
         required: false,
-        isKnockout: false,
+        is_knockout: false,
         weight: 10,
-        maxLength: 100
-      }
-    ]
-  }
+        max_length: 100,
+      },
+    ],
+  },
 ];
 
-export function ScreeningQuestionsBuilder({ 
-  questions, 
-  onChange, 
-  jobTitle,
-  jobDescription,
-  isPremium = false 
-}: ScreeningQuestionsBuilderProps) {
+export function ScreeningQuestionsBuilder({ questions, onChange, jobTitle, jobDescription, isPremium = false }: ScreeningQuestionsBuilderProps) {
   const [showTemplates, setShowTemplates] = useState(true);
   const [showPreview, setShowPreview] = useState(false);
   const [showUpgradeNudge, setShowUpgradeNudge] = useState(false);
@@ -167,14 +117,14 @@ export function ScreeningQuestionsBuilder({
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiUsageCount, setAiUsageCount] = useState(2); // Simulated usage counter
 
-  const totalWeight = questions.reduce((sum, q) => sum + (q.isKnockout ? 0 : q.weight), 0);
-  const knockoutCount = questions.filter(q => q.isKnockout).length;
+  const totalWeight = questions.reduce((sum, q) => sum + (q.is_knockout ? 0 : q.weight), 0);
+  const knockoutCount = questions.filter((q) => q.is_knockout).length;
 
   // Add question from template
   const addTemplateQuestions = (template: QuestionTemplate) => {
-    const newQuestions = template.questions.map(q => ({
+    const newQuestions = template.questions.map((q) => ({
       ...q,
-      id: `q-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      id: `q-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     }));
     onChange([...questions, ...newQuestions]);
   };
@@ -183,12 +133,14 @@ export function ScreeningQuestionsBuilder({
   const addBlankQuestion = () => {
     const newQuestion: ScreeningQuestion = {
       id: `q-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      type: 'multiple-choice',
-      question: '',
+      type: "multiple_choice",
+      title: "",
       required: true,
-      isKnockout: false,
+      is_knockout: false,
       weight: 10,
-      options: ['Option 1', 'Option 2']
+      options: ["Option 1", "Option 2"],
+      min_value: 1,
+      max_value: 5
     };
     onChange([...questions, newQuestion]);
     setExpandedQuestions(new Set([...expandedQuestions, newQuestion.id]));
@@ -196,12 +148,14 @@ export function ScreeningQuestionsBuilder({
 
   // Update question
   const updateQuestion = (id: string, updates: Partial<ScreeningQuestion>) => {
-    onChange(questions.map(q => q.id === id ? { ...q, ...updates } : q));
+    const updated_questions = questions.map((q) => (q.id === id ? { ...q, ...updates } : q))
+    console.log("🚀 ~ updateQuestion ~ updated_questions:", updated_questions)
+    onChange(updated_questions);
   };
 
   // Delete question
   const deleteQuestion = (id: string) => {
-    onChange(questions.filter(q => q.id !== id));
+    onChange(questions.filter((q) => q.id !== id));
     const newExpanded = new Set(expandedQuestions);
     newExpanded.delete(id);
     setExpandedQuestions(newExpanded);
@@ -220,27 +174,27 @@ export function ScreeningQuestionsBuilder({
 
   // Add option to multiple choice
   const addOption = (questionId: string) => {
-    const question = questions.find(q => q.id === questionId);
+    const question = questions.find((q) => q.id === questionId);
     if (question && question.options) {
       updateQuestion(questionId, {
-        options: [...question.options, `Option ${question.options.length + 1}`]
+        options: [...question.options, `Option ${question.options.length + 1}`],
       });
     }
   };
 
   // Remove option from multiple choice
   const removeOption = (questionId: string, index: number) => {
-    const question = questions.find(q => q.id === questionId);
+    const question = questions.find((q) => q.id === questionId);
     if (question && question.options && question.options.length > 2) {
       updateQuestion(questionId, {
-        options: question.options.filter((_, i) => i !== index)
+        options: question.options.filter((_, i) => i !== index),
       });
     }
   };
 
   // Update option text
   const updateOption = (questionId: string, index: number, value: string) => {
-    const question = questions.find(q => q.id === questionId);
+    const question = questions.find((q) => q.id === questionId);
     if (question && question.options) {
       const newOptions = [...question.options];
       newOptions[index] = value;
@@ -251,45 +205,45 @@ export function ScreeningQuestionsBuilder({
   // AI Generate Questions - AVAILABLE TO ALL USERS
   const handleGenerateAI = async () => {
     setIsGenerating(true);
-    setAiUsageCount(prev => prev + 1);
-    
+    setAiUsageCount((prev) => prev + 1);
+
     // Simulate AI generation
     setTimeout(() => {
       const generated: ScreeningQuestion[] = [
         {
           id: `ai-${Date.now()}-1`,
-          type: 'yes-no',
-          question: `Do you have at least 3 years of experience in ${jobTitle?.split(' ')[0] || 'this field'}?`,
+          type: "yes_no",
+          title: `Do you have at least 3 years of experience in ${jobTitle?.split(" ")[0] || "this field"}?`,
           required: true,
-          isKnockout: true,
+          is_knockout: true,
           weight: 0,
-          knockoutCondition: 'equals',
-          knockoutValue: 'no'
+          // knockout_condition: "equals",
+          // knockout_value: "no",
         },
         {
           id: `ai-${Date.now()}-2`,
-          type: 'scale',
-          question: 'Rate your proficiency with the primary technology stack mentioned in the job description',
+          type: "scale",
+          title: "Rate your proficiency with the primary technology stack mentioned in the job description",
           required: true,
-          isKnockout: false,
+          is_knockout: false,
           weight: 30,
-          minValue: 1,
-          maxValue: 5
+          min_value: 1,
+          max_value: 5,
         },
         {
           id: `ai-${Date.now()}-3`,
-          type: 'multiple-choice',
-          question: 'Which best describes your work arrangement preference?',
+          type: "multiple_choice",
+          title: "Which best describes your work arrangement preference?",
           required: true,
-          isKnockout: false,
+          is_knockout: false,
           weight: 20,
-          options: ['Remote only', 'Hybrid (2-3 days office)', 'On-site preferred', 'Fully flexible']
-        }
+          options: ["Remote only", "Hybrid (2-3 days office)", "On-site preferred", "Fully flexible"],
+        },
       ];
       setAiSuggestions(generated);
       setShowAISuggestions(true);
       setIsGenerating(false);
-      
+
       // Show upgrade nudge after successful generation (soft limit)
       if (!isPremium && aiUsageCount >= 5) {
         setTimeout(() => setShowUpgradeNudge(true), 2000);
@@ -299,23 +253,23 @@ export function ScreeningQuestionsBuilder({
 
   // AI Rewrite Question - AVAILABLE TO ALL USERS
   const handleRewriteAI = (questionId: string) => {
-    setAiUsageCount(prev => prev + 1);
-    
-    const question = questions.find(q => q.id === questionId);
+    setAiUsageCount((prev) => prev + 1);
+
+    const question = questions.find((q) => q.id === questionId);
     if (question) {
       // Simulate AI rewrite with improved phrasing
       const improvements = [
-        { from: /you /gi, to: 'you ' },
-        { from: /your /gi, to: 'your ' }
+        { from: /you /gi, to: "you " },
+        { from: /your /gi, to: "your " },
       ];
-      
-      let improved = question.question;
-      if (!question.question.includes('Please provide')) {
-        improved += ' Please provide specific examples.';
+
+      let improved = question.title;
+      if (!question.title.includes("Please provide")) {
+        improved += " Please provide specific examples.";
       }
-      
-      updateQuestion(questionId, { question: improved });
-      
+
+      updateQuestion(questionId, { title: improved });
+
       // Show upgrade nudge after multiple uses
       if (!isPremium && aiUsageCount >= 5) {
         setTimeout(() => setShowUpgradeNudge(true), 1000);
@@ -326,7 +280,7 @@ export function ScreeningQuestionsBuilder({
   // Apply AI suggestion - AVAILABLE TO ALL USERS
   const applyAISuggestion = (suggestion: ScreeningQuestion) => {
     onChange([...questions, suggestion]);
-    setAiSuggestions(aiSuggestions.filter(s => s.id !== suggestion.id));
+    setAiSuggestions(aiSuggestions.filter((s) => s.id !== suggestion.id));
   };
 
   // Apply all AI suggestions
@@ -340,13 +294,13 @@ export function ScreeningQuestionsBuilder({
   const getValidationWarnings = () => {
     const warnings: string[] = [];
     if (questions.length > 8) {
-      warnings.push('Consider reducing questions to 6-8 for better completion rates');
+      warnings.push("Consider reducing questions to 6-8 for better completion rates");
     }
     if (knockoutCount > 3) {
-      warnings.push('Too many knockout questions may reduce applicant pool');
+      warnings.push("Too many knockout questions may reduce applicant pool");
     }
     if (totalWeight > 0 && Math.abs(totalWeight - 100) > 5) {
-      warnings.push('Question weights should sum to approximately 100%');
+      warnings.push("Question weights should sum to approximately 100%");
     }
     return warnings;
   };
@@ -367,29 +321,16 @@ export function ScreeningQuestionsBuilder({
               </Badge>
             )}
           </div>
-          <p className="text-sm text-muted-foreground">
-            Add questions to pre-screen candidates automatically
-          </p>
+          <p className="text-sm text-muted-foreground">Add questions to pre-screen candidates automatically</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowPreview(!showPreview)}
-            className="gap-2"
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowPreview(!showPreview)} className="gap-2">
             <Eye className="w-4 h-4" />
             Preview
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleGenerateAI}
-            disabled={isGenerating}
-            className="gap-2 glass border-neon-purple/30 hover:border-neon-purple hover:glow-purple"
-          >
+          <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGenerating} className="gap-2 glass border-neon-purple/30 hover:border-neon-purple hover:glow-purple">
             <Sparkles className="w-4 h-4 text-neon-purple" />
-            {isGenerating ? 'Generating...' : 'AI Generate'}
+            {isGenerating ? "Generating..." : "AI Generate"}
           </Button>
         </div>
       </div>
@@ -403,7 +344,9 @@ export function ScreeningQuestionsBuilder({
           </div>
           <ul className="text-sm text-muted-foreground space-y-1 ml-6">
             {warnings.map((warning, index) => (
-              <li key={index} className="list-disc">{warning}</li>
+              <li key={index} className="list-disc">
+                {warning}
+              </li>
             ))}
           </ul>
         </div>
@@ -414,30 +357,22 @@ export function ScreeningQuestionsBuilder({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-sm">Quick Start Templates</h4>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowTemplates(false)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setShowTemplates(false)}>
               Hide
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {QUESTION_TEMPLATES.map((template) => (
-              <button
-                key={template.id}
-                onClick={() => addTemplateQuestions(template)}
-                className="glass rounded-lg p-4 text-left hover:border-neon-cyan/50 hover:glow-cyan transition-all group"
-              >
+              <button key={template.id} onClick={() => addTemplateQuestions(template)} className="glass rounded-lg p-4 text-left hover:border-neon-cyan/50 hover:glow-cyan transition-all group">
                 <div className="flex items-start justify-between mb-2">
                   <Badge
                     variant="outline"
                     className={
-                      template.category === 'essentials'
-                        ? 'border-neon-cyan/30 text-neon-cyan'
-                        : template.category === 'skills'
-                        ? 'border-neon-purple/30 text-neon-purple'
-                        : 'border-neon-pink/30 text-neon-pink'
+                      template.category === "essentials"
+                        ? "border-neon-cyan/30 text-neon-cyan"
+                        : template.category === "skills"
+                        ? "border-neon-purple/30 text-neon-purple"
+                        : "border-neon-pink/30 text-neon-pink"
                     }
                   >
                     {template.category}
@@ -445,15 +380,11 @@ export function ScreeningQuestionsBuilder({
                   <Plus className="w-4 h-4 text-muted-foreground group-hover:text-neon-cyan transition-colors" />
                 </div>
                 <h5 className="text-sm mb-1">{template.name}</h5>
-                <p className="text-xs text-muted-foreground mb-2">
-                  {template.description}
-                </p>
+                <p className="text-xs text-muted-foreground mb-2">{template.description}</p>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>{template.questions.length} questions</span>
                   <span>•</span>
-                  <span>
-                    {template.questions.filter(q => q.isKnockout).length} knockout
-                  </span>
+                  <span>{template.questions.filter((q) => q.is_knockout).length} knockout</span>
                 </div>
               </button>
             ))}
@@ -474,19 +405,10 @@ export function ScreeningQuestionsBuilder({
               </Badge>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={applyAllAISuggestions}
-                className="text-neon-purple hover:text-neon-purple"
-              >
+              <Button variant="ghost" size="sm" onClick={applyAllAISuggestions} className="text-neon-purple hover:text-neon-purple">
                 Add All
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowAISuggestions(false)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setShowAISuggestions(false)}>
                 Dismiss
               </Button>
             </div>
@@ -496,12 +418,12 @@ export function ScreeningQuestionsBuilder({
               <div key={suggestion.id} className="glass-strong rounded-lg p-3 space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
-                    <p className="text-sm">{suggestion.question}</p>
+                    <p className="text-sm">{suggestion.title}</p>
                     <div className="flex items-center gap-2 mt-2">
                       <Badge variant="outline" className="text-xs">
                         {suggestion.type}
                       </Badge>
-                      {suggestion.isKnockout ? (
+                      {suggestion.is_knockout ? (
                         <Badge variant="outline" className="text-xs border-destructive/30 text-destructive">
                           Knockout
                         </Badge>
@@ -512,11 +434,7 @@ export function ScreeningQuestionsBuilder({
                       )}
                     </div>
                   </div>
-                  <Button
-                    size="sm"
-                    onClick={() => applyAISuggestion(suggestion)}
-                    className="gradient-animated"
-                  >
+                  <Button size="sm" onClick={() => applyAISuggestion(suggestion)} className="gradient-animated">
                     <Plus className="w-4 h-4 mr-1" />
                     Add
                   </Button>
@@ -530,20 +448,14 @@ export function ScreeningQuestionsBuilder({
       {/* Questions List */}
       <div className="space-y-3">
         {questions.map((question, index) => (
-          <div
-            key={question.id}
-            className="glass rounded-lg overflow-hidden transition-all"
-          >
+          <div key={question.id} className="glass rounded-lg overflow-hidden transition-all">
             {/* Question Header */}
-            <div
-              className="flex items-center gap-3 p-4 cursor-pointer hover:bg-white/5"
-              onClick={() => toggleExpanded(question.id)}
-            >
+            <div className="flex items-center gap-3 p-4 cursor-pointer hover:bg-white/5" onClick={() => toggleExpanded(question.id)}>
               <GripVertical className="w-4 h-4 text-muted-foreground flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-sm text-muted-foreground">Q{index + 1}</span>
-                  {question.isKnockout ? (
+                  {question.is_knockout ? (
                     <Badge variant="outline" className="text-xs border-destructive/30 text-destructive">
                       Knockout
                     </Badge>
@@ -556,9 +468,7 @@ export function ScreeningQuestionsBuilder({
                     {question.type}
                   </Badge>
                 </div>
-                <p className="text-sm truncate">
-                  {question.question || 'Untitled question'}
-                </p>
+                <p className="text-sm truncate">{question.title || "Untitled question"}</p>
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -572,11 +482,7 @@ export function ScreeningQuestionsBuilder({
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
-                {expandedQuestions.has(question.id) ? (
-                  <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                )}
+                {expandedQuestions.has(question.id) ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
               </div>
             </div>
 
@@ -587,73 +493,46 @@ export function ScreeningQuestionsBuilder({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label>Question</Label>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRewriteAI(question.id)}
-                      className="gap-2 text-xs h-7 text-neon-purple hover:text-neon-purple"
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => handleRewriteAI(question.id)} className="gap-2 text-xs h-7 text-neon-purple hover:text-neon-purple">
                       <Sparkles className="w-3 h-3" />
                       Improve with AI
                     </Button>
                   </div>
-                  <Textarea
-                    value={question.question}
-                    onChange={(e) => updateQuestion(question.id, { question: e.target.value })}
-                    placeholder="Enter your question..."
-                    rows={2}
-                    className="resize-none"
-                  />
+                  <Textarea value={question.title} onChange={(e) => updateQuestion(question.id, { title: e.target.value })} placeholder="Enter your question..." rows={2} className="resize-none" />
                 </div>
 
                 {/* Question Type */}
                 <div className="space-y-2">
                   <Label>Question Type</Label>
-                  <Select
-                    value={question.type}
-                    onValueChange={(value: any) => updateQuestion(question.id, { type: value })}
-                  >
+                  <Select value={question.type} onValueChange={(value: any) => updateQuestion(question.id, { type: value })}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
-                      <SelectItem value="yes-no">Yes/No</SelectItem>
+                      <SelectItem value="multiple_choice">Multiple Choice</SelectItem>
+                      <SelectItem value="yes_no">Yes/No</SelectItem>
                       <SelectItem value="scale">Rating Scale</SelectItem>
-                      <SelectItem value="short-text">Short Text</SelectItem>
+                      <SelectItem value="short_text">Short Text</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 {/* Options for Multiple Choice */}
-                {question.type === 'multiple-choice' && (
+                {question.type === "multiple_choice" && (
                   <div className="space-y-2">
                     <Label>Answer Options</Label>
                     <div className="space-y-2">
                       {question.options?.map((option, optIndex) => (
                         <div key={optIndex} className="flex items-center gap-2">
-                          <Input
-                            value={option}
-                            onChange={(e) => updateOption(question.id, optIndex, e.target.value)}
-                            placeholder={`Option ${optIndex + 1}`}
-                          />
+                          <Input value={option} onChange={(e) => updateOption(question.id, optIndex, e.target.value)} placeholder={`Option ${optIndex + 1}`} />
                           {question.options && question.options.length > 2 && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeOption(question.id, optIndex)}
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => removeOption(question.id, optIndex)}>
                               <XCircle className="w-4 h-4" />
                             </Button>
                           )}
                         </div>
                       ))}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => addOption(question.id)}
-                        className="w-full"
-                      >
+                      <Button variant="outline" size="sm" onClick={() => addOption(question.id)} className="w-full">
                         <Plus className="w-4 h-4 mr-2" />
                         Add Option
                       </Button>
@@ -662,23 +541,15 @@ export function ScreeningQuestionsBuilder({
                 )}
 
                 {/* Scale Range */}
-                {question.type === 'scale' && (
+                {question.type === "scale" && (
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Minimum Value</Label>
-                      <Input
-                        type="number"
-                        value={question.minValue || 1}
-                        onChange={(e) => updateQuestion(question.id, { minValue: parseInt(e.target.value) })}
-                      />
+                      <Input type="number" value={question.min_value || 1} onChange={(e) => updateQuestion(question.id, { min_value: parseInt(e.target.value) })} />
                     </div>
                     <div className="space-y-2">
                       <Label>Maximum Value</Label>
-                      <Input
-                        type="number"
-                        value={question.maxValue || 5}
-                        onChange={(e) => updateQuestion(question.id, { maxValue: parseInt(e.target.value) })}
-                      />
+                      <Input type="number" value={question.max_value || 5} onChange={(e) => updateQuestion(question.id, { max_value: parseInt(e.target.value) })} />
                     </div>
                   </div>
                 )}
@@ -688,27 +559,24 @@ export function ScreeningQuestionsBuilder({
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label>Knockout Question</Label>
-                      <p className="text-xs text-muted-foreground">
-                        Auto-reject if condition not met
-                      </p>
+                      <p className="text-xs text-muted-foreground">Auto-reject if condition not met</p>
                     </div>
                     <Switch
-                      checked={question.isKnockout}
-                      onCheckedChange={(checked) => updateQuestion(question.id, { 
-                        isKnockout: checked,
-                        weight: checked ? 0 : 10
-                      })}
+                      checked={question.is_knockout}
+                      onCheckedChange={(checked) =>
+                        updateQuestion(question.id, {
+                          is_knockout: checked,
+                          weight: checked ? 0 : 10,
+                        })
+                      }
                     />
                   </div>
 
-                  {question.isKnockout && (
+                  {question.is_knockout && (
                     <div className="glass-strong rounded-lg p-3 space-y-3">
                       <div className="space-y-2">
                         <Label>Knockout Condition</Label>
-                        <Select
-                          value={question.knockoutCondition}
-                          onValueChange={(value: any) => updateQuestion(question.id, { knockoutCondition: value })}
-                        >
+                        <Select value={question.knockout_condition} onValueChange={(value: any) => updateQuestion(question.id, { knockout_condition: value })}>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
@@ -722,34 +590,21 @@ export function ScreeningQuestionsBuilder({
                       </div>
                       <div className="space-y-2">
                         <Label>Knockout Value</Label>
-                        <Input
-                          value={question.knockoutValue || ''}
-                          onChange={(e) => updateQuestion(question.id, { knockoutValue: e.target.value })}
-                          placeholder="e.g., 'no' or '3'"
-                        />
+                        <Input value={question.knockout_value || ""} onChange={(e) => updateQuestion(question.id, { knockout_value: e.target.value })} placeholder="e.g., 'no' or '3'" />
                       </div>
                     </div>
                   )}
                 </div>
 
                 {/* Weight Slider (if not knockout) */}
-                {!question.isKnockout && (
+                {!question.is_knockout && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label>Question Weight</Label>
                       <span className="text-sm text-neon-cyan">{question.weight}%</span>
                     </div>
-                    <Slider
-                      value={[question.weight]}
-                      onValueChange={([value]) => updateQuestion(question.id, { weight: value })}
-                      min={0}
-                      max={100}
-                      step={5}
-                      className="py-4"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Higher weight = more important for overall score
-                    </p>
+                    <Slider value={[question.weight]} onValueChange={([value]) => updateQuestion(question.id, { weight: value })} min={0} max={100} step={5} className="py-4" />
+                    <p className="text-xs text-muted-foreground">Higher weight = more important for overall score</p>
                   </div>
                 )}
 
@@ -757,14 +612,9 @@ export function ScreeningQuestionsBuilder({
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label>Required Question</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Candidates must answer to submit
-                    </p>
+                    <p className="text-xs text-muted-foreground">Candidates must answer to submit</p>
                   </div>
-                  <Switch
-                    checked={question.required}
-                    onCheckedChange={(checked) => updateQuestion(question.id, { required: checked })}
-                  />
+                  <Switch checked={question.required} onCheckedChange={(checked) => updateQuestion(question.id, { required: checked })} />
                 </div>
               </div>
             )}
@@ -772,11 +622,7 @@ export function ScreeningQuestionsBuilder({
         ))}
 
         {/* Add Question Button */}
-        <Button
-          variant="outline"
-          onClick={addBlankQuestion}
-          className="w-full glass hover:border-neon-cyan/50 hover:glow-cyan"
-        >
+        <Button variant="outline" onClick={addBlankQuestion} className="w-full glass hover:border-neon-cyan/50 hover:glow-cyan">
           <Plus className="w-4 h-4 mr-2" />
           Add Custom Question
         </Button>
@@ -800,9 +646,7 @@ export function ScreeningQuestionsBuilder({
             </div>
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">Scored Weight</p>
-              <p className={`text-xl ${Math.abs(totalWeight - 100) > 5 ? 'text-neon-yellow' : 'text-neon-green'}`}>
-                {totalWeight}%
-              </p>
+              <p className={`text-xl ${Math.abs(totalWeight - 100) > 5 ? "text-neon-yellow" : "text-neon-green"}`}>{totalWeight}%</p>
             </div>
           </div>
           <div className="pt-2 border-t border-glass-border space-y-2">
@@ -821,9 +665,7 @@ export function ScreeningQuestionsBuilder({
         <DialogContent className="max-w-2xl glass border-glass-border">
           <DialogHeader>
             <DialogTitle>Candidate Preview</DialogTitle>
-            <DialogDescription>
-              How candidates will see your screening questions
-            </DialogDescription>
+            <DialogDescription>How candidates will see your screening questions</DialogDescription>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh] pr-4">
             <div className="space-y-4">
@@ -839,12 +681,12 @@ export function ScreeningQuestionsBuilder({
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm">{question.question || 'Untitled question'}</p>
+                      <p className="text-sm">{question.title || "Untitled question"}</p>
                     </div>
                   </div>
-                  
+
                   {/* Preview answer format */}
-                  {question.type === 'multiple-choice' && (
+                  {question.type === "multiple_choice" && (
                     <div className="space-y-2">
                       {question.options?.map((option, i) => (
                         <div key={i} className="flex items-center gap-2">
@@ -854,8 +696,8 @@ export function ScreeningQuestionsBuilder({
                       ))}
                     </div>
                   )}
-                  
-                  {question.type === 'yes-no' && (
+
+                  {question.type === "yes_no" && (
                     <div className="flex gap-4">
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded border border-glass-border" />
@@ -867,22 +709,18 @@ export function ScreeningQuestionsBuilder({
                       </div>
                     </div>
                   )}
-                  
-                  {question.type === 'scale' && (
+
+                  {question.type === "scale" && (
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>{question.minValue || 1}</span>
-                        <span>{question.maxValue || 5}</span>
+                        <span>{question.min_value || 1}</span>
+                        <span>{question.max_value || 5}</span>
                       </div>
                       <div className="h-2 glass rounded-full" />
                     </div>
                   )}
-                  
-                  {question.type === 'short-text' && (
-                    <div className="glass rounded p-3 text-sm text-muted-foreground">
-                      Text input area...
-                    </div>
-                  )}
+
+                  {question.type === "short_text" && <div className="glass rounded p-3 text-sm text-muted-foreground">Text input area...</div>}
                 </div>
               ))}
             </div>
@@ -901,9 +739,7 @@ export function ScreeningQuestionsBuilder({
               <TrendingUp className="w-5 h-5 text-neon-purple" />
               You&apos;re on a roll!
             </DialogTitle>
-            <DialogDescription>
-              You&apos;ve used AI {aiUsageCount} times this month. Great work!
-            </DialogDescription>
+            <DialogDescription>You&apos;ve used AI {aiUsageCount} times this month. Great work!</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <Card className="glass-strong p-4 space-y-3">
@@ -913,9 +749,7 @@ export function ScreeningQuestionsBuilder({
                 </div>
                 <div className="flex-1">
                   <h4 className="text-sm mb-1">Upgrade to Premium</h4>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Get unlimited AI generations, advanced scoring analytics, and priority support
-                  </p>
+                  <p className="text-xs text-muted-foreground mb-3">Get unlimited AI generations, advanced scoring analytics, and priority support</p>
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-xs">
                       <CheckCircle className="w-3 h-3 text-neon-green" />
@@ -933,22 +767,13 @@ export function ScreeningQuestionsBuilder({
                 </div>
               </div>
             </Card>
-            <p className="text-xs text-muted-foreground text-center">
-              Free plan: 10 AI uses per month • Premium: Unlimited
-            </p>
+            <p className="text-xs text-muted-foreground text-center">Free plan: 10 AI uses per month • Premium: Unlimited</p>
           </div>
           <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowUpgradeNudge(false)}
-              className="flex-1"
-            >
+            <Button variant="outline" onClick={() => setShowUpgradeNudge(false)} className="flex-1">
               Maybe Later
             </Button>
-            <Button
-              onClick={() => setShowUpgradeNudge(false)}
-              className="flex-1 gradient-animated"
-            >
+            <Button onClick={() => setShowUpgradeNudge(false)} className="flex-1 gradient-animated">
               <TrendingUp className="w-4 h-4 mr-2" />
               Upgrade Now
             </Button>

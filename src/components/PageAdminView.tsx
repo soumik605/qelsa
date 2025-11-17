@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Textarea } from "./ui/textarea";
 
 interface PageAdminViewProps {
-  pageId: string;
+  page_id: string;
 }
 
 interface TeamMember {
@@ -22,7 +22,7 @@ interface TeamMember {
   avatar?: string;
 }
 
-export function PageAdminView({ pageId }: PageAdminViewProps) {
+export function PageAdminView({ page_id }: PageAdminViewProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberRole, setNewMemberRole] = useState<"editor" | "recruiter">("editor");

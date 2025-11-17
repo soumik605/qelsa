@@ -1,13 +1,12 @@
-import React from 'react'
-import Layout from '../layout'
-import { PageAdminView } from '../components/PageAdminView'
+import { PageAdminView } from "../components/PageAdminView";
+import Layout from "../layout";
 
 const PageAdmin = () => {
   return (
     <Layout activeSection={"pages"}>
-      <PageAdminView pageId="1" />;
+      <PageAdminView page_id="1" />;
     </Layout>
-  )
-}
+  );
+};
 
-export default PageAdmin
+export default PageAdmin;

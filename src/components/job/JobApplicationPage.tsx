@@ -148,7 +148,7 @@ export function JobApplicationPage({ job, onBack, onSubmit }: JobApplicationPage
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-4">
               <Badge variant="secondary">
-                {currentQuestion?.type === "multiple-choice" && "Multiple Choice"}
+                {currentQuestion?.type === "multiple_choice" && "Multiple Choice"}
                 {currentQuestion?.type === "short-answer" && "Short Answer"}
                 {currentQuestion?.type === "coding" && "Coding Challenge"}
                 {currentQuestion?.type === "behavioral" && "Behavioral"}
@@ -165,7 +165,7 @@ export function JobApplicationPage({ job, onBack, onSubmit }: JobApplicationPage
 
           {/* Answer Input */}
           <div className="space-y-4">
-            {currentQuestion?.type === "multiple-choice" && currentQuestion.options && (
+            {currentQuestion?.type === "multiple_choice" && currentQuestion.options && (
               <div className="space-y-3">
                 {currentQuestion.options.map((option, idx) => (
                   <label key={idx} className="flex items-center gap-3 p-4 rounded-lg border border-glass-border hover:border-neon-cyan/50 cursor-pointer transition-colors">
@@ -251,7 +251,7 @@ function solution() {
                 {currentQuestion?.type === "coding" && "Write clean, well-commented code. Explain your thought process and time/space complexity."}
                 {currentQuestion?.type === "behavioral" && "Use the STAR method (Situation, Task, Action, Result) to structure your answer effectively."}
                 {currentQuestion?.type === "short-answer" && "Be specific and concise. Provide concrete examples when possible."}
-                {currentQuestion?.type === "multiple-choice" && "Select all options that apply to your experience."}
+                {currentQuestion?.type === "multiple_choice" && "Select all options that apply to your experience."}
               </p>
             </div>
           </div>

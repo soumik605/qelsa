@@ -1,6 +1,8 @@
-import { AlertCircle, ArrowLeft, CheckCircle2, Clock, DollarSign, Eye, FileText, HelpCircle, Lightbulb, Save, Send, Shield, Sparkles, TrendingUp, Users, Wand2, Zap } from "lucide-react";
+import { Job, ScreeningQuestion } from "@/types/job";
+import { AlertCircle, ArrowLeft, CheckCircle2, Clock, DollarSign, Edit2, Eye, FileText, HelpCircle, Lightbulb, Save, Send, Shield, Sparkles, TrendingUp, Users, Wand2, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ScreeningQuestion, ScreeningQuestionsBuilder } from "../ScreeningQuestionsBuilder";
+import { ScreeningQuestionsBuilder } from "../ScreeningQuestionsBuilder";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
@@ -9,47 +11,34 @@ import { Progress } from "../ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
-
-interface JobPostingPageProps {}
+import { useCreateJobMutation } from "@/features/api/jobsApi";
 
 type PostingMode = "select" | "ai-copilot" | "manual";
 type PostingStep = "input" | "review" | "questions" | "final-review" | "published";
 
-interface JobData {
-  title: string;
-  company: string;
-  location: string;
-  workType: string;
-  experience: string;
-  salary: string;
-  description: string;
-  responsibilities: string[];
-  requirements: string[];
-  skills: string[];
-  benefits: string[];
-  screeningQuestions: ScreeningQuestion[];
-}
-
-export function JobPostingPage({}: JobPostingPageProps) {
+export function JobPostingPage() {
+  const [createJob, { isLoading, isSuccess, error }] = useCreateJobMutation();
+  const router = useRouter();
   const [mode, setMode] = useState<PostingMode>("select");
   const [step, setStep] = useState<PostingStep>("input");
   const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPremium] = useState(false); // Set to true for premium users
-  const [jobData, setJobData] = useState<Partial<JobData>>({
+  const [jobData, setJobData] = useState<Partial<Job>>({
     title: "",
-    company: "",
     location: "",
-    workType: "Full-time",
-    experience: "",
-    salary: "",
+    work_type: "Full-time",
+    experience: null,
+    salary: null,
     description: "",
-    responsibilities: [],
-    requirements: [],
-    skills: [],
-    benefits: [],
-    screeningQuestions: [],
+    // responsibilities: [],
+    // requirements: [],
+    // skills: [],
+    // benefits: [],
+    screening_questions: [],
   });
+
+  console.log("jobData", jobData);
 
   // AI Insights (mock data)
   const [aiInsights, setAiInsights] = useState({
@@ -68,69 +57,10 @@ export function JobPostingPage({}: JobPostingPageProps) {
     conversionRate: 0,
   });
 
-  const handleAIGenerate = () => {
-    if (!aiPrompt.trim()) return;
+  const handleAIGenerate = () => {};
 
-    setIsGenerating(true);
-
-    // Simulate AI generation
-    setTimeout(() => {
-      const generatedData: Partial<JobData> = {
-        title: "Senior Backend Engineer",
-        company: "Qelsa Technologies",
-        location: "San Francisco, CA (Remote)",
-        workType: "Full-time",
-        experience: "3-5 years",
-        salary: "$130k - $170k",
-        description:
-          "We are looking for a passionate Senior Backend Engineer to join our dynamic team. You will be responsible for building scalable microservices and APIs that power our career platform used by millions of professionals worldwide.",
-        responsibilities: [
-          "Design and implement scalable backend services using Node.js and Python",
-          "Collaborate with frontend teams to create seamless API integrations",
-          "Optimize database queries and improve system performance",
-          "Mentor junior engineers and conduct code reviews",
-          "Participate in architectural decisions and technical planning",
-        ],
-        requirements: [
-          "3+ years of experience in backend development",
-          "Strong proficiency in Node.js, Python, or similar",
-          "Experience with AWS, Docker, and microservices architecture",
-          "Solid understanding of database design (PostgreSQL, MongoDB)",
-          "Excellent problem-solving and communication skills",
-        ],
-        skills: ["Node.js", "Python", "AWS", "Docker", "PostgreSQL", "MongoDB", "REST APIs", "GraphQL"],
-        benefits: [
-          "Competitive salary and equity package",
-          "Flexible remote work options",
-          "Health, dental, and vision insurance",
-          "Professional development budget",
-          "401(k) matching",
-          "Unlimited PTO",
-        ],
-      };
-
-      setJobData(generatedData);
-      setIsGenerating(false);
-    }, 2000);
-  };
-
-  const handleManualUpdate = (field: keyof JobData, value: any) => {
+  const handleManualUpdate = (field: keyof Job, value: any) => {
     setJobData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleArrayAdd = (field: keyof JobData, value: string) => {
-    if (!value.trim()) return;
-    setJobData((prev) => ({
-      ...prev,
-      [field]: [...((prev[field] as string[]) || []), value],
-    }));
-  };
-
-  const handleArrayRemove = (field: keyof JobData, index: number) => {
-    setJobData((prev) => ({
-      ...prev,
-      [field]: (prev[field] as string[])?.filter((_, i) => i !== index) || [],
-    }));
   };
 
   const handleOptimize = () => {
@@ -148,30 +78,75 @@ export function JobPostingPage({}: JobPostingPageProps) {
   const handleScreeningQuestionsChange = (questions: ScreeningQuestion[]) => {
     setJobData((prev) => ({
       ...prev,
-      screeningQuestions: questions,
+      screening_questions: questions,
     }));
   };
 
-  const handlePublish = () => {
-    setStep("published");
-    // Simulate post-publish metrics
-    setTimeout(() => {
-      setPostMetrics({
-        views: 45,
-        applications: 3,
-        avgTimeToApply: "2 days",
-        conversionRate: 6.7,
-      });
-    }, 1000);
+  function transformJobPayload(formData: any) {
+    const questions = formData.screening_questions.map((q: any) => {
+      const base = { title: q.title, type: q.type, is_knockout: q.is_knockout, weight: q.weight ?? 0 };
+
+      if (q.type === "multiple_choice") {
+        return { ...base, options: q.options.map((opt: string) => ({ title: opt })) };
+      }
+
+      if (q.type === "scale") {
+        return { ...base, min_value: q.min_value ?? 1, max_value: q.max_value ?? 5 };
+      }
+
+      return base;
+    });
+
+    return {
+      job: {
+        title: formData.title,
+        description: formData.description,
+        location: formData.location,
+        work_type: formData.work_type,
+        salary: formData.salary,
+        experience: formData.experience,
+        company_name: formData.company_name,
+        resource: formData.resource,
+      },
+      questionSet: {
+        title: `Screening - ${new Date().toISOString()}`, // auto generate
+      },
+      questions,
+    };
+  }
+
+  const handlePublish = async () => {
+    console.log("🚀 ~ handlePublish ~ jobData:", jobData)
+    const newData = transformJobPayload(jobData);
+    console.log("🚀 ~ handlePublish ~ newData:", newData)
+
+    try {
+      const result = await createJob(newData).unwrap();
+      console.log("Created job:", result);
+      
+      setStep("published");
+    } catch (err) {
+      console.error("Job creation failed:", err);
+    }
+    
+
+    // // Simulate post-publish metrics
+    // setTimeout(() => {
+    //   setPostMetrics({
+    //     views: 45,
+    //     applications: 3,
+    //     avgTimeToApply: "2 days",
+    //     conversionRate: 6.7,
+    //   });
+    // }, 1000);
+
+    // onPublish?.(jobData);
+    // onPostSuccess?.();
   };
 
   const handleSaveDraft = () => {
     console.log("Saving draft:", jobData);
   };
-
-  // ========================================
-  // STEP-BASED RENDERING (checked first)
-  // ========================================
 
   // Published State
   if (step === "published") {
@@ -179,7 +154,7 @@ export function JobPostingPage({}: JobPostingPageProps) {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <div className="glass-strong border-b border-glass-border">
           <div className="max-w-5xl mx-auto px-6 py-6">
-            <Button variant="ghost" className="mb-4 text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" onClick={() => router.push("/jobs")} className="mb-4 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Jobs
             </Button>
@@ -296,7 +271,7 @@ export function JobPostingPage({}: JobPostingPageProps) {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <h4 className="font-medium mb-1">Make Title More Specific</h4>
-                    <p className="text-sm text-muted-foreground">Try &quot;Senior Backend Engineer (Node.js)&quot; instead of generic title</p>
+                    <p className="text-sm text-muted-foreground">Try Senior Backend Engineer (Node.js) instead of generic title</p>
                   </div>
                   <Button size="sm" variant="outline" className="border-neon-cyan/30 text-neon-cyan">
                     Refine
@@ -327,7 +302,7 @@ export function JobPostingPage({}: JobPostingPageProps) {
                 <p className="text-muted-foreground mt-2">Pre-screen candidates with smart questions and AI-powered evaluation</p>
               </div>
 
-              <Badge className="bg-neon-cyan/20 text-neon-cyan border-0">{jobData.screeningQuestions?.length || 0} Questions</Badge>
+              <Badge className="bg-neon-cyan/20 text-neon-cyan border-0">{jobData.screening_questions?.length || 0} Questions</Badge>
             </div>
           </div>
         </div>
@@ -335,7 +310,7 @@ export function JobPostingPage({}: JobPostingPageProps) {
         <div className="max-w-5xl mx-auto px-6 py-8">
           <Card className="p-6 glass border-glass-border">
             <ScreeningQuestionsBuilder
-              questions={jobData.screeningQuestions || []}
+              questions={jobData.screening_questions || []}
               onChange={handleScreeningQuestionsChange}
               jobTitle={jobData.title}
               jobDescription={jobData.description}
@@ -400,7 +375,7 @@ export function JobPostingPage({}: JobPostingPageProps) {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm text-muted-foreground mb-1">Type</p>
-                    <p className="font-medium text-sm">{jobData.workType}</p>
+                    <p className="font-medium text-sm">{jobData.work_type}</p>
                   </div>
                   <div className="flex-1">
                     <p className="text-sm text-muted-foreground mb-1">Salary</p>
@@ -414,24 +389,24 @@ export function JobPostingPage({}: JobPostingPageProps) {
             <Card className="p-6 glass border-glass-border">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">Screening Questions</h3>
-                <Badge className="bg-neon-cyan/20 text-neon-cyan border-0">{jobData.screeningQuestions?.length || 0} Questions</Badge>
+                <Badge className="bg-neon-cyan/20 text-neon-cyan border-0">{jobData.screening_questions?.length || 0} Questions</Badge>
               </div>
-              {jobData.screeningQuestions && jobData.screeningQuestions.length > 0 ? (
+              {jobData.screening_questions && jobData.screening_questions.length > 0 ? (
                 <div className="space-y-2">
-                  {jobData.screeningQuestions?.slice(0, 3).map((q, idx) => (
+                  {jobData.screening_questions?.slice(0, 3).map((q, idx) => (
                     <div key={q.id} className="p-3 rounded-lg bg-white/5">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm text-muted-foreground">{idx + 1}.</span>
-                        {q.isKnockout && (
+                        {q.is_knockout && (
                           <Badge variant="outline" className="text-xs border-destructive/30 text-destructive">
                             Knockout
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm">{q.question}</p>
+                      <p className="text-sm">{q.title}</p>
                     </div>
                   ))}
-                  {jobData.screeningQuestions.length > 3 && <p className="text-xs text-muted-foreground text-center py-2">+{jobData.screeningQuestions.length - 3} more questions</p>}
+                  {jobData.screening_questions.length > 3 && <p className="text-xs text-muted-foreground text-center py-2">+{jobData.screening_questions.length - 3} more questions</p>}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground text-center py-4">No screening questions added</p>
@@ -474,23 +449,19 @@ export function JobPostingPage({}: JobPostingPageProps) {
     );
   }
 
-  // ========================================
-  // MODE-BASED RENDERING (checked after steps)
-  // ========================================
-
   // Mode Selection Screen
   if (mode === "select") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <div className="glass-strong border-b border-glass-border">
           <div className="max-w-5xl mx-auto px-6 py-6">
-            <Button variant="ghost" className="mb-4 text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" onClick={() => router.push("/jobs")} className="mb-4 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Jobs
             </Button>
 
             <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Post a Job</h1>
-            <p className="text-muted-foreground mt-2">Choose how you&apos;d like to create your job posting</p>
+            <p className="text-muted-foreground mt-2">Choose how youd like to create your job posting</p>
           </div>
         </div>
 
@@ -684,12 +655,12 @@ export function JobPostingPage({}: JobPostingPageProps) {
                   <div className="space-y-4">
                     <div>
                       <h4 className="text-xl font-bold">{jobData.title}</h4>
-                      <p className="text-muted-foreground">{jobData.company}</p>
+                      <p className="text-muted-foreground">{jobData.page?.name}</p>
                     </div>
 
                     <div className="flex flex-wrap gap-2">
                       <Badge variant="secondary">{jobData.location}</Badge>
-                      <Badge variant="secondary">{jobData.workType}</Badge>
+                      <Badge variant="secondary">{jobData.work_type}</Badge>
                       <Badge variant="secondary">{jobData.experience}</Badge>
                       <Badge className="bg-neon-green/20 text-neon-green border-0">{jobData.salary}</Badge>
                     </div>
@@ -701,7 +672,7 @@ export function JobPostingPage({}: JobPostingPageProps) {
                       <p className="text-muted-foreground text-sm">{jobData.description}</p>
                     </div>
 
-                    <div>
+                    {/* <div>
                       <h5 className="font-semibold mb-2">Key Responsibilities</h5>
                       <ul className="space-y-1">
                         {jobData.responsibilities?.map((item, idx) => (
@@ -711,9 +682,9 @@ export function JobPostingPage({}: JobPostingPageProps) {
                           </li>
                         ))}
                       </ul>
-                    </div>
+                    </div> */}
 
-                    <div>
+                    {/* <div>
                       <h5 className="font-semibold mb-2">Requirements</h5>
                       <ul className="space-y-1">
                         {jobData.requirements?.map((item, idx) => (
@@ -723,9 +694,9 @@ export function JobPostingPage({}: JobPostingPageProps) {
                           </li>
                         ))}
                       </ul>
-                    </div>
+                    </div> */}
 
-                    <div>
+                    {/* <div>
                       <h5 className="font-semibold mb-2">Required Skills</h5>
                       <div className="flex flex-wrap gap-2">
                         {jobData.skills?.map((skill, idx) => (
@@ -734,7 +705,7 @@ export function JobPostingPage({}: JobPostingPageProps) {
                           </Badge>
                         ))}
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </Card>
               )}
@@ -769,7 +740,7 @@ export function JobPostingPage({}: JobPostingPageProps) {
                       </div>
                       <div>
                         <label className="text-sm font-medium mb-2 block">Work Type</label>
-                        <Select value={jobData.workType} onValueChange={(value) => handleManualUpdate("workType", value)}>
+                        <Select value={jobData.work_type} onValueChange={(value) => handleManualUpdate("work_type", value)}>
                           <SelectTrigger className="glass border-glass-border">
                             <SelectValue />
                           </SelectTrigger>
@@ -877,93 +848,168 @@ export function JobPostingPage({}: JobPostingPageProps) {
   }
 
   // Manual Entry Mode
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
-      <div className="glass-strong border-b border-glass-border">
-        <div className="max-w-5xl mx-auto px-6 py-6">
-          <Button variant="ghost" onClick={() => setMode("select")} className="mb-4 text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Manual Entry</h1>
-          <p className="text-muted-foreground mt-2">Fill out the job details with AI assistance</p>
-        </div>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        <Card className="p-6 glass border-glass-border">
-          <div className="space-y-6">
-            {/* Basic Info */}
-            <div>
-              <h3 className="font-semibold mb-4">Basic Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Job Title *</label>
-                  <Input placeholder="e.g., Senior Backend Engineer" value={jobData.title} onChange={(e) => handleManualUpdate("title", e.target.value)} className="glass border-glass-border" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Company *</label>
-                  <Input placeholder="e.g., Qelsa Technologies" value={jobData.company} onChange={(e) => handleManualUpdate("company", e.target.value)} className="glass border-glass-border" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Location *</label>
-                  <Input placeholder="e.g., San Francisco, CA" value={jobData.location} onChange={(e) => handleManualUpdate("location", e.target.value)} className="glass border-glass-border" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Work Type *</label>
-                  <Select value={jobData.workType} onValueChange={(value) => handleManualUpdate("workType", value)}>
-                    <SelectTrigger className="glass border-glass-border">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Full-time">Full-time</SelectItem>
-                      <SelectItem value="Part-time">Part-time</SelectItem>
-                      <SelectItem value="Contract">Contract</SelectItem>
-                      <SelectItem value="Internship">Internship</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Description */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium">Job Description *</label>
-                <Button size="sm" variant="ghost" className="text-neon-purple text-xs">
-                  <Wand2 className="w-3 h-3 mr-1" />
-                  AI Improve
-                </Button>
-              </div>
-              <Textarea
-                placeholder="Describe the role, responsibilities, and what makes this position unique..."
-                value={jobData.description}
-                onChange={(e) => handleManualUpdate("description", e.target.value)}
-                className="glass border-glass-border min-h-32"
-              />
-              {jobData.description && jobData.description.length < 100 && (
-                <p className="text-xs text-neon-yellow mt-2 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  AI suggests adding more details (min 100 characters for better reach)
-                </p>
-              )}
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <Button variant="outline" onClick={handleSaveDraft} className="flex-1 border-neon-cyan/30 text-neon-cyan">
-                <Save className="w-4 h-4 mr-2" />
-                Save Draft
+  if (mode === "manual") {
+    // If in review step, show review interface
+    if (step === "review") {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
+          <div className="glass-strong border-b border-glass-border">
+            <div className="max-w-5xl mx-auto px-6 py-6">
+              <Button variant="ghost" onClick={() => setStep("input")} className="mb-4 text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Edit
               </Button>
-              <Button onClick={() => setStep("review")} disabled={!jobData.title || !jobData.description} className="flex-1 gradient-animated">
-                Continue to Review
-              </Button>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Review & Publish</h1>
+                  <p className="text-muted-foreground mt-2">Review your job posting and add screening questions</p>
+                </div>
+
+                <Badge className="bg-neon-green/20 text-neon-green border-0">
+                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                  Ready
+                </Badge>
+              </div>
             </div>
           </div>
-        </Card>
+
+          <div className="max-w-5xl mx-auto px-6 py-8">
+            <Card className="p-6 glass border-glass-border">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-semibold">Job Preview</h3>
+                <Button size="sm" variant="outline" onClick={() => setStep("input")} className="border-neon-cyan/30 text-neon-cyan">
+                  <Edit2 className="w-3 h-3 mr-2" />
+                  Edit
+                </Button>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div>
+                  <h4 className="text-xl font-bold">{jobData.title}</h4>
+                  <p className="text-muted-foreground">{jobData.page?.name}</p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="secondary">{jobData.location}</Badge>
+                  <Badge variant="secondary">{jobData.work_type}</Badge>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h5 className="font-semibold mb-2">Description</h5>
+                  <p className="text-muted-foreground text-sm">{jobData.description}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleSaveDraft} className="flex-1 border-neon-cyan/30 text-neon-cyan">
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Draft
+                </Button>
+                <Button onClick={() => setStep("questions")} className="flex-1 gradient-animated">
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  Add Screening Questions
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      );
+    }
+
+    // Default input form
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
+        <div className="glass-strong border-b border-glass-border">
+          <div className="max-w-5xl mx-auto px-6 py-6">
+            <Button variant="ghost" onClick={() => setMode("select")} className="mb-4 text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Manual Entry</h1>
+            <p className="text-muted-foreground mt-2">Fill out the job details with AI assistance</p>
+          </div>
+        </div>
+
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          <Card className="p-6 glass border-glass-border">
+            <div className="space-y-6">
+              {/* Basic Info */}
+              <div>
+                <h3 className="font-semibold mb-4">Basic Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Job Title *</label>
+                    <Input placeholder="e.g., Senior Backend Engineer" value={jobData.title} onChange={(e) => handleManualUpdate("title", e.target.value)} className="glass border-glass-border" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Company *</label>
+                    {/* <Input placeholder="e.g., Qelsa Technologies" value={jobData.page?.name} onChange={(e) => handleManualUpdate("company", e.target.value)} className="glass border-glass-border" /> */}
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Location *</label>
+                    <Input placeholder="e.g., San Francisco, CA" value={jobData.location} onChange={(e) => handleManualUpdate("location", e.target.value)} className="glass border-glass-border" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Work Type *</label>
+                    <Select value={jobData.work_type} onValueChange={(value) => handleManualUpdate("work_type", value)}>
+                      <SelectTrigger className="glass border-glass-border">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Full-time">Full-time</SelectItem>
+                        <SelectItem value="Part-time">Part-time</SelectItem>
+                        <SelectItem value="Contract">Contract</SelectItem>
+                        <SelectItem value="Internship">Internship</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Description */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium">Job Description *</label>
+                  <Button size="sm" variant="ghost" className="text-neon-purple text-xs">
+                    <Wand2 className="w-3 h-3 mr-1" />
+                    AI Improve
+                  </Button>
+                </div>
+                <Textarea
+                  placeholder="Describe the role, responsibilities, and what makes this position unique..."
+                  value={jobData.description}
+                  onChange={(e) => handleManualUpdate("description", e.target.value)}
+                  className="glass border-glass-border min-h-32"
+                />
+                {jobData.description && jobData.description.length < 100 && (
+                  <p className="text-xs text-neon-yellow mt-2 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    AI suggests adding more details (min 100 characters for better reach)
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button variant="outline" onClick={handleSaveDraft} className="flex-1 border-neon-cyan/30 text-neon-cyan">
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Draft
+                </Button>
+                <Button onClick={() => setStep("review")} disabled={!jobData.title || !jobData.description} className="flex-1 gradient-animated">
+                  Continue to Review
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return null;
 }
