@@ -17,8 +17,6 @@ export function PagesHub({}: PagesHubProps) {
   const { data: mypages = [], isLoading, error } = useGetMyPagesQuery();
   const { data: discoverPages = [], isLoading: discoverLoading, error: discoverError } = useGetDiscoverPagesQuery();
 
-  console.log("🚀 ~ PagesHub ~ data:", mypages);
-
   const getPageTypeIcon = (type: string) => {
     switch (type) {
       case "company":
@@ -105,7 +103,7 @@ export function PagesHub({}: PagesHubProps) {
           View
         </Button>
         {(role === "admin" || role === "editor") && (
-          <Button size="sm" className="flex-1 gradient-animated">
+          <Button size="sm" className="flex-1 gradient-animated" onClick={() => router.push(`/pages/${page.id}/manage`)}>
             <Edit className="w-3 h-3 mr-1" />
             Manage
           </Button>

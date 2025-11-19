@@ -1,8 +1,8 @@
-import { Button } from "@mui/material";
 import { Activity, Bell, BookOpen, Briefcase, FileText, Filter, Home, Mail, Rss, Search, User, Users, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 
 interface NavigationItem {
   id: string;
@@ -24,7 +24,7 @@ const mainNavigationItems: NavigationItem[] = [
   { id: "profile", label: "My Space", icon: Home, url: "/" },
   { id: "home", label: "Feed", icon: Activity, url: "/feed" },
   { id: "qelsa-ai", label: "Qelsa AI", icon: Zap, url: "/qelsa-ai" },
-  { id: "jobs", label: "Jobs", icon: Briefcase, badge: 12, url: "/jobs" },
+  { id: "jobs", label: "Jobs", icon: Briefcase, badge: 12, url: "/jobs/discover" },
   { id: "pages", label: "Pages", icon: FileText, url: "/pages" },
   { id: "connections", label: "Network", icon: Users, url: "/network" },
   { id: "courses", label: "Courses", icon: BookOpen, badge: 3, url: "/courses" },
@@ -78,7 +78,7 @@ export function MainNavigation({ activeSection, onJobSearch, onJobFilter, onProf
               <Button
                 key={item.id}
                 onClick={() => handleTabChange(item.url)}
-                sx={{ textDecoration: "none", color: "inherit" }}
+                // sx={{ textDecoration: "none", color: "inherit" }}
                 className={`relative group flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 hover:scale-110 ${
                   isActive ? "text-neon-cyan" : "text-muted-foreground hover:text-white"
                 }`}

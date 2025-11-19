@@ -1,6 +1,7 @@
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
 import { createApi, fetchBaseQuery, FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 
+// Interfaces
 interface LoginRequest {
   email: string;
   password: string;
@@ -29,13 +30,7 @@ interface Profile {
   role: string;
 }
 
-interface ErrorResponse {
-  status: number;
-  data?: {
-    message?: string;
-  };
-}
-
+// Redirect Helper
 const redirectToLogin = (message: string) => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
@@ -43,9 +38,7 @@ const redirectToLogin = (message: string) => {
   window.location.href = `/login?${params.toString()}`;
 };
 
-// -------------------------------
-// 🔹 Raw base query
-// -------------------------------
+// Raw baseQuery
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: "http://localhost:3000/api/auth",
   prepareHeaders: (headers) => {
@@ -55,9 +48,6 @@ const rawBaseQuery = fetchBaseQuery({
   },
 });
 
-// -------------------------------
-// 🔹 Wrapper with refresh token logic
-// -------------------------------
 const baseQueryWithReauth: BaseQueryFn<string | { url: string; method?: string; body?: unknown }, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
   let result = await rawBaseQuery(args, api, extraOptions);
 
@@ -68,7 +58,11 @@ const baseQueryWithReauth: BaseQueryFn<string | { url: string; method?: string; 
       return result;
     }
 
-    // Try to refresh token
+    if (typeof args === "string" ? args.includes("/refresh") : args.url.includes("/refresh")) {
+      redirectToLogin("Session expired. Please login again.");
+      return result;
+    }
+
     const refreshResult = await rawBaseQuery(
       {
         url: "/refresh",
@@ -84,7 +78,6 @@ const baseQueryWithReauth: BaseQueryFn<string | { url: string; method?: string; 
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", newRefresh);
 
-      // Retry original request
       result = await rawBaseQuery(args, api, extraOptions);
     } else {
       redirectToLogin("Session expired. Please login again.");
@@ -94,9 +87,7 @@ const baseQueryWithReauth: BaseQueryFn<string | { url: string; method?: string; 
   return result;
 };
 
-// -------------------------------
-// 🔹 Auth API
-// -------------------------------
+// Auth API
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: baseQueryWithReauth,

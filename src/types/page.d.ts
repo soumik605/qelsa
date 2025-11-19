@@ -12,4 +12,5 @@ export type Page = {
   facebook_url?: string;
   instagram_url?: string;
   youtube_url?: string;
+  can_manage: boolean;
 };

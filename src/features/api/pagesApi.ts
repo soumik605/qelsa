@@ -56,11 +56,11 @@ export const pagesApi = createApi({
       invalidatesTags: ["Pages"],
     }),
 
-    updatePage: builder.mutation<{ success: boolean; message: string; data: Page }, { id: string; updates: Partial<Page> }>({
-      query: ({ id, updates }) => ({
+    updatePage: builder.mutation<{ success: boolean; message: string; data: Page }, { id: number; data: Partial<Page> }>({
+      query: ({ id, data }) => ({
         url: `pages/${id}`,
         method: "PUT",
-        body: updates,
+        body: data,
       }),
       invalidatesTags: ["Pages"],
     }),

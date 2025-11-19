@@ -1,5 +1,7 @@
+import { useGetPageByIdQuery, useUpdatePageMutation } from "@/features/api/pagesApi";
 import { ArrowLeft, Briefcase, Crown, Edit, Eye, FileText, Plus, Trash2, TrendingUp, UserPlus, Users } from "lucide-react";
-import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -8,10 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Separator } from "./ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Textarea } from "./ui/textarea";
-
-interface PageAdminViewProps {
-  page_id: string;
-}
 
 interface TeamMember {
   id: string;
@@ -22,12 +20,18 @@ interface TeamMember {
   avatar?: string;
 }
 
-export function PageAdminView({ page_id }: PageAdminViewProps) {
+export function PageAdminView() {
+  const router = useRouter();
+  const params = useParams();
+
+  const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const [activeTab, setActiveTab] = useState("overview");
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberRole, setNewMemberRole] = useState<"editor" | "recruiter">("editor");
+  const { data: page, isLoading, error } = useGetPageByIdQuery(id);
+  const [pageData, setPageData] = useState({ name: page?.name, tagline: page?.tagline, description: page?.description });
+  const [updatePage, { isLoading: updateLoading, isSuccess, isError, error: updateError }] = useUpdatePageMutation();
 
-  // Mock data
   const pageStats = {
     followers: 12450,
     followersGrowth: "+12%",
@@ -39,50 +43,32 @@ export function PageAdminView({ page_id }: PageAdminViewProps) {
     engagementGrowth: "+8%",
   };
 
-  const teamMembers: TeamMember[] = [
-    {
-      id: "1",
-      name: "You",
-      email: "you@techcorp.com",
-      role: "admin",
-      joinedDate: "2023-01-15",
-    },
-    {
-      id: "2",
-      name: "Sarah Chen",
-      email: "sarah@techcorp.com",
-      role: "editor",
-      joinedDate: "2023-03-20",
-    },
-    {
-      id: "3",
-      name: "Marcus Johnson",
-      email: "marcus@techcorp.com",
-      role: "recruiter",
-      joinedDate: "2023-06-10",
-    },
-  ];
+  const teamMembers: TeamMember[] = [];
 
-  const recentActivity = [
-    {
-      id: "1",
-      type: "follower",
-      description: "New follower: John Doe",
-      timestamp: "2 hours ago",
-    },
-    {
-      id: "2",
-      type: "job",
-      description: "Job posted: Senior Backend Engineer",
-      timestamp: "5 hours ago",
-    },
-    {
-      id: "3",
-      type: "update",
-      description: "Update published: Series B funding announcement",
-      timestamp: "1 day ago",
-    },
-  ];
+  const recentActivity = [];
+
+  useEffect(() => {
+    if (page) {
+      setPageData({
+        name: page.name || "",
+        tagline: page.tagline || "",
+        description: page.description || "",
+      });
+    }
+
+    if (page && !page.can_manage) {
+      router.push(`/jobs/${page.id}`);
+    }
+  }, [page]);
+
+  const handleUpdatePage = async () => {
+    try {
+      await updatePage({ id: page.id, data: pageData }).unwrap();
+      console.log("Page updated successfully");
+    } catch (err) {
+      console.error("Update failed:", err);
+    }
+  };
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -115,11 +101,11 @@ export function PageAdminView({ page_id }: PageAdminViewProps) {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Page Admin Dashboard</h1>
-              <p className="text-muted-foreground mt-2">TechCorp Solutions</p>
+              <p className="text-muted-foreground mt-2">{page?.name}</p>
             </div>
 
             <div className="flex gap-2">
-              <Button variant="outline" className="border-neon-cyan/30 text-neon-cyan">
+              <Button variant="outline" className="border-neon-cyan/30 text-neon-cyan" onClick={() => router.push(`/jobs/${page.id}`)}>
                 <Eye className="w-4 h-4 mr-2" />
                 View Public Page
               </Button>
@@ -327,23 +313,25 @@ export function PageAdminView({ page_id }: PageAdminViewProps) {
               <div className="space-y-6">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Page Name</label>
-                  <Input defaultValue="TechCorp Solutions" className="glass border-glass-border" />
+                  <Input value={pageData.name} onChange={(e) => setPageData({ ...pageData, name: e.target.value })} className="glass border-glass-border" />
                 </div>
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">Tagline</label>
-                  <Input defaultValue="Building the future of enterprise software" className="glass border-glass-border" />
+                  <Input value={pageData.tagline} onChange={(e) => setPageData({ ...pageData, tagline: e.target.value })} className="glass border-glass-border" />
                 </div>
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">Description</label>
-                  <Textarea defaultValue="TechCorp Solutions is a forward-thinking technology company..." className="glass border-glass-border min-h-32" />
+                  <Textarea value={pageData.description} onChange={(e) => setPageData({ ...pageData, description: e.target.value })} className="glass border-glass-border min-h-32" />
                 </div>
 
                 <Separator />
 
                 <div className="flex gap-3">
-                  <Button className="gradient-animated">Save Changes</Button>
+                  <Button className="gradient-animated" onClick={handleUpdatePage}>
+                    Save Changes
+                  </Button>
                   <Button variant="outline" className="border-glass-border">
                     Cancel
                   </Button>

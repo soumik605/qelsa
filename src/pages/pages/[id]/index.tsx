@@ -1,10 +1,10 @@
-import { PageView } from "@/components/PageView";
+import { CompanyPage } from "@/components/CompanyPage";
 import Layout from "@/layout";
 
 const PageDetails = () => {
   return (
     <Layout activeSection={"pages"}>
-      <PageView />;
+      <CompanyPage />;
     </Layout>
   );
 };

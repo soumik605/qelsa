@@ -40,28 +40,124 @@ export const jobsApi = createApi({
       providesTags: ["Jobs"],
     }),
 
-    //  GET SINGLE JOB
+    getDiscoverJobs: builder.query<Job[], { city?: string; search?: string; page_id?: string } | void>({
+      query: (filters) => {
+        const params = new URLSearchParams();
+
+        if (filters) {
+          if (filters.city) params.append("city", filters.city);
+          if (filters.search) params.append("search", filters.search);
+          if (filters.page_id) params.append("page_id", filters.page_id);
+        }
+
+        return `jobs?${params.toString()}`;
+      },
+
+      transformResponse: (response: { success: boolean; data: Job[] }) => {
+        return response.data;
+      },
+
+      providesTags: ["Jobs"],
+    }),
+
+    getAppliedJobs: builder.query<Job[], { city?: string; search?: string; page_id?: string } | void>({
+      query: (filters) => {
+        const params = new URLSearchParams();
+
+        if (filters) {
+          if (filters.city) params.append("city", filters.city);
+          if (filters.search) params.append("search", filters.search);
+          if (filters.page_id) params.append("page_id", filters.page_id);
+        }
+
+        return `jobs?${params.toString()}`;
+      },
+
+      transformResponse: (response: { success: boolean; data: Job[] }) => {
+        return response.data;
+      },
+
+      providesTags: ["Jobs"],
+    }),
+
+    getInProgressJobs: builder.query<Job[], { city?: string; search?: string; page_id?: string } | void>({
+      query: (filters) => {
+        const params = new URLSearchParams();
+
+        if (filters) {
+          if (filters.city) params.append("city", filters.city);
+          if (filters.search) params.append("search", filters.search);
+          if (filters.page_id) params.append("page_id", filters.page_id);
+        }
+
+        return `jobs?${params.toString()}`;
+      },
+
+      transformResponse: (response: { success: boolean; data: Job[] }) => {
+        return response.data;
+      },
+
+      providesTags: ["Jobs"],
+    }),
+
+    getPostedJobs: builder.query<Job[], { city?: string; search?: string; page_id?: string } | void>({
+      query: (filters) => {
+        const params = new URLSearchParams();
+
+        if (filters) {
+          if (filters.city) params.append("city", filters.city);
+          if (filters.search) params.append("search", filters.search);
+          if (filters.page_id) params.append("page_id", filters.page_id);
+        }
+
+        return `jobs?${params.toString()}`;
+      },
+
+      transformResponse: (response: { success: boolean; data: Job[] }) => {
+        return response.data;
+      },
+
+      providesTags: ["Jobs"],
+    }),
+
+    getSavedJobs: builder.query<Job[], { city?: string; search?: string; page_id?: string } | void>({
+      query: (filters) => {
+        const params = new URLSearchParams();
+
+        if (filters) {
+          if (filters.city) params.append("city", filters.city);
+          if (filters.search) params.append("search", filters.search);
+          if (filters.page_id) params.append("page_id", filters.page_id);
+        }
+
+        return `jobs?${params.toString()}`;
+      },
+
+      transformResponse: (response: { success: boolean; data: Job[] }) => {
+        return response.data;
+      },
+
+      providesTags: ["Jobs"],
+    }),
+
     getJobById: builder.query<Job, string>({
       query: (id) => `jobs/${id}`,
       transformResponse: (response: { success: boolean; data: Job }) => response.data,
       providesTags: (result, error, id) => [{ type: "Job", id }],
     }),
 
-    //  GET CITY LIST
     getCities: builder.query<string[], void>({
       query: () => `jobs/cities`,
       transformResponse: (response: { success: boolean; data: string[] }) => response.data,
       providesTags: ["Cities"],
     }),
 
-    //  GET JOB TYPES
     getJobTypes: builder.query<string[], void>({
       query: () => `jobs/types`,
       transformResponse: (response: { success: boolean; data: string[] }) => response.data,
       providesTags: ["Types"],
     }),
 
-    //  CREATE JOB  (Invalidates list)
     createJob: builder.mutation({
       query: (body) => ({
         url: "jobs/with-questions",
@@ -76,4 +172,15 @@ export const jobsApi = createApi({
   }),
 });
 
-export const { useGetJobsQuery, useGetJobByIdQuery, useGetCitiesQuery, useGetJobTypesQuery, useCreateJobMutation } = jobsApi;
+export const {
+  useGetJobsQuery,
+  useGetDiscoverJobsQuery,
+  useGetAppliedJobsQuery,
+  useGetInProgressJobsQuery,
+  useGetPostedJobsQuery,
+  useGetSavedJobsQuery,
+  useGetJobByIdQuery,
+  useGetCitiesQuery,
+  useGetJobTypesQuery,
+  useCreateJobMutation,
+} = jobsApi;

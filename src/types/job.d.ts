@@ -35,6 +35,7 @@ export type Job = {
   updatedAt?: Date;
 
   page?: Page;
+  is_bookmarked: boolean;
 };
 
 export interface ScreeningQuestion {

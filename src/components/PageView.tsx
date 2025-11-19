@@ -28,9 +28,9 @@ export function PageView() {
   } = useGetPageByIdQuery(id ?? "", {
     skip: !id,
   });
+  console.log("🚀 ~ PageView ~ pageData:", pageData)
 
   const { data: pageJobs, isLoading: jobsLoading, error: jobsError } = useGetJobsQuery({ page_id: id });
-  console.log("🚀 ~ PageView ~ pageJobs:", pageJobs);
 
   if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading page details...</div>;
 
@@ -58,11 +58,11 @@ export function PageView() {
             Back
           </Button>
         </div>
-        {/* {isAdmin && (
+        {pageData.can_manage && (
           <div className="absolute top-6 right-6">
-            <Button className="gradient-animated">Edit Page</Button>
+            <Button onClick={() => router.push(`/pages/${id}/manage`)} className="gradient-animated">Edit Page</Button>
           </div>
-        )} */}
+        )}
       </div>
 
       {/* Header */}
@@ -192,8 +192,8 @@ export function PageView() {
 
               {/* Jobs Tab */}
               <TabsContent value="jobs" className="space-y-4">
-                {pageJobs.map((job) => (
-                  <Card key={job.id} className="p-6 glass border-glass-border hover:border-neon-cyan/50 transition-all cursor-pointer">
+                {pageJobs?.map((job) => (
+                  <Card onClick={() => router.push(`/jobs/${job.id}`)} key={job.id} className="p-6 glass border-glass-border hover:border-neon-cyan/50 transition-all cursor-pointer">
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <h3 className="font-semibold mb-1">{job.title}</h3>
