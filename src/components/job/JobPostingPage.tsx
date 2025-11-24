@@ -1,5 +1,28 @@
+import { useCreateJobMutation } from "@/features/api/jobsApi";
 import { Job, ScreeningQuestion } from "@/types/job";
-import { AlertCircle, ArrowLeft, CheckCircle2, Clock, DollarSign, Edit2, Eye, FileText, HelpCircle, Lightbulb, Save, Send, Shield, Sparkles, TrendingUp, Users, Wand2, Zap } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle2,
+  Clock,
+  DollarSign,
+  Edit2,
+  Eye,
+  FileText,
+  HelpCircle,
+  Lightbulb,
+  MessageSquare,
+  Plus,
+  Save,
+  Send,
+  Shield,
+  Sparkles,
+  TrendingUp,
+  Users,
+  Wand2,
+  X,
+  Zap,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ScreeningQuestionsBuilder } from "../ScreeningQuestionsBuilder";
@@ -11,34 +34,37 @@ import { Progress } from "../ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
-import { useCreateJobMutation } from "@/features/api/jobsApi";
+import { useGetMyPagesQuery } from "@/features/api/pagesApi";
 
 type PostingMode = "select" | "ai-copilot" | "manual";
 type PostingStep = "input" | "review" | "questions" | "final-review" | "published";
 
 export function JobPostingPage() {
   const [createJob, { isLoading, isSuccess, error }] = useCreateJobMutation();
+  const {data: my_pages} = useGetMyPagesQuery()
   const router = useRouter();
-  const [mode, setMode] = useState<PostingMode>("select");
+  const [mode, setMode] = useState<PostingMode>("manual");
   const [step, setStep] = useState<PostingStep>("input");
   const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPremium] = useState(false); // Set to true for premium users
+  const [showScreeningQuestions, setShowScreeningQuestions] = useState(false);
+  const [skillInput, setSkillInput] = useState("");
   const [jobData, setJobData] = useState<Partial<Job>>({
     title: "",
+    // company: "",
     location: "",
-    work_type: "Full-time",
-    experience: null,
+    work_type: "full-time",
+    workplace_type: "on-site",
+    experience: 0,
     salary: null,
     description: "",
     // responsibilities: [],
     // requirements: [],
-    // skills: [],
+    skills: [],
     // benefits: [],
     screening_questions: [],
   });
-
-  console.log("jobData", jobData);
 
   // AI Insights (mock data)
   const [aiInsights, setAiInsights] = useState({
@@ -61,6 +87,21 @@ export function JobPostingPage() {
 
   const handleManualUpdate = (field: keyof Job, value: any) => {
     setJobData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleArrayAdd = (field: keyof Job, value: string) => {
+    // if (!value.trim()) return;
+    // setJobData((prev) => ({
+    //   ...prev,
+    //   [field]: [...((prev[field] as string[]) || []), value],
+    // }));
+  };
+
+  const handleArrayRemove = (field: keyof Job, index: number) => {
+    // setJobData((prev) => ({
+    //   ...prev,
+    //   [field]: (prev[field] as string[])?.filter((_, i) => i !== index) || [],
+    // }));
   };
 
   const handleOptimize = () => {
@@ -106,7 +147,8 @@ export function JobPostingPage() {
         salary: formData.salary,
         experience: formData.experience,
         company_name: formData.company_name,
-        resource: formData.resource,
+        resource: 'qelsa',
+        page_id: formData.page_id,
       },
       questionSet: {
         title: `Screening - ${new Date().toISOString()}`, // auto generate
@@ -116,36 +158,47 @@ export function JobPostingPage() {
   }
 
   const handlePublish = async () => {
-    console.log("🚀 ~ handlePublish ~ jobData:", jobData)
+    console.log("🚀 ~ handlePublish ~ jobData:", jobData);
     const newData = transformJobPayload(jobData);
-    console.log("🚀 ~ handlePublish ~ newData:", newData)
+    console.log("🚀 ~ handlePublish ~ newData:", newData);
 
     try {
       const result = await createJob(newData).unwrap();
       console.log("Created job:", result);
-      
+
       setStep("published");
     } catch (err) {
       console.error("Job creation failed:", err);
     }
-    
-
-    // // Simulate post-publish metrics
-    // setTimeout(() => {
-    //   setPostMetrics({
-    //     views: 45,
-    //     applications: 3,
-    //     avgTimeToApply: "2 days",
-    //     conversionRate: 6.7,
-    //   });
-    // }, 1000);
-
-    // onPublish?.(jobData);
-    // onPostSuccess?.();
   };
 
   const handleSaveDraft = () => {
     console.log("Saving draft:", jobData);
+  };
+
+  const handleAddSkill = () => {
+    const trimmedSkill = skillInput.trim();
+    if (trimmedSkill && !jobData.skills?.includes(trimmedSkill)) {
+      setJobData((prev) => ({
+        ...prev,
+        skills: [...(prev.skills || []), trimmedSkill],
+      }));
+      setSkillInput("");
+    }
+  };
+
+  const handleRemoveSkill = (skillToRemove: string) => {
+    setJobData((prev) => ({
+      ...prev,
+      skills: (prev.skills || []).filter((skill) => skill !== skillToRemove),
+    }));
+  };
+
+  const handleSkillKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddSkill();
+    }
   };
 
   // Published State
@@ -154,7 +207,7 @@ export function JobPostingPage() {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <div className="glass-strong border-b border-glass-border">
           <div className="max-w-5xl mx-auto px-6 py-6">
-            <Button variant="ghost" onClick={() => router.push("/jobs")} className="mb-4 text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" onClick={() => router.back()} className="mb-4 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Jobs
             </Button>
@@ -460,7 +513,7 @@ export function JobPostingPage() {
               Back to Jobs
             </Button>
 
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Post a Job</h1>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Post A Job</h1>
             <p className="text-muted-foreground mt-2">Choose how youd like to create your job posting</p>
           </div>
         </div>
@@ -655,7 +708,7 @@ export function JobPostingPage() {
                   <div className="space-y-4">
                     <div>
                       <h4 className="text-xl font-bold">{jobData.title}</h4>
-                      <p className="text-muted-foreground">{jobData.page?.name}</p>
+                      {/* <p className="text-muted-foreground">{jobData.company}</p> */}
                     </div>
 
                     <div className="flex flex-wrap gap-2">
@@ -672,31 +725,31 @@ export function JobPostingPage() {
                       <p className="text-muted-foreground text-sm">{jobData.description}</p>
                     </div>
 
-                    {/* <div>
+                    <div>
                       <h5 className="font-semibold mb-2">Key Responsibilities</h5>
                       <ul className="space-y-1">
-                        {jobData.responsibilities?.map((item, idx) => (
+                        {/* {jobData.responsibilities?.map((item, idx) => (
                           <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
                             <span className="text-neon-cyan mt-1">•</span>
                             <span>{item}</span>
                           </li>
-                        ))}
+                        ))} */}
                       </ul>
-                    </div> */}
+                    </div>
 
-                    {/* <div>
+                    <div>
                       <h5 className="font-semibold mb-2">Requirements</h5>
                       <ul className="space-y-1">
-                        {jobData.requirements?.map((item, idx) => (
+                        {/* {jobData.requirements?.map((item, idx) => (
                           <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
                             <span className="text-neon-purple mt-1">•</span>
                             <span>{item}</span>
                           </li>
-                        ))}
+                        ))} */}
                       </ul>
-                    </div> */}
+                    </div>
 
-                    {/* <div>
+                    <div>
                       <h5 className="font-semibold mb-2">Required Skills</h5>
                       <div className="flex flex-wrap gap-2">
                         {jobData.skills?.map((skill, idx) => (
@@ -705,7 +758,7 @@ export function JobPostingPage() {
                           </Badge>
                         ))}
                       </div>
-                    </div> */}
+                    </div>
                   </div>
                 </Card>
               )}
@@ -745,10 +798,23 @@ export function JobPostingPage() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Full-time">Full-time</SelectItem>
-                            <SelectItem value="Part-time">Part-time</SelectItem>
-                            <SelectItem value="Contract">Contract</SelectItem>
-                            <SelectItem value="Internship">Internship</SelectItem>
+                            <SelectItem value="full-time">Full-time</SelectItem>
+                            <SelectItem value="part-time">Part-time</SelectItem>
+                            <SelectItem value="contract">Contract</SelectItem>
+                            <SelectItem value="internship">Internship</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Workplace Type</label>
+                        <Select value={jobData.workplace_type} onValueChange={(value) => handleManualUpdate("workplace_type", value)}>
+                          <SelectTrigger className="glass border-glass-border">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="on-site">On-site</SelectItem>
+                            <SelectItem value="hybrid">Hybrid</SelectItem>
+                            <SelectItem value="remote">Remote</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -887,7 +953,7 @@ export function JobPostingPage() {
               <div className="space-y-4 mb-6">
                 <div>
                   <h4 className="text-xl font-bold">{jobData.title}</h4>
-                  <p className="text-muted-foreground">{jobData.page?.name}</p>
+                  {/* <p className="text-muted-foreground">{jobData.company}</p> */}
                 </div>
 
                 <div className="flex flex-wrap gap-2">
@@ -929,83 +995,266 @@ export function JobPostingPage() {
               Back
             </Button>
 
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Manual Entry</h1>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Post a Job</h1>
             <p className="text-muted-foreground mt-2">Fill out the job details with AI assistance</p>
           </div>
         </div>
 
         <div className="max-w-5xl mx-auto px-6 py-8">
-          <Card className="p-6 glass border-glass-border">
-            <div className="space-y-6">
-              {/* Basic Info */}
-              <div>
-                <h3 className="font-semibold mb-4">Basic Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Job Title *</label>
-                    <Input placeholder="e.g., Senior Backend Engineer" value={jobData.title} onChange={(e) => handleManualUpdate("title", e.target.value)} className="glass border-glass-border" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Company *</label>
-                    {/* <Input placeholder="e.g., Qelsa Technologies" value={jobData.page?.name} onChange={(e) => handleManualUpdate("company", e.target.value)} className="glass border-glass-border" /> */}
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Location *</label>
-                    <Input placeholder="e.g., San Francisco, CA" value={jobData.location} onChange={(e) => handleManualUpdate("location", e.target.value)} className="glass border-glass-border" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Work Type *</label>
-                    <Select value={jobData.work_type} onValueChange={(value) => handleManualUpdate("work_type", value)}>
-                      <SelectTrigger className="glass border-glass-border">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Full-time">Full-time</SelectItem>
-                        <SelectItem value="Part-time">Part-time</SelectItem>
-                        <SelectItem value="Contract">Contract</SelectItem>
-                        <SelectItem value="Internship">Internship</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+          <div className="space-y-6">
+            {/* AI Quick Fill Section */}
+            <Card className="p-6 glass border-glass-border">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-5 h-5 text-neon-purple" />
+                <h3 className="font-semibold">Describe the Role</h3>
               </div>
 
-              <Separator />
+              <Textarea
+                placeholder="Example: I need a backend engineer with 3+ years in Node.js & AWS to build scalable microservices for our career platform..."
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                className="glass border-glass-border min-h-32 mb-4"
+              />
 
-              {/* Description */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium">Job Description *</label>
-                  <Button size="sm" variant="ghost" className="text-neon-purple text-xs">
-                    <Wand2 className="w-3 h-3 mr-1" />
-                    AI Improve
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4" />
+                  Tip: Include experience level, key skills, and main responsibilities
+                </p>
+
+                <Button onClick={handleAIGenerate} disabled={!aiPrompt.trim() || isGenerating} className="gradient-animated">
+                  {isGenerating ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin mr-2" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Generate Job Description
+                    </>
+                  )}
+                </Button>
+              </div>
+            </Card>
+
+            {/* Manual Form */}
+            <Card className="p-6 glass border-glass-border">
+              <div className="space-y-6">
+                {/* Basic Info */}
+                <div>
+                  <h3 className="font-semibold mb-4">Basic Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Job Title *</label>
+                      <Input placeholder="e.g., Senior Backend Engineer" value={jobData.title} onChange={(e) => handleManualUpdate("title", e.target.value)} className="glass border-glass-border" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Company *</label>
+                      {/* <Input placeholder="e.g., Qelsa Technologies" value={jobData.company} onChange={(e) => handleManualUpdate("company", e.target.value)} className="glass border-glass-border" /> */}
+                      <Select value={jobData.page_id?.toString()} onValueChange={(value) => handleManualUpdate("page_id", Number(value))}>
+                        <SelectTrigger className="glass border-glass-border">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {my_pages?.map((page) => (
+                            <SelectItem key={page.id} value={page.id.toString()}>
+                              {page.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                    
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Location *</label>
+                      <Input placeholder="e.g., San Francisco, CA" value={jobData.location} onChange={(e) => handleManualUpdate("location", e.target.value)} className="glass border-glass-border" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Work Type *</label>
+                      <Select value={jobData.work_type} onValueChange={(value) => handleManualUpdate("work_type", value)}>
+                        <SelectTrigger className="glass border-glass-border">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="full-time">Full-time</SelectItem>
+                          <SelectItem value="part-time">Part-time</SelectItem>
+                          <SelectItem value="contract">Contract</SelectItem>
+                          <SelectItem value="internship">Internship</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Workplace Type *</label>
+                      <Select value={jobData.workplace_type} onValueChange={(value) => handleManualUpdate("workplace_type", value)}>
+                        <SelectTrigger className="glass border-glass-border">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="on-site">On-site</SelectItem>
+                          <SelectItem value="hybrid">Hybrid</SelectItem>
+                          <SelectItem value="remote">Remote</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Experience *</label>
+                      <Select value={String(jobData.experience)} onValueChange={(value) => handleManualUpdate("experience", Number(value))}>
+                        <SelectTrigger className="glass border-glass-border">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">0 years</SelectItem>
+                          <SelectItem value="1">1 years</SelectItem>
+                          <SelectItem value="2">2 years</SelectItem>
+                          <SelectItem value="3">3 years</SelectItem>
+                          <SelectItem value="5">5 years</SelectItem>
+                          <SelectItem value="7">7 years</SelectItem>
+                          <SelectItem value="10">10 years</SelectItem>
+                          <SelectItem value="12">12 years</SelectItem>
+                          <SelectItem value="15">15 years</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Salary Range</label>
+                      <Input placeholder="e.g., $80k - $120k" value={jobData.salary} onChange={(e) => handleManualUpdate("salary", e.target.value)} className="glass border-glass-border" />
+                    </div>
+                  </div>
+
+                  {/* Skills Section */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Required Skills</label>
+                    <div className="flex gap-2 mb-3">
+                      <Input
+                        placeholder="Add a skill and press Enter..."
+                        value={skillInput}
+                        onChange={(e) => setSkillInput(e.target.value)}
+                        onKeyPress={handleSkillKeyPress}
+                        className="glass border-glass-border flex-1"
+                      />
+                      <Button type="button" onClick={handleAddSkill} disabled={!skillInput.trim()} className="bg-neon-cyan/20 hover:bg-neon-cyan/30 text-neon-cyan border-neon-cyan/30" size="sm">
+                        <Plus className="w-4 h-4 mr-1" />
+                        Add
+                      </Button>
+                    </div>
+
+                    {/* Skills Tags Display */}
+                    {jobData.skills && jobData.skills.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {jobData.skills.map((skill, index) => (
+                          <Badge
+                            key={index}
+                            className="bg-neon-purple/20 text-neon-purple border border-neon-purple/30 px-3 py-1.5 flex items-center gap-2 group hover:bg-neon-purple/30 transition-all"
+                          >
+                            <span>{skill}</span>
+                            <button type="button" onClick={() => handleRemoveSkill(skill)} className="hover:text-white transition-colors">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+
+                    {(!jobData.skills || jobData.skills.length === 0) && (
+                      <p className="text-sm text-muted-foreground flex items-center gap-2">
+                        <Lightbulb className="w-4 h-4" />
+                        Add relevant skills like React, Python, Project Management, etc.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Description */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-medium">Job Description *</label>
+                    <Button size="sm" variant="ghost" className="text-neon-purple text-xs">
+                      <Wand2 className="w-3 h-3 mr-1" />
+                      AI Improve
+                    </Button>
+                  </div>
+                  <Textarea
+                    placeholder="Describe the role, responsibilities, and what makes this position unique..."
+                    value={jobData.description}
+                    onChange={(e) => handleManualUpdate("description", e.target.value)}
+                    className="glass border-glass-border min-h-32"
+                  />
+                  {jobData.description && jobData.description.length < 100 && (
+                    <p className="text-xs text-neon-yellow mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      AI suggests adding more details (min 100 characters for better reach)
+                    </p>
+                  )}
+                </div>
+
+                <Separator />
+
+                {/* Screening Questions Section */}
+                <div>
+                  <div className="flex items-center justify-between cursor-pointer p-4 rounded-lg hover:bg-white/5 transition-all" onClick={() => setShowScreeningQuestions(!showScreeningQuestions)}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-neon-purple/20 flex items-center justify-center">
+                        <MessageSquare className="w-5 h-5 text-neon-purple" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Add Screening Questions</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {jobData.screening_questions && jobData.screening_questions.length > 0
+                            ? `${jobData.screening_questions.length} question${jobData.screening_questions.length !== 1 ? "s" : ""} added`
+                            : "Pre-screen candidates with smart questions"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {jobData.screening_questions && jobData.screening_questions.length > 0 && (
+                        <Badge className="bg-neon-purple/20 text-neon-purple border-0">{jobData.screening_questions.length}</Badge>
+                      )}
+                      <Button variant="ghost" size="sm" className="text-neon-cyan">
+                        {showScreeningQuestions ? (
+                          <>
+                            <X className="w-4 h-4 mr-1" />
+                            Hide
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-4 h-4 mr-1" />
+                            Add
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {showScreeningQuestions && (
+                    <div className="mt-4 p-4 rounded-lg border border-glass-border bg-white/5">
+                      <ScreeningQuestionsBuilder
+                        questions={jobData.screening_questions || []}
+                        onChange={handleScreeningQuestionsChange}
+                        jobTitle={jobData.title}
+                        jobDescription={jobData.description}
+                        isPremium={isPremium}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button variant="outline" onClick={handleSaveDraft} className="flex-1 border-neon-cyan/30 text-neon-cyan">
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Draft
+                  </Button>
+                  <Button onClick={handlePublish} disabled={!jobData.title || !jobData.description} className="flex-1 gradient-animated">
+                    <Send className="w-4 h-4 mr-2" />
+                    Post
                   </Button>
                 </div>
-                <Textarea
-                  placeholder="Describe the role, responsibilities, and what makes this position unique..."
-                  value={jobData.description}
-                  onChange={(e) => handleManualUpdate("description", e.target.value)}
-                  className="glass border-glass-border min-h-32"
-                />
-                {jobData.description && jobData.description.length < 100 && (
-                  <p className="text-xs text-neon-yellow mt-2 flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    AI suggests adding more details (min 100 characters for better reach)
-                  </p>
-                )}
               </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button variant="outline" onClick={handleSaveDraft} className="flex-1 border-neon-cyan/30 text-neon-cyan">
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Draft
-                </Button>
-                <Button onClick={() => setStep("review")} disabled={!jobData.title || !jobData.description} className="flex-1 gradient-animated">
-                  Continue to Review
-                </Button>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
         </div>
       </div>
     );

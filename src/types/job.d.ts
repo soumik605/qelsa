@@ -18,6 +18,9 @@ export type Job = {
   work_type?: string | null;
   experience?: number | null;
   screening_questions?: ScreeningQuestion[];
+  status?: "active" | "paused" | "closed";
+  workplace_type?: "on-site" | "remote" | "hybrid" | null;
+  page_id?: number | null;
 
   // Company fields
   company_name?: string | null;
@@ -36,6 +39,8 @@ export type Job = {
 
   page?: Page;
   is_bookmarked: boolean;
+
+  skills?: string[];
 };
 
 export interface ScreeningQuestion {

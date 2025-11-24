@@ -6,7 +6,6 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { JobAIAssistantDrawer } from "./JobAIAssistantDrawer";
 import { JobSearchSuggestions } from "./JobSearchSuggestions";
 
@@ -59,8 +58,16 @@ const Layout = ({ children }) => {
               </Button>
 
               <Button
-                onClick={() => router.push("/jobs/create-job")}
+                onClick={() => router.push("/jobs/posted")}
+                variant="outline"
+                className="glass border-muted/30 hover:border-muted/50 hover:bg-white/5 hover:shadow-md transition-all duration-200 rounded-xl px-4 py-2"
+              >
+                <span className="font-medium text-foreground">Posted Jobs</span>
+              </Button>
+
+              <Button
                 className="gradient-animated text-white font-bold shadow-lg hover:shadow-xl hover:shadow-neon-purple/30 transition-all duration-300 hover:scale-105 border-0"
+                onClick={() => router.push("/jobs/create-job")}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Post Job
@@ -141,25 +148,23 @@ const Layout = ({ children }) => {
 
           {/* View Mode Tabs */}
           <div className="mt-6">
-            <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "discover" | "all" | "my-jobs")}>
-              <TabsList className="glass-strong border-glass-border">
-                <TabsTrigger value="discover" className="data-[state=active]:bg-neon-cyan/20 data-[state=active]:text-neon-cyan">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Discover
-                </TabsTrigger>
-                <TabsTrigger value="all" className="data-[state=active]:bg-neon-cyan/20 data-[state=active]:text-neon-cyan">
-                  <Filter className="w-4 h-4 mr-2" />
-                  All Jobs
-                </TabsTrigger>
-                <TabsTrigger value="my-jobs" className="data-[state=active]:bg-neon-purple/20 data-[state=active]:text-neon-purple relative">
-                  <Briefcase className="w-4 h-4 mr-2" />
-                  My Jobs
-                  <Badge variant="outline" className="ml-2 h-5 min-w-[20px] px-1.5 bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30 text-xs">
-                    5
-                  </Badge>
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="glass-strong border-glass-border w-fit p-0.5 rounded-2xl flex space-x-1">
+              <Button onClick={() => router.push("/jobs/smart_matches")} variant="outline" className="data-[state=active]:bg-neon-cyan/20 data-[state=active]:text-neon-cyan">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Smart Matches
+              </Button>
+              <Button onClick={() => router.push("/jobs/all")} variant="outline" className="data-[state=active]:bg-neon-cyan/20 data-[state=active]:text-neon-cyan">
+                <Filter className="w-4 h-4 mr-2" />
+                All Jobs
+              </Button>
+              <Button onClick={() => router.push("/jobs/my-jobs/saved")} variant="outline" className="data-[state=active]:bg-neon-purple/20 data-[state=active]:text-neon-purple relative">
+                <Briefcase className="w-4 h-4 mr-2" />
+                My Jobs
+                <Badge variant="outline" className="ml-2 h-5 min-w-[20px] px-1.5 bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30 text-xs">
+                  5
+                </Badge>
+              </Button>
+            </div>
           </div>
         </div>
       </div>

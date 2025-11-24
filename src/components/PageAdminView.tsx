@@ -109,7 +109,7 @@ export function PageAdminView() {
                 <Eye className="w-4 h-4 mr-2" />
                 View Public Page
               </Button>
-              <Button className="gradient-animated">
+              <Button className="gradient-animated" onClick={() => router.push("/jobs/create-job")}>
                 <Plus className="w-4 h-4 mr-2" />
                 Post Job
               </Button>

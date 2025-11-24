@@ -1,245 +1,185 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useGetJobApplicationsQuery } from "@/features/api/jobApplicationsApi";
+import { useGetJobByIdQuery } from "@/features/api/jobsApi";
+import { JobApplication } from "@/types/jobApplication";
 import {
-  ArrowLeft,
-  Search,
-  Filter,
-  Star,
-  Clock,
-  MapPin,
-  Briefcase,
-  Mail,
-  Phone,
-  Calendar,
-  CheckCircle2,
-  XCircle,
-  ChevronRight,
-  MoreVertical,
-  Download,
-  Share2,
-  MessageSquare,
-  UserCheck,
-  UserX,
   Archive,
-  Send,
-  TrendingUp,
-  AlertCircle,
-  Eye,
+  ArrowLeft,
+  Briefcase,
+  CheckCircle2,
+  ChevronRight,
+  Clock,
+  Download,
+  ExternalLink,
   FileText,
   GraduationCap,
-  Award,
-  Zap,
-  Users,
+  Mail,
+  MapPin,
+  MessageSquare,
+  MoreVertical,
+  Phone,
+  Send,
+  Share2,
+  Star,
   Target,
   User,
-  ExternalLink
-} from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Badge } from './ui/badge';
-import { Card } from './ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { Checkbox } from './ui/checkbox';
-import { Textarea } from './ui/textarea';
-import { Progress } from './ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { ScrollArea } from './ui/scroll-area';
-import { Separator } from './ui/separator';
+  UserCheck,
+  Users,
+  UserX,
+  Zap,
+} from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
+import { CandidateNLPSearch } from "./CandidateNLPSearch";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Card } from "./ui/card";
+import { Checkbox } from "./ui/checkbox";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { ScrollArea } from "./ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Separator } from "./ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Textarea } from "./ui/textarea";
 
-interface Applicant {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  avatar?: string;
-  rating: number;
-  yearsExperience: number;
-  keySkills: string[];
-  source: 'Qelsa' | 'LinkedIn' | 'Indeed' | 'Referral' | 'Direct';
-  appliedDaysAgo: number;
-  status: 'new' | 'reviewed' | 'shortlisted' | 'phone-screen' | 'interview' | 'rejected';
-  matchScore: number;
-  location: string;
-  currentRole?: string;
-  education: {
-    degree: string;
-    institution: string;
-    year: string;
-  }[];
-  timeline: {
-    status: string;
-    date: string;
-    note?: string;
-  }[];
-  resumeUrl?: string;
-  mustHavesMatched: number;
-  mustHavesTotal: number;
-}
+export function ApplicationsManagementPage() {
+  const router = useRouter();
+  const params = useParams<{ id: string }>();
+  const id = params?.id;
 
-interface JobPosting {
-  id: string;
-  title: string;
-  location: string;
-  mustHaves: string[];
-}
-
-interface ApplicationsManagementPageProps {
-  jobPosting: JobPosting;
-  onBack: () => void;
-}
-
-export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsManagementPageProps) {
-  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
-  const [selectedApplicants, setSelectedApplicants] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState('recent');
-  const [savedView, setSavedView] = useState('all');
+  const [selectedApplication, setSelectedApplication] = useState<JobApplication>(null);
+  const [selectedApplications, setSelectedApplications] = useState<number[]>([]);
+  const [sortBy, setSortBy] = useState("recent");
+  const [savedView, setSavedView] = useState("all");
   const [showMessageComposer, setShowMessageComposer] = useState(false);
-  const [messageTemplate, setMessageTemplate] = useState('');
-  const [messageText, setMessageText] = useState('');
+  const [messageTemplate, setMessageTemplate] = useState("");
+  const [messageText, setMessageText] = useState("");
+  const [nlpSearchQuery, setNlpSearchQuery] = useState("");
+  const [nlpFilters, setNlpFilters] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
-  // Mock applicants data
-  const applicants: Applicant[] = [
-    {
-      id: '1',
-      name: 'Sarah Chen',
-      email: 'sarah.chen@email.com',
-      phone: '+1 (555) 123-4567',
-      rating: 4.8,
-      yearsExperience: 5,
-      keySkills: ['React', 'TypeScript', 'Node.js', 'AWS'],
-      source: 'Qelsa',
-      appliedDaysAgo: 2,
-      status: 'shortlisted',
-      matchScore: 94,
-      location: 'San Francisco, CA',
-      currentRole: 'Senior Frontend Developer at TechCorp',
-      education: [
-        { degree: 'M.S. Computer Science', institution: 'Stanford University', year: '2019' },
-        { degree: 'B.S. Computer Science', institution: 'UC Berkeley', year: '2017' }
-      ],
-      timeline: [
-        { status: 'Applied', date: '2 days ago' },
-        { status: 'Application viewed', date: '1 day ago' },
-        { status: 'Shortlisted', date: '6 hours ago', note: 'Strong technical background' }
-      ],
-      mustHavesMatched: 5,
-      mustHavesTotal: 6
-    },
-    {
-      id: '2',
-      name: 'Michael Rodriguez',
-      email: 'michael.r@email.com',
-      rating: 4.5,
-      yearsExperience: 3,
-      keySkills: ['React', 'JavaScript', 'Redux', 'GraphQL'],
-      source: 'LinkedIn',
-      appliedDaysAgo: 5,
-      status: 'reviewed',
-      matchScore: 87,
-      location: 'Austin, TX',
-      currentRole: 'Frontend Developer at StartupXYZ',
-      education: [
-        { degree: 'B.S. Software Engineering', institution: 'UT Austin', year: '2020' }
-      ],
-      timeline: [
-        { status: 'Applied', date: '5 days ago' },
-        { status: 'Application viewed', date: '3 days ago' }
-      ],
-      mustHavesMatched: 4,
-      mustHavesTotal: 6
-    },
-    {
-      id: '3',
-      name: 'Emily Watson',
-      email: 'emily.watson@email.com',
-      rating: 4.9,
-      yearsExperience: 7,
-      keySkills: ['React', 'TypeScript', 'Next.js', 'Docker', 'Kubernetes'],
-      source: 'Referral',
-      appliedDaysAgo: 1,
-      status: 'new',
-      matchScore: 96,
-      location: 'Remote',
-      currentRole: 'Staff Engineer at CloudTech',
-      education: [
-        { degree: 'Ph.D. Computer Science', institution: 'MIT', year: '2018' },
-        { degree: 'B.S. Computer Engineering', institution: 'Caltech', year: '2014' }
-      ],
-      timeline: [
-        { status: 'Applied', date: '1 day ago' }
-      ],
-      mustHavesMatched: 6,
-      mustHavesTotal: 6
-    }
-  ];
+  const { data: currentJobPosting } = useGetJobByIdQuery(id);
+  const { data: applicants, error, isLoading } = useGetJobApplicationsQuery({ jobId: id });
 
-  const filteredApplicants = useMemo(() => {
-    return applicants.filter(applicant => {
-      if (savedView === 'new-week') return applicant.appliedDaysAgo <= 7 && applicant.status === 'new';
-      if (savedView === 'strong-match') return applicant.matchScore >= 90;
-      if (savedView === 'needs-followup') return applicant.appliedDaysAgo > 7 && applicant.status === 'reviewed';
+  const filteredApplications = useMemo(() => {
+    let filtered = (applicants ?? []).filter((application) => {
+      // if (savedView === "new-week") return application.applied_days_ago <= 7 && application.status === "new";
+      // if (savedView === "strong-match") return application.matchScore >= 90;
+      // if (savedView === "needs-followup") return application.applied_days_ago > 7 && application.status === "reviewed";
       return true;
     });
-  }, [savedView]);
 
-  const sortedApplicants = useMemo(() => {
-    return [...filteredApplicants].sort((a, b) => {
-      if (sortBy === 'rating') return b.rating - a.rating;
-      if (sortBy === 'match') return b.matchScore - a.matchScore;
-      return a.appliedDaysAgo - b.appliedDaysAgo; // Most recent first
+    // Apply NLP filters if any exist
+    if (nlpFilters.length > 0) {
+      filtered = filtered.filter((application) => {
+        return nlpFilters.every((filter) => {
+          const lowerLabel = filter.label.toLowerCase();
+
+          // switch (filter.category) {
+          //   case "skill":
+          //     return application.keySkills.some((skill) => skill.toLowerCase().includes(lowerLabel) || lowerLabel.includes(skill.toLowerCase()));
+
+          //   case "experience":
+          //     const yearsMatch = filter.label.match(/(\d+)/);
+          //     if (yearsMatch) {
+          //       const requiredYears = parseInt(yearsMatch[1]);
+          //       return application.yearsExperience >= requiredYears;
+          //     }
+          //     return true;
+
+          //   case "location":
+          //     return application.location.toLowerCase().includes(lowerLabel);
+
+          //   case "education":
+          //     return application.education.some((edu) => edu.degree.toLowerCase().includes(lowerLabel) || lowerLabel.includes(edu.degree.toLowerCase()));
+
+          //   default:
+          //     // For other categories, search across all fields
+          //     const searchString = `${application.name} ${application.currentRole} ${application.keySkills.join(" ")} ${application.location}`.toLowerCase();
+          //     return searchString.includes(lowerLabel);
+          // }
+        });
+      });
+    }
+
+    return filtered;
+  }, [savedView, nlpFilters, applicants]);
+
+  const sortedApplications = useMemo(() => {
+    return [...filteredApplications].sort((a, b) => {
+      // if (sortBy === "rating") return b.rating - a.rating;
+      // if (sortBy === "match") return b.matchScore - a.matchScore;
+      return a.applied_days_ago - b.applied_days_ago; // Most recent first
     });
-  }, [filteredApplicants, sortBy]);
+  }, [filteredApplications, sortBy]);
+
+  const handleNLPSearch = useCallback((query: string, filters: any[]) => {
+    setIsSearching(true);
+    setNlpSearchQuery(query);
+    setNlpFilters(filters);
+
+    // Simulate search delay
+    setTimeout(() => {
+      setIsSearching(false);
+    }, 300);
+  }, []);
+
+  const handleClearNLPSearch = useCallback(() => {
+    setNlpSearchQuery("");
+    setNlpFilters([]);
+    setIsSearching(false);
+  }, []);
 
   // Health metrics
   const applyRate = 23.4; // percentage
   const completionRate = 67.8; // percentage
   const medianResponseTime = 2.3; // days
 
-  const handleBulkAction = useCallback((action: string) => {
-    console.log(`Bulk action: ${action} for applicants:`, selectedApplicants);
-    setSelectedApplicants([]);
-  }, [selectedApplicants]);
+  const handleBulkAction = useCallback(
+    (action: string) => {
+      console.log(`Bulk action: ${action} for applicants:`, selectedApplications);
+      setSelectedApplications([]);
+    },
+    [selectedApplications]
+  );
 
   const handleSendMessage = useCallback(() => {
-    console.log('Sending message:', messageText);
+    console.log("Sending message:", messageText);
     setShowMessageComposer(false);
-    setMessageText('');
+    setMessageText("");
   }, [messageText]);
 
   const messageTemplates = {
-    thanks: 'Thank you for your application! We\'ve received your materials and will review them carefully. We\'ll be in touch soon.',
-    phoneScreen: 'We were impressed by your application! We\'d like to schedule a brief phone screening. Are you available this week?',
-    rejection: 'Thank you for your interest in this position. After careful consideration, we\'ve decided to move forward with other candidates whose experience more closely matches our current needs. We appreciate the time you took to apply and wish you the best in your job search.'
+    thanks: "Thank you for your application! We've received your materials and will review them carefully. We'll be in touch soon.",
+    phoneScreen: "We were impressed by your application! We'd like to schedule a brief phone screening. Are you available this week?",
+    rejection:
+      "Thank you for your interest in this position. After careful consideration, we've decided to move forward with other candidates whose experience more closely matches our current needs. We appreciate the time you took to apply and wish you the best in your job search.",
   };
 
   const getStatusColor = useCallback((status: string) => {
     switch (status) {
-      case 'shortlisted': return 'border-neon-purple/30 text-neon-purple bg-neon-purple/10';
-      case 'phone-screen': return 'border-neon-cyan/30 text-neon-cyan bg-neon-cyan/10';
-      case 'interview': return 'border-neon-green/30 text-neon-green bg-neon-green/10';
-      case 'rejected': return 'border-destructive/30 text-destructive bg-destructive/10';
-      case 'reviewed': return 'border-neon-yellow/30 text-neon-yellow bg-neon-yellow/10';
-      default: return 'border-muted-foreground/30 text-muted-foreground bg-muted/10';
+      case "shortlisted":
+        return "border-neon-purple/30 text-neon-purple bg-neon-purple/10";
+      case "phone-screen":
+        return "border-neon-cyan/30 text-neon-cyan bg-neon-cyan/10";
+      case "interview":
+        return "border-neon-green/30 text-neon-green bg-neon-green/10";
+      case "rejected":
+        return "border-destructive/30 text-destructive bg-destructive/10";
+      case "reviewed":
+        return "border-neon-yellow/30 text-neon-yellow bg-neon-yellow/10";
+      default:
+        return "border-muted-foreground/30 text-muted-foreground bg-muted/10";
     }
   }, []);
 
   const getSourceColor = useCallback((source: string) => {
     switch (source) {
-      case 'Qelsa': return 'border-neon-cyan/30 text-neon-cyan bg-neon-cyan/10';
-      case 'Referral': return 'border-neon-green/30 text-neon-green bg-neon-green/10';
-      default: return 'border-muted-foreground/30 text-muted-foreground bg-muted/10';
+      case "Qelsa":
+        return "border-neon-cyan/30 text-neon-cyan bg-neon-cyan/10";
+      case "Referral":
+        return "border-neon-green/30 text-neon-green bg-neon-green/10";
+      default:
+        return "border-muted-foreground/30 text-muted-foreground bg-muted/10";
     }
   }, []);
 
@@ -248,25 +188,21 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
       {/* Header */}
       <div className="glass-strong border-b border-glass-border">
         <div className="max-w-[1800px] mx-auto px-6 py-6">
-          <Button
-            variant="ghost"
-            onClick={onBack}
-            className="mb-4 text-muted-foreground hover:text-foreground"
-          >
+          <Button variant="ghost" onClick={() => router.push("/jobs/posted")} className="mb-4 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Posted Jobs
           </Button>
 
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
-              <h1 className="text-2xl font-bold mb-2">{jobPosting.title}</h1>
+              <h1 className="text-2xl font-bold mb-2">{currentJobPosting?.title}</h1>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />
-                  {jobPosting.location}
+                  {currentJobPosting?.location}
                 </span>
                 <span>•</span>
-                <span>{applicants.length} applications</span>
+                <span>{applicants?.length} applications</span>
               </div>
             </div>
 
@@ -351,25 +287,25 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
               </SelectContent>
             </Select>
 
-            {selectedApplicants.length > 0 && (
+            {selectedApplications.length > 0 && (
               <>
                 <Separator orientation="vertical" className="h-8" />
                 <Badge variant="outline" className="border-neon-purple/30 text-neon-purple">
-                  {selectedApplicants.length} selected
+                  {selectedApplications.length} selected
                 </Badge>
-                <Button size="sm" variant="outline" onClick={() => handleBulkAction('shortlist')}>
+                <Button size="sm" variant="outline" onClick={() => handleBulkAction("shortlist")}>
                   <Star className="w-4 h-4 mr-2" />
                   Shortlist
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => handleBulkAction('phone-screen')}>
+                <Button size="sm" variant="outline" onClick={() => handleBulkAction("phone-screen")}>
                   <Phone className="w-4 h-4 mr-2" />
                   Phone Screen
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => handleBulkAction('message')}>
+                <Button size="sm" variant="outline" onClick={() => handleBulkAction("message")}>
                   <Send className="w-4 h-4 mr-2" />
                   Message
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => handleBulkAction('archive')}>
+                <Button size="sm" variant="outline" onClick={() => handleBulkAction("archive")}>
                   <Archive className="w-4 h-4 mr-2" />
                   Archive
                 </Button>
@@ -384,6 +320,11 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Applicants List */}
           <div className="lg:col-span-1">
+            {/* NLP Search Bar */}
+            <div className="mb-4">
+              <CandidateNLPSearch onSearch={handleNLPSearch} onClear={handleClearNLPSearch} isLoading={isSearching} />
+            </div>
+
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Applicants</h2>
               <Select value={sortBy} onValueChange={setSortBy}>
@@ -398,80 +339,111 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
               </Select>
             </div>
 
-            <ScrollArea className="h-[calc(100vh-24rem)]">
-              <div className="space-y-3">
-                {sortedApplicants.map((applicant) => (
-                  <Card
-                    key={applicant.id}
-                    className={`glass border-glass-border p-4 cursor-pointer transition-all hover:border-neon-cyan/50 ${
-                      selectedApplicant?.id === applicant.id ? 'border-neon-cyan/50 bg-neon-cyan/5' : ''
-                    }`}
-                    onClick={() => setSelectedApplicant(applicant)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <Checkbox
-                        checked={selectedApplicants.includes(applicant.id)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setSelectedApplicants([...selectedApplicants, applicant.id]);
-                          } else {
-                            setSelectedApplicants(selectedApplicants.filter(id => id !== applicant.id));
-                          }
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold truncate">{applicant.name}</h3>
-                          <Badge variant="outline" className={`text-xs ${getStatusColor(applicant.status)}`}>
-                            {applicant.status.replace('-', ' ')}
-                          </Badge>
-                        </div>
-
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                          <span>{applicant.yearsExperience}y exp</span>
-                          <span>•</span>
-                          <Badge variant="outline" className={`text-xs ${getSourceColor(applicant.source)}`}>
-                            {applicant.source}
-                          </Badge>
-                        </div>
-
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {applicant.keySkills.slice(0, 3).map((skill, idx) => (
-                            <Badge key={idx} variant="outline" className="text-xs border-neon-purple/30 text-neon-purple">
-                              {skill}
-                            </Badge>
-                          ))}
-                          {applicant.keySkills.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{applicant.keySkills.length - 3}
-                            </Badge>
-                          )}
-                        </div>
-
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground">
-                            Applied {applicant.appliedDaysAgo}d ago
-                          </span>
-                          <div className="flex items-center gap-1">
-                            <Target className="w-3 h-3 text-neon-cyan" />
-                            <span className="text-neon-cyan">{applicant.matchScore}%</span>
+            {/* Empty State or Candidate List */}
+            {sortedApplications?.length === 0 && nlpFilters.length > 0 ? (
+              <Card className="glass border-glass-border p-12 flex flex-col items-center justify-center text-center">
+                <Users className="w-16 h-16 text-muted-foreground/50 mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No candidates match your filters</h3>
+                <p className="text-sm text-muted-foreground mb-4">Try adjusting your search criteria or clearing filters</p>
+                <Button variant="outline" size="sm" onClick={handleClearNLPSearch}>
+                  Clear Filters
+                </Button>
+              </Card>
+            ) : (
+              <ScrollArea className="h-[calc(100vh-32rem)]">
+                <div className="space-y-3">
+                  {isSearching ? (
+                    // Loading shimmer
+                    <>
+                      {[1, 2, 3].map((i) => (
+                        <Card key={i} className="glass border-glass-border p-4 animate-pulse">
+                          <div className="flex items-start gap-3">
+                            <div className="w-4 h-4 bg-muted/20 rounded" />
+                            <div className="flex-1 space-y-3">
+                              <div className="h-4 bg-muted/20 rounded w-3/4" />
+                              <div className="h-3 bg-muted/20 rounded w-1/2" />
+                              <div className="flex gap-2">
+                                <div className="h-5 bg-muted/20 rounded w-16" />
+                                <div className="h-5 bg-muted/20 rounded w-16" />
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
+                        </Card>
+                      ))}
+                    </>
+                  ) : (
+                    sortedApplications?.map((application) => (
+                      <Card
+                        key={application.id}
+                        className={`glass border-glass-border p-4 cursor-pointer transition-all hover:border-neon-cyan/50 ${
+                          selectedApplication?.id === application.id ? "border-neon-cyan/50 bg-neon-cyan/5" : ""
+                        }`}
+                        onClick={() => setSelectedApplication(application)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <Checkbox
+                            checked={selectedApplications.includes(application.id)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedApplications([...selectedApplications, application.id]);
+                              } else {
+                                setSelectedApplications(selectedApplications.filter((id) => id !== application.id));
+                              }
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                          />
 
-                      <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </ScrollArea>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="font-semibold truncate">{application?.user?.name}</h3>
+                              <Badge variant="outline" className={`text-xs ${getStatusColor(application.status)}`}>
+                                {application.status.replace("-", " ")}
+                              </Badge>
+                            </div>
+
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                              <span>{application?.user?.yearsExperience}y exp</span>
+                              <span>•</span>
+                              {/* <Badge variant="outline" className={`text-xs ${getSourceColor(application.source)}`}>
+                                {application.source}
+                              </Badge> */}
+                            </div>
+
+                            <div className="flex flex-wrap gap-1 mb-2">
+                              {/* {application.keySkills.slice(0, 3).map((skill, idx) => (
+                                <Badge key={idx} variant="outline" className="text-xs border-neon-purple/30 text-neon-purple">
+                                  {skill}
+                                </Badge>
+                              ))}
+                              {application.keySkills.length > 3 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{application.keySkills.length - 3}
+                                </Badge>
+                              )} */}
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground">Applied {application.applied_days_ago}d ago</span>
+                              <div className="flex items-center gap-1">
+                                <Target className="w-3 h-3 text-neon-cyan" />
+                                {/* <span className="text-neon-cyan">{application.matchScore}%</span> */}
+                              </div>
+                            </div>
+                          </div>
+
+                          <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        </div>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </ScrollArea>
+            )}
           </div>
 
-          {/* Right: Applicant Detail with Profile/Resume Tabs */}
+          {/* Right: Application Detail with Profile/Resume Tabs */}
           <div className="lg:col-span-2">
-            {selectedApplicant ? (
+            {selectedApplication ? (
               <Card className="glass border-glass-border">
                 {/* Sticky Actions Bar */}
                 <div className="sticky top-0 z-10 glass-strong border-b border-glass-border p-4">
@@ -538,26 +510,26 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                               Generated
                             </Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-3">
-                            <strong className="text-foreground">Strong fit for this role.</strong> {selectedApplicant.name} has {selectedApplicant.yearsExperience} years of relevant experience 
-                            and matches {selectedApplicant.mustHavesMatched} of {selectedApplicant.mustHavesTotal} must-have requirements. 
-                            {selectedApplicant.matchScore >= 90 
-                              ? ' Excellent technical alignment with the job description. Highly recommended for interview.' 
-                              : ' Good foundation with some skill gaps. Consider for phone screening to assess cultural fit and growth potential.'}
-                          </p>
+                          {/* <p className="text-sm text-muted-foreground mb-3">
+                            <strong className="text-foreground">Strong fit for this role.</strong> {selectedApplication?.user?.name} has {selectedApplication.user?.yearsExperience} years of relevant
+                            experience and matches {selectedApplication.mustHavesMatched} of {selectedApplication.mustHavesTotal} must-have requirements.
+                            {selectedApplication.matchScore >= 90
+                              ? " Excellent technical alignment with the job description. Highly recommended for interview."
+                              : " Good foundation with some skill gaps. Consider for phone screening to assess cultural fit and growth potential."}
+                          </p> */}
                           <div className="flex items-center gap-2 text-xs">
                             <Badge variant="outline" className="border-neon-green/30 text-neon-green">
                               <CheckCircle2 className="w-3 h-3 mr-1" />
-                              {selectedApplicant.mustHavesMatched} must-haves matched
+                              {/* {selectedApplication.mustHavesMatched} must-haves matched */}
                             </Badge>
-                            {selectedApplicant.mustHavesMatched < selectedApplicant.mustHavesTotal && (
+                            {/* {selectedApplication.mustHavesMatched < selectedApplication.mustHavesTotal && (
                               <Badge variant="outline" className="border-neon-yellow/30 text-neon-yellow">
-                                {selectedApplicant.mustHavesTotal - selectedApplicant.mustHavesMatched} gaps
+                                {selectedApplication.mustHavesTotal - selectedApplication.mustHavesMatched} gaps
                               </Badge>
                             )}
                             <Badge variant="outline" className="border-neon-cyan/30 text-neon-cyan">
-                              {selectedApplicant.matchScore}% overall match
-                            </Badge>
+                              {selectedApplication.matchScore}% overall match
+                            </Badge> */}
                           </div>
                         </div>
 
@@ -566,36 +538,36 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                           <h3 className="font-semibold mb-3">Contact & Basic Info</h3>
                           <div className="glass-strong rounded-lg p-4 space-y-3">
                             <div>
-                              <h4 className="text-lg font-semibold">{selectedApplicant.name}</h4>
-                              <p className="text-sm text-muted-foreground">{selectedApplicant.currentRole}</p>
+                              <h4 className="text-lg font-semibold">{selectedApplication?.user?.name}</h4>
+                              <p className="text-sm text-muted-foreground">{selectedApplication.user?.currentRole}</p>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                               <div className="flex items-center gap-2">
                                 <Mail className="w-4 h-4 text-neon-cyan flex-shrink-0" />
-                                <span className="truncate">{selectedApplicant.email}</span>
+                                <span className="truncate">{selectedApplication.user?.email}</span>
                               </div>
-                              {selectedApplicant.phone && (
+                              {selectedApplication.user?.phone && (
                                 <div className="flex items-center gap-2">
                                   <Phone className="w-4 h-4 text-neon-cyan flex-shrink-0" />
-                                  <span>{selectedApplicant.phone}</span>
+                                  <span>{selectedApplication.user?.phone}</span>
                                 </div>
                               )}
                               <div className="flex items-center gap-2">
                                 <MapPin className="w-4 h-4 text-neon-cyan flex-shrink-0" />
-                                <span>{selectedApplicant.location}</span>
+                                <span>{selectedApplication.user?.location}</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-neon-cyan flex-shrink-0" />
-                                <span>Applied {selectedApplicant.appliedDaysAgo}d ago</span>
+                                <span>Applied {selectedApplication.applied_days_ago}d ago</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Briefcase className="w-4 h-4 text-neon-cyan flex-shrink-0" />
-                                <span>{selectedApplicant.yearsExperience} years experience</span>
+                                <span>{selectedApplication.user?.yearsExperience} years experience</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <Badge variant="outline" className={`text-xs ${getSourceColor(selectedApplicant.source)}`}>
-                                  {selectedApplicant.source}
-                                </Badge>
+                                {/* <Badge variant="outline" className={`text-xs ${getSourceColor(selectedApplication.source)}`}>
+                                  {selectedApplication.source}
+                                </Badge> */}
                               </div>
                             </div>
                           </div>
@@ -608,22 +580,20 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                             <div className="flex items-center justify-between mb-3">
                               <span className="text-sm text-muted-foreground">JD Requirements</span>
                               <Badge variant="outline" className="border-neon-green/30 text-neon-green">
-                                {selectedApplicant.mustHavesMatched}/{selectedApplicant.mustHavesTotal}
+                                {/* {selectedApplication.mustHavesMatched}/{selectedApplication.mustHavesTotal} */}
                               </Badge>
                             </div>
                             <div className="space-y-2">
-                              {jobPosting.mustHaves.map((item, idx) => (
+                              {/* {currentJobPosting?.mustHaves.map((item, idx) => (
                                 <div key={idx} className="flex items-center gap-2 text-sm">
-                                  {idx < selectedApplicant.mustHavesMatched ? (
+                                  {idx < selectedApplication.mustHavesMatched ? (
                                     <CheckCircle2 className="w-4 h-4 text-neon-green flex-shrink-0" />
                                   ) : (
                                     <XCircle className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                   )}
-                                  <span className={idx < selectedApplicant.mustHavesMatched ? '' : 'text-muted-foreground'}>
-                                    {item}
-                                  </span>
+                                  <span className={idx < selectedApplication.mustHavesMatched ? "" : "text-muted-foreground"}>{item}</span>
                                 </div>
-                              ))}
+                              ))} */}
                             </div>
                           </div>
                         </div>
@@ -637,7 +607,7 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                               <ExternalLink className="w-3 h-3 ml-1" />
                             </Button>
                           </div>
-                          
+
                           {/* Experience */}
                           <div className="glass-strong rounded-lg p-4 mb-3">
                             <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
@@ -646,8 +616,8 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                             </h4>
                             <div className="space-y-3">
                               <div className="pb-3 border-b border-glass-border">
-                                <p className="font-medium text-sm">{selectedApplicant.currentRole}</p>
-                                <p className="text-xs text-muted-foreground">Current • {selectedApplicant.yearsExperience} years</p>
+                                <p className="font-medium text-sm">{selectedApplication.user?.currentRole}</p>
+                                <p className="text-xs text-muted-foreground">Current • {selectedApplication.user?.yearsExperience} years</p>
                               </div>
                               <Button variant="ghost" size="sm" className="w-full text-xs text-neon-cyan">
                                 Show more experience
@@ -663,18 +633,20 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                               Education
                             </h4>
                             <div className="space-y-3">
-                              {selectedApplicant.education.slice(0, 1).map((edu, idx) => (
+                              {/* {selectedApplication.education.slice(0, 1).map((edu, idx) => (
                                 <div key={idx} className="pb-3 border-b border-glass-border">
                                   <p className="font-medium text-sm">{edu.degree}</p>
-                                  <p className="text-xs text-muted-foreground">{edu.institution} • {edu.year}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {edu.institution} • {edu.year}
+                                  </p>
                                 </div>
-                              ))}
-                              {selectedApplicant.education.length > 1 && (
+                              ))} */}
+                              {/* {selectedApplication.education.length > 1 && (
                                 <Button variant="ghost" size="sm" className="w-full text-xs text-neon-cyan">
                                   Show more education
                                   <ChevronRight className="w-3 h-3 ml-1" />
                                 </Button>
-                              )}
+                              )} */}
                             </div>
                           </div>
                         </div>
@@ -689,15 +661,15 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                                 <CheckCircle2 className="w-4 h-4 text-neon-green" />
                                 <span className="text-sm font-medium">Exact Matches</span>
                                 <Badge variant="outline" className="text-xs border-neon-green/30 text-neon-green">
-                                  {selectedApplicant.keySkills.slice(0, 3).length}
+                                  {/* {selectedApplication.keySkills.slice(0, 3).length} */}
                                 </Badge>
                               </div>
                               <div className="flex flex-wrap gap-2 mb-3">
-                                {selectedApplicant.keySkills.slice(0, 3).map((skill, idx) => (
+                                {/* {selectedApplication.keySkills.slice(0, 3).map((skill, idx) => (
                                   <Badge key={idx} variant="outline" className="border-neon-green/30 text-neon-green">
                                     {skill}
                                   </Badge>
-                                ))}
+                                ))} */}
                               </div>
                             </div>
 
@@ -707,37 +679,37 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                                 <Target className="w-4 h-4 text-neon-cyan" />
                                 <span className="text-sm font-medium">Adjacent Skills</span>
                                 <Badge variant="outline" className="text-xs border-neon-cyan/30 text-neon-cyan">
-                                  {selectedApplicant.keySkills.length - 3}
+                                  {/* {selectedApplication.keySkills.length - 3} */}
                                 </Badge>
                               </div>
                               <div className="flex flex-wrap gap-2 mb-3">
-                                {selectedApplicant.keySkills.slice(3).map((skill, idx) => (
+                                {/* {selectedApplication.keySkills.slice(3).map((skill, idx) => (
                                   <Badge key={idx} variant="outline" className="border-neon-cyan/30 text-neon-cyan">
                                     {skill}
                                   </Badge>
-                                ))}
+                                ))} */}
                               </div>
                             </div>
 
                             {/* Missing */}
-                            {selectedApplicant.mustHavesMatched < selectedApplicant.mustHavesTotal && (
+                            {/* {selectedApplication.mustHavesMatched < selectedApplication.mustHavesTotal && (
                               <div>
                                 <div className="flex items-center gap-2 mb-2">
                                   <XCircle className="w-4 h-4 text-muted-foreground" />
                                   <span className="text-sm font-medium text-muted-foreground">Missing</span>
                                   <Badge variant="outline" className="text-xs">
-                                    {selectedApplicant.mustHavesTotal - selectedApplicant.mustHavesMatched}
+                                    {selectedApplication.mustHavesTotal - selectedApplication.mustHavesMatched}
                                   </Badge>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                  {jobPosting.mustHaves.slice(selectedApplicant.mustHavesMatched).map((skill, idx) => (
+                                  {currentJobPosting?.mustHaves.slice(selectedApplication.mustHavesMatched).map((skill, idx) => (
                                     <Badge key={idx} variant="outline" className="text-muted-foreground">
                                       {skill}
                                     </Badge>
                                   ))}
                                 </div>
                               </div>
-                            )}
+                            )} */}
                           </div>
                         </div>
 
@@ -745,24 +717,18 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                         <div>
                           <h3 className="font-semibold mb-3">Application Timeline</h3>
                           <div className="glass-strong rounded-lg p-4 space-y-3">
-                            {selectedApplicant.timeline.map((event, idx) => (
+                            {selectedApplication.jobApplicationLogs.map((event, idx) => (
                               <div key={idx} className="flex gap-3">
                                 <div className="flex flex-col items-center">
-                                  <div className={`w-2 h-2 rounded-full ${
-                                    idx === 0 ? 'bg-neon-green' : 'bg-muted-foreground/30'
-                                  }`} />
-                                  {idx < selectedApplicant.timeline.length - 1 && (
-                                    <div className="w-px h-full bg-muted-foreground/20 my-1" />
-                                  )}
+                                  <div className={`w-2 h-2 rounded-full ${idx === 0 ? "bg-neon-green" : "bg-muted-foreground/30"}`} />
+                                  {idx < selectedApplication.jobApplicationLogs.length - 1 && <div className="w-px h-full bg-muted-foreground/20 my-1" />}
                                 </div>
                                 <div className="flex-1 pb-2">
                                   <div className="flex items-center justify-between mb-1">
-                                    <p className="text-sm font-medium">{event.status}</p>
-                                    <span className="text-xs text-muted-foreground">{event.date}</span>
+                                    <p className="text-sm font-medium">{event.new_status}</p>
+                                    <span className="text-xs text-muted-foreground">{event.createdAt}</span>
                                   </div>
-                                  {event.note && (
-                                    <p className="text-xs text-muted-foreground">{event.note}</p>
-                                  )}
+                                  {/* {event.note && <p className="text-xs text-muted-foreground">{event.note}</p>} */}
                                 </div>
                               </div>
                             ))}
@@ -773,11 +739,7 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                         <div>
                           <h3 className="font-semibold mb-3">Team Notes</h3>
                           <div className="glass-strong rounded-lg p-4">
-                            <Textarea
-                              placeholder="Add notes, @mention team members, or add labels..."
-                              rows={3}
-                              className="mb-3 glass border-glass-border resize-none"
-                            />
+                            <Textarea placeholder="Add notes, @mention team members, or add labels..." rows={3} className="mb-3 glass border-glass-border resize-none" />
                             <div className="flex items-center gap-2">
                               <Badge variant="outline" className="cursor-pointer text-xs border-neon-purple/30 text-neon-purple">
                                 + Add Label
@@ -802,18 +764,16 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                             <div className="glass-strong rounded-lg p-4 sticky top-0">
                               <h4 className="text-sm font-semibold mb-3">JD Match Summary</h4>
                               <div className="space-y-2 mb-4">
-                                {jobPosting.mustHaves.slice(0, 4).map((item, idx) => (
+                                {/* {currentJobPosting?.mustHaves.slice(0, 4).map((item, idx) => (
                                   <div key={idx} className="flex items-center gap-2 text-xs">
-                                    {idx < selectedApplicant.mustHavesMatched ? (
+                                    {idx < selectedApplication.mustHavesMatched ? (
                                       <CheckCircle2 className="w-3 h-3 text-neon-green flex-shrink-0" />
                                     ) : (
                                       <XCircle className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                                     )}
-                                    <span className={idx < selectedApplicant.mustHavesMatched ? 'text-foreground' : 'text-muted-foreground'}>
-                                      {item}
-                                    </span>
+                                    <span className={idx < selectedApplication.mustHavesMatched ? "text-foreground" : "text-muted-foreground"}>{item}</span>
                                   </div>
-                                ))}
+                                ))} */}
                               </div>
                               <Button size="sm" variant="outline" className="w-full border-neon-cyan/30 text-neon-cyan">
                                 <Download className="w-3 h-3 mr-2" />
@@ -833,12 +793,12 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                               <div className="bg-white/5 rounded-lg p-6 min-h-[600px]">
                                 <div className="max-w-2xl mx-auto space-y-6">
                                   <div className="text-center pb-4 border-b border-glass-border">
-                                    <h3 className="text-xl font-bold mb-2">{selectedApplicant.name}</h3>
-                                    <p className="text-sm text-muted-foreground mb-2">{selectedApplicant.currentRole}</p>
+                                    <h3 className="text-xl font-bold mb-2">{selectedApplication?.user?.name}</h3>
+                                    <p className="text-sm text-muted-foreground mb-2">{selectedApplication.user?.currentRole}</p>
                                     <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-                                      <span>{selectedApplicant.email}</span>
+                                      <span>{selectedApplication.user?.email}</span>
                                       <span>•</span>
-                                      <span>{selectedApplicant.location}</span>
+                                      <span>{selectedApplication.user?.location}</span>
                                     </div>
                                   </div>
 
@@ -848,8 +808,8 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                                       <div>
                                         <div className="flex items-start justify-between mb-2">
                                           <div>
-                                            <p className="font-semibold text-sm">{selectedApplicant.currentRole}</p>
-                                            <p className="text-xs text-muted-foreground">Current • {selectedApplicant.yearsExperience} years</p>
+                                            <p className="font-semibold text-sm">{selectedApplication.user?.currentRole}</p>
+                                            <p className="text-xs text-muted-foreground">Current • {selectedApplication.user?.yearsExperience} years</p>
                                           </div>
                                         </div>
                                         <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
@@ -866,9 +826,7 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                                     <div className="space-y-2">
                                       <div>
                                         <p className="text-xs font-semibold mb-1">Technical:</p>
-                                        <p className="text-xs text-muted-foreground">
-                                          {selectedApplicant.keySkills.join(', ')}
-                                        </p>
+                                        {/* <p className="text-xs text-muted-foreground">{selectedApplication.keySkills.join(", ")}</p> */}
                                       </div>
                                     </div>
                                   </div>
@@ -876,10 +834,12 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
                                   <div>
                                     <h4 className="text-sm font-bold mb-3 text-neon-cyan">EDUCATION</h4>
                                     <div className="space-y-3">
-                                      {selectedApplicant.education.map((edu, idx) => (
+                                      {selectedApplication.user?.education?.map((edu, idx) => (
                                         <div key={idx}>
                                           <p className="font-semibold text-sm">{edu.degree}</p>
-                                          <p className="text-xs text-muted-foreground">{edu.institution} • {edu.year}</p>
+                                          <p className="text-xs text-muted-foreground">
+                                            {edu.institution} • {edu.year}
+                                          </p>
                                         </div>
                                       ))}
                                     </div>
@@ -898,9 +858,7 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
               <Card className="glass border-glass-border p-12 flex flex-col items-center justify-center text-center h-[calc(100vh-24rem)]">
                 <Users className="w-16 h-16 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Select an applicant</h3>
-                <p className="text-sm text-muted-foreground">
-                  Choose an applicant from the list to view their details
-                </p>
+                <p className="text-sm text-muted-foreground">Choose an applicant from the list to view their details</p>
               </Card>
             )}
           </div>
@@ -912,14 +870,17 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <Card className="glass-strong border-glass-border p-6 max-w-2xl w-full">
             <h3 className="font-semibold mb-4">Send Message</h3>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">Template</label>
-                <Select value={messageTemplate} onValueChange={(value) => {
-                  setMessageTemplate(value);
-                  setMessageText(messageTemplates[value as keyof typeof messageTemplates] || '');
-                }}>
+                <Select
+                  value={messageTemplate}
+                  onValueChange={(value) => {
+                    setMessageTemplate(value);
+                    setMessageText(messageTemplates[value as keyof typeof messageTemplates] || "");
+                  }}
+                >
                   <SelectTrigger className="glass border-glass-border">
                     <SelectValue placeholder="Choose a template..." />
                   </SelectTrigger>
@@ -933,13 +894,7 @@ export function ApplicationsManagementPage({ jobPosting, onBack }: ApplicationsM
 
               <div>
                 <label className="text-sm font-medium mb-2 block">Message</label>
-                <Textarea
-                  value={messageText}
-                  onChange={(e) => setMessageText(e.target.value)}
-                  placeholder="Type your message..."
-                  rows={6}
-                  className="glass border-glass-border resize-none"
-                />
+                <Textarea value={messageText} onChange={(e) => setMessageText(e.target.value)} placeholder="Type your message..." rows={6} className="glass border-glass-border resize-none" />
               </div>
 
               <div className="flex gap-2">

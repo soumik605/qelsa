@@ -3,7 +3,7 @@ import JobLayout from "@/components/job/layout";
 import { useGetDiscoverJobsQuery } from "@/features/api/jobsApi";
 import Layout from "../../layout";
 
-const Discover = () => {
+const SmartMatches = () => {
   const { data: jobs } = useGetDiscoverJobsQuery();
 
   return (
@@ -15,4 +15,4 @@ const Discover = () => {
   );
 };
 
-export default Discover;
+export default SmartMatches;
