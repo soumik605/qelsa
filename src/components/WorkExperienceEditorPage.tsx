@@ -1,28 +1,15 @@
-import { ArrowLeft, Briefcase, Calendar, Check, Edit3, GripVertical, Loader2, MapPin, Plus, Sparkles, Trash2, TrendingUp, Users, X } from "lucide-react";
+import { useCreateExperienceMutation, useDeleteExperienceMutation, useGetExperiencesQuery, useUpdateExperienceMutation } from "@/features/api/experiencesApi";
+import { Experience } from "@/types/experience";
+import { ArrowLeft, Briefcase, Calendar, Check, Edit3, GripVertical, Loader2, MapPin, Plus, Sparkles, Trash2, TrendingUp, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { toast } from "sonner";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
-
-export interface WorkExperience {
-  id: string;
-  title: string;
-  company: string;
-  duration: string;
-  location: string;
-  startDate: string;
-  endDate: string | null;
-  isPresent: boolean;
-  description: string[];
-  metrics: Metric[];
-  skills: string[];
-  teamSize?: number;
-  proofs: Proof[];
-}
 
 interface Metric {
   id: string;
@@ -31,93 +18,105 @@ interface Metric {
   outcome: string;
 }
 
-interface Proof {
-  id: string;
-  name: string;
-  url: string;
-}
-
 const METRIC_TYPES = ["Revenue Growth", "User Growth", "Cost Reduction", "Efficiency Improvement", "Customer Satisfaction", "Team Performance", "Time Saved", "Quality Improvement"];
 
 const COMMON_SKILLS = ["Product Management", "Project Management", "Leadership", "Strategy", "Data Analysis", "Agile", "Scrum", "SQL", "Python", "Figma", "Jira", "Communication", "Problem Solving"];
 
 export function WorkExperienceEditorPage() {
   const router = useRouter();
-  const [experiences, setExperiences] = useState<WorkExperience[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const { data: experiences, error, isLoading } = useGetExperiencesQuery();
+  const [createExperience, { isLoading: isCreating, error: createError }] = useCreateExperienceMutation();
+  const [updateExperience, { isLoading: isUpdating, error: updateError }] = useUpdateExperienceMutation();
+  const [deleteExperience, { isLoading: isDeleting, error: deleteError }] = useDeleteExperienceMutation();
 
-  const [formData, setFormData] = useState<Partial<WorkExperience>>({
+  const [formData, setFormData] = useState<Partial<Experience>>({
     title: "",
-    company: "",
+    company_name: "",
     location: "",
-    startDate: "",
-    endDate: null,
-    isPresent: false,
-    description: [""],
-    metrics: [],
-    skills: [],
-    teamSize: undefined,
-    proofs: [],
+    start_date: undefined,
+    end_date: undefined,
+    is_current: false,
+    // metrics: [],
+    // skills: [],
+    team_size: undefined,
+    // proofs: [],
   });
 
   const handleAddNew = () => {
     setEditingId("new");
     setFormData({
       title: "",
-      company: "",
+      company_name: "",
       location: "",
-      startDate: "",
-      endDate: null,
-      isPresent: false,
-      description: [""],
-      metrics: [],
-      skills: [],
-      teamSize: undefined,
-      proofs: [],
+      start_date: undefined,
+      end_date: undefined,
+      is_current: false,
+      // description: [""],
+      // metrics: [],
+      // skills: [],
+      team_size: undefined,
+      // proofs: [],
     });
   };
 
-  const handleEdit = (exp: WorkExperience) => {
-    setEditingId(exp.id);
+  const handleEdit = (exp: Experience) => {
+    setEditingId(exp.id.toString());
     setFormData(exp);
   };
 
-  const handleDelete = (id: string) => {
-    setExperiences(experiences.filter((exp) => exp.id !== id));
+  const handleDelete = (id: any) => {
+    deleteExperience(id);
+    toast.success("Experience entry deleted");
   };
 
   const handleSaveExperience = () => {
-    if (!formData.title || !formData.company || !formData.startDate) {
+    if (!formData.title || !formData.company_name || !formData.start_date) {
       return;
     }
 
-    const duration = formData.isPresent ? `${formData.startDate} - Present` : `${formData.startDate} - ${formData.endDate}`;
-
-    const newExperience: WorkExperience = {
-      id: editingId === "new" ? Date.now().toString() : editingId!,
+    let newExperience: Experience = {
       title: formData.title!,
-      company: formData.company!,
+      company_name: formData.company_name!,
       location: formData.location!,
-      startDate: formData.startDate!,
-      endDate: formData.endDate,
-      isPresent: formData.isPresent!,
-      duration,
-      description: formData.description!.filter((d) => d.trim() !== ""),
-      metrics: formData.metrics || [],
-      skills: formData.skills || [],
-      teamSize: formData.teamSize,
-      proofs: formData.proofs || [],
+      start_date: formData.start_date!,
+      end_date: formData.end_date,
+      is_current: formData.is_current!,
+      description: Array.isArray(formData.description) ? formData.description.filter((d) => d.trim() !== "").join("\n") : undefined,
+      // metrics: formData.metrics || [],
+      // skills: formData.skills || [],
+      team_size: formData.team_size,
+      position: "",
     };
 
-    if (editingId === "new") {
-      setExperiences([newExperience, ...experiences]);
-    } else {
-      setExperiences(experiences.map((exp) => (exp.id === editingId ? newExperience : exp)));
-    }
+    if (editingId !== "new") newExperience.id = Number(editingId);
 
-    setEditingId(null);
+    if (editingId === "new") {
+      createExperience(newExperience)
+        .unwrap()
+        .then(() => {
+          toast.success("Education entry saved");
+          window.location.href = "/profile/educations";
+        })
+        .catch((error) => {
+          toast.error(error?.data?.message || "Failed to save education entry");
+        });
+    } else {
+      updateExperience({
+        id: Number(editingId),
+        data: newExperience,
+      })
+        .unwrap()
+        .then(() => {
+          toast.success("Experience entry updated");
+          setEditingId(null);
+        })
+        .catch((error) => {
+          toast.error(error?.data?.message || "Failed to update experience entry");
+        });
+    }
   };
 
   const handleCancel = () => {
@@ -125,23 +124,23 @@ export function WorkExperienceEditorPage() {
   };
 
   const handleAddBullet = () => {
-    setFormData({
-      ...formData,
-      description: [...(formData.description || []), ""],
-    });
+    // setFormData({
+    //   ...formData,
+    //   description: [...(formData.description || []), ""],
+    // });
   };
 
   const handleRemoveBullet = (index: number) => {
-    setFormData({
-      ...formData,
-      description: formData.description!.filter((_, i) => i !== index),
-    });
+    // setFormData({
+    //   ...formData,
+    //   description: formData.description!.filter((_, i) => i !== index),
+    // });
   };
 
   const handleBulletChange = (index: number, value: string) => {
     const newDescription = [...formData.description!];
     newDescription[index] = value;
-    setFormData({ ...formData, description: newDescription });
+    // setFormData({ ...formData, description: newDescription });
   };
 
   const handleAIRewriteBullet = async (index: number) => {
@@ -153,7 +152,7 @@ export function WorkExperienceEditorPage() {
 
     const newDescription = [...formData.description!];
     newDescription[index] = enhanced;
-    setFormData({ ...formData, description: newDescription });
+    // setFormData({ ...formData, description: newDescription });
 
     setAiLoading(false);
   };
@@ -165,40 +164,40 @@ export function WorkExperienceEditorPage() {
       value: "",
       outcome: "",
     };
-    setFormData({
-      ...formData,
-      metrics: [...(formData.metrics || []), newMetric],
-    });
+    // setFormData({
+    //   ...formData,
+    //   metrics: [...(formData.metrics || []), newMetric],
+    // });
   };
 
   const handleRemoveMetric = (id: string) => {
-    setFormData({
-      ...formData,
-      metrics: formData.metrics!.filter((m) => m.id !== id),
-    });
+    // setFormData({
+    //   ...formData,
+    //   metrics: formData.metrics!.filter((m) => m.id !== id),
+    // });
   };
 
   const handleMetricChange = (id: string, field: keyof Metric, value: string) => {
-    setFormData({
-      ...formData,
-      metrics: formData.metrics!.map((m) => (m.id === id ? { ...m, [field]: value } : m)),
-    });
+    // setFormData({
+    //   ...formData,
+    //   metrics: formData.metrics!.map((m) => (m.id === id ? { ...m, [field]: value } : m)),
+    // });
   };
 
   const handleAddSkill = (skill: string) => {
-    if (!formData.skills?.includes(skill)) {
-      setFormData({
-        ...formData,
-        skills: [...(formData.skills || []), skill],
-      });
-    }
+    // if (!formData.skills?.includes(skill)) {
+    //   setFormData({
+    //     ...formData,
+    //     skills: [...(formData.skills || []), skill],
+    //   });
+    // }
   };
 
   const handleRemoveSkill = (skill: string) => {
-    setFormData({
-      ...formData,
-      skills: formData.skills!.filter((s) => s !== skill),
-    });
+    // setFormData({
+    //   ...formData,
+    //   skills: formData.skills!.filter((s) => s !== skill),
+    // });
   };
 
   const handleDragStart = (index: number) => {
@@ -214,7 +213,7 @@ export function WorkExperienceEditorPage() {
     newExperiences.splice(draggedIndex, 1);
     newExperiences.splice(index, 0, draggedItem);
 
-    setExperiences(newExperiences);
+    // setExperiences(newExperiences);
     setDraggedIndex(index);
   };
 
@@ -261,7 +260,7 @@ export function WorkExperienceEditorPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-muted-foreground">
-                  {experiences.length} work {experiences.length === 1 ? "experience" : "experiences"} • Drag to reorder
+                  {experiences?.length} work {experiences?.length === 1 ? "experience" : "experiences"} • Drag to reorder
                 </p>
               </div>
               <Button onClick={handleAddNew} className="bg-gradient-to-r from-neon-cyan to-neon-purple text-white hover:scale-105 transition-all">
@@ -271,7 +270,7 @@ export function WorkExperienceEditorPage() {
             </div>
 
             <div className="space-y-4">
-              {experiences.map((exp, index) => (
+              {experiences?.map((exp, index) => (
                 <Card
                   key={exp.id}
                   draggable
@@ -287,20 +286,20 @@ export function WorkExperienceEditorPage() {
                       <div className="flex items-start justify-between gap-4 mb-3">
                         <div>
                           <h3 className="font-bold text-white text-lg">{exp.title}</h3>
-                          <p className="text-neon-cyan">{exp.company}</p>
+                          <p className="text-neon-cyan">{exp.company_name}</p>
                           <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
-                              {exp.duration}
+                              {/* {exp.duration} */}
                             </span>
                             <span className="flex items-center gap-1">
                               <MapPin className="h-3 w-3" />
                               {exp.location}
                             </span>
-                            {exp.teamSize && (
+                            {exp.team_size && (
                               <span className="flex items-center gap-1">
                                 <Users className="h-3 w-3" />
-                                Team of {exp.teamSize}
+                                Team of {exp.team_size}
                               </span>
                             )}
                           </div>
@@ -316,19 +315,25 @@ export function WorkExperienceEditorPage() {
                         </div>
                       </div>
 
-                      {exp.description.length > 0 && (
+                      {exp.description && exp.description.length > 0 && (
                         <ul className="space-y-1 mb-3">
-                          {exp.description.slice(0, 3).map((bullet, idx) => (
-                            <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                              <span className="text-neon-cyan mt-1">•</span>
-                              <span>{bullet}</span>
-                            </li>
-                          ))}
-                          {exp.description.length > 3 && <li className="text-sm text-neon-pink">+{exp.description.length - 3} more achievements...</li>}
+                          {exp.description
+                            .split("\n")
+                            .filter((d) => d.trim())
+                            .slice(0, 3)
+                            .map((bullet, idx) => (
+                              <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                                <span className="text-neon-cyan mt-1">•</span>
+                                <span>{bullet}</span>
+                              </li>
+                            ))}
+                          {exp.description.split("\n").filter((d) => d.trim()).length > 3 && (
+                            <li className="text-sm text-neon-pink">+{exp.description.split("\n").filter((d) => d.trim()).length - 3} more achievements...</li>
+                          )}
                         </ul>
                       )}
 
-                      {exp.metrics.length > 0 && (
+                      {/* {exp.metrics.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-3">
                           {exp.metrics.map((metric) => (
                             <Badge key={metric.id} variant="outline" className="border-neon-green/30 text-neon-green">
@@ -337,9 +342,9 @@ export function WorkExperienceEditorPage() {
                             </Badge>
                           ))}
                         </div>
-                      )}
+                      )} */}
 
-                      {exp.skills.length > 0 && (
+                      {/* {exp.skills.length > 0 && (
                         <div className="flex flex-wrap gap-2">
                           {exp.skills.slice(0, 5).map((skill) => (
                             <Badge key={skill} variant="outline" className="border-neon-purple/30 text-neon-purple text-xs">
@@ -352,7 +357,7 @@ export function WorkExperienceEditorPage() {
                             </Badge>
                           )}
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </Card>
@@ -396,13 +401,13 @@ export function WorkExperienceEditorPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="company" className="text-white">
+                  <Label htmlFor="company_name" className="text-white">
                     Company <span className="text-destructive">*</span>
                   </Label>
                   <Input
-                    id="company"
-                    value={formData.company}
-                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    id="company_name"
+                    value={formData.company_name}
+                    onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                     placeholder="e.g., TechFlow Solutions"
                     className="glass border-glass-border focus:border-neon-cyan"
                   />
@@ -422,50 +427,50 @@ export function WorkExperienceEditorPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="teamSize" className="text-white">
+                  <Label htmlFor="team_size" className="text-white">
                     Team Size
                   </Label>
                   <Input
-                    id="teamSize"
+                    id="team_size"
                     type="number"
-                    value={formData.teamSize || ""}
-                    onChange={(e) => setFormData({ ...formData, teamSize: parseInt(e.target.value) || undefined })}
+                    value={formData.team_size || ""}
+                    onChange={(e) => setFormData({ ...formData, team_size: parseInt(e.target.value) || undefined })}
                     placeholder="e.g., 12"
                     className="glass border-glass-border focus:border-neon-cyan"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="startDate" className="text-white">
+                  <Label htmlFor="start_date" className="text-white">
                     Start Date <span className="text-destructive">*</span>
                   </Label>
                   <Input
-                    id="startDate"
+                    id="start_date"
                     type="month"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                    value={formData.start_date ? new Date(formData.start_date).toISOString().slice(0, 7) : ""}
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value ? new Date(e.target.value + "-01") : undefined })}
                     className="glass border-glass-border focus:border-neon-cyan"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="endDate" className="text-white">
+                  <Label htmlFor="end_date" className="text-white">
                     End Date
                   </Label>
                   <div className="space-y-2">
                     <Input
-                      id="endDate"
+                      id="end_date"
                       type="month"
-                      value={formData.endDate || ""}
-                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                      disabled={formData.isPresent}
+                      value={formData.end_date ? new Date(formData.end_date).toISOString().slice(0, 7) : ""}
+                      onChange={(e) => setFormData({ ...formData, end_date: e.target.value ? new Date(e.target.value + "-01") : undefined })}
+                      disabled={formData.is_current}
                       className="glass border-glass-border focus:border-neon-cyan"
                     />
                     <label className="flex items-center gap-2 text-sm text-muted-foreground">
                       <input
                         type="checkbox"
-                        checked={formData.isPresent}
-                        onChange={(e) => setFormData({ ...formData, isPresent: e.target.checked, endDate: null })}
+                        checked={formData.is_current}
+                        onChange={(e) => setFormData({ ...formData, is_current: e.target.checked, end_date: undefined })}
                         className="rounded border-glass-border"
                       />
                       I currently work here
@@ -485,7 +490,7 @@ export function WorkExperienceEditorPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {formData.description?.map((bullet, index) => (
+                  {(formData.description ? formData.description.split("\n") : []).map((bullet, index) => (
                     <div key={index} className="flex gap-2">
                       <Textarea
                         value={bullet}
@@ -520,7 +525,7 @@ export function WorkExperienceEditorPage() {
                   </Button>
                 </div>
 
-                <div className="space-y-3">
+                {/* <div className="space-y-3">
                   {formData.metrics?.map((metric) => (
                     <Card key={metric.id} className="glass p-4">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -560,11 +565,11 @@ export function WorkExperienceEditorPage() {
                       </div>
                     </Card>
                   ))}
-                </div>
+                </div> */}
               </div>
 
               {/* Skills */}
-              <div className="space-y-3">
+              {/* <div className="space-y-3">
                 <Label className="text-white">Skills Used</Label>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {formData.skills?.map((skill) => (
@@ -590,7 +595,7 @@ export function WorkExperienceEditorPage() {
                     ))}
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Form Actions */}
               <div className="flex justify-end gap-3 pt-4 border-t border-glass-border">

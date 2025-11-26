@@ -1,4 +1,5 @@
 import { useGetEducationsQuery } from "@/features/api/educationsApi";
+import { useGetExperiencesQuery } from "@/features/api/experiencesApi";
 import {
   Activity,
   ArrowRight,
@@ -10,7 +11,6 @@ import {
   Building,
   Calendar,
   CheckCircle,
-  ChevronRight,
   Clock,
   Download,
   Edit3,
@@ -47,6 +47,7 @@ interface MySpacePageProps {}
 export function MySpacePage({}: MySpacePageProps) {
   const router = useRouter();
   const { data: educations, error, isLoading } = useGetEducationsQuery();
+  const { data: experiences, error: experiencesError, isLoading: experiencesLoading } = useGetExperiencesQuery();
 
   const [currentTime, setCurrentTime] = useState(new Date());
   const [animatedValues, setAnimatedValues] = useState({
@@ -201,30 +202,6 @@ export function MySpacePage({}: MySpacePageProps) {
       time: "5 days ago",
       icon: EyeIcon,
       color: "text-neon-pink",
-    },
-  ];
-
-  const workExperience = [
-    {
-      title: "Senior Product Manager",
-      company: "TechFlow Solutions",
-      duration: "Jan 2023 - Present",
-      location: "Bangalore, India",
-      highlights: ["Led 3 product launches with 40% user growth", "Managed cross-functional team of 12", "Increased revenue by ₹2.5Cr"],
-    },
-    {
-      title: "Product Manager",
-      company: "InnovateCorp",
-      duration: "Mar 2021 - Dec 2022",
-      location: "Mumbai, India",
-      highlights: ["Launched B2B SaaS platform", "Improved user retention by 35%", "Reduced customer acquisition cost by 25%"],
-    },
-    {
-      title: "Associate Product Manager",
-      company: "StartupX",
-      duration: "Jul 2019 - Feb 2021",
-      location: "Pune, India",
-      highlights: ["Built MVP from 0 to 10K users", "Designed user onboarding flow", "Achieved Product-Market Fit"],
     },
   ];
 
@@ -636,27 +613,25 @@ export function MySpacePage({}: MySpacePageProps) {
             </Button>
           </div>
           <div className="space-y-6">
-            {workExperience.map((exp, index) => (
+            {experiences?.map((exp, index) => (
               <div key={index} className="relative">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-neon-cyan to-neon-purple flex items-center justify-center text-black font-bold">{index + 1}</div>
                   <div className="flex-1">
                     <h4 className="font-semibold text-white">{exp.title}</h4>
-                    <p className="text-neon-cyan">{exp.company}</p>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {exp.duration} • {exp.location}
-                    </p>
-                    <ul className="space-y-1">
+                    <p className="text-neon-cyan">{exp.company_name}</p>
+                    <p className="text-sm text-muted-foreground mb-3">{exp.location}</p>
+                    {/* <ul className="space-y-1">
                       {exp.highlights.map((highlight, idx) => (
                         <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
                           <ChevronRight className="h-3 w-3 mt-1 text-neon-cyan flex-shrink-0" />
                           {highlight}
                         </li>
                       ))}
-                    </ul>
+                    </ul> */}
                   </div>
                 </div>
-                {index < workExperience.length - 1 && <div className="absolute left-6 top-12 w-px h-6 bg-glass-border"></div>}
+                {index < experiences.length - 1 && <div className="absolute left-6 top-12 w-px h-6 bg-glass-border"></div>}
               </div>
             ))}
           </div>
@@ -696,7 +671,7 @@ export function MySpacePage({}: MySpacePageProps) {
                 <Award className="h-5 w-5 text-neon-pink" />
                 <h3 className="text-xl font-bold text-white">Skills & Expertise</h3>
               </div>
-              <Button variant="ghost" size="sm" className="glass hover:glass-strong border-neon-pink/30 text-neon-pink hover:text-neon-pink">
+              <Button variant="ghost" size="sm" className="glass hover:glass-strong border-neon-pink/30 text-neon-pink hover:text-neon-pink" onClick={() => router.push("/profile/skills")}>
                 <Edit3 className="h-4 w-4 mr-2" />
                 Edit
               </Button>

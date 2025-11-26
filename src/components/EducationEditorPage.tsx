@@ -1,4 +1,4 @@
-import { useCreateEducationMutation, useGetEducationsQuery, useUpdateEducationMutation } from "@/features/api/educationsApi";
+import { useCreateEducationMutation, useDeleteEducationMutation, useGetEducationsQuery, useUpdateEducationMutation } from "@/features/api/educationsApi";
 import { Education } from "@/types/education";
 import { ArrowLeft, Award, Calendar, Check, Edit3, FileText, FolderOpen, GraduationCap, GripVertical, MapPin, Plus, Sparkles, Trash2, Trophy, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -19,6 +19,7 @@ export function EducationEditorPage() {
   const { data: educations, error, isLoading } = useGetEducationsQuery();
   const [createEducation, { isLoading: isCreating, error: createError }] = useCreateEducationMutation();
   const [updateEducation, { isLoading: isUpdating, error: updateError }] = useUpdateEducationMutation();
+  const [deleteEducation, { isLoading: isDeleting, error: deleteError }] = useDeleteEducationMutation();
 
   const [formData, setFormData] = useState<Partial<Education>>({
     degree: "",
@@ -55,7 +56,7 @@ export function EducationEditorPage() {
   };
 
   const handleDelete = (id: number) => {
-    setEducation(education.filter((edu) => edu.id !== id));
+    deleteEducation(id);
     toast.success("Education entry deleted");
   };
 
