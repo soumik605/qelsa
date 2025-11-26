@@ -1,4 +1,5 @@
 import { AlertCircle, ArrowLeft, Award, Briefcase, Check, Code, Crown, Lightbulb, Plus, Search, Sparkles, Target, Trash2, Upload, Users, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "./ui/badge";
@@ -112,6 +113,7 @@ function getProficiencyColor(proficiency: number): string {
 }
 
 export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: SkillsEditorPageProps) {
+  const router = useRouter();
   const [skills, setSkills] = useState<Skill[]>(initialSkills);
   const [selectedCategory, setSelectedCategory] = useState<SkillCategory>("Professional");
   const [searchQuery, setSearchQuery] = useState("");
@@ -279,7 +281,7 @@ export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: Skil
       <div className="relative z-10 max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Button onClick={onBack} variant="ghost" className="glass hover:glass-strong mb-4">
+          <Button variant="ghost" className="glass hover:glass-strong mb-4" onClick={() => router.push("/")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Profile
           </Button>

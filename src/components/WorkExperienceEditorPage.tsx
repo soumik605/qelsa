@@ -1,4 +1,5 @@
 import { ArrowLeft, Briefcase, Calendar, Check, Edit3, GripVertical, Loader2, MapPin, Plus, Sparkles, Trash2, TrendingUp, Users, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -41,6 +42,7 @@ const METRIC_TYPES = ["Revenue Growth", "User Growth", "Cost Reduction", "Effici
 const COMMON_SKILLS = ["Product Management", "Project Management", "Leadership", "Strategy", "Data Analysis", "Agile", "Scrum", "SQL", "Python", "Figma", "Jira", "Communication", "Problem Solving"];
 
 export function WorkExperienceEditorPage() {
+  const router = useRouter();
   const [experiences, setExperiences] = useState<WorkExperience[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -220,9 +222,7 @@ export function WorkExperienceEditorPage() {
     setDraggedIndex(null);
   };
 
-  const handleSaveAll = () => {
-    
-  };
+  const handleSaveAll = () => {};
 
   return (
     <div className="min-h-screen relative">
@@ -235,7 +235,7 @@ export function WorkExperienceEditorPage() {
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Button variant="ghost" className="glass hover:glass-strong mb-4">
+          <Button variant="ghost" className="glass hover:glass-strong mb-4" onClick={() => router.push("/")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Profile
           </Button>

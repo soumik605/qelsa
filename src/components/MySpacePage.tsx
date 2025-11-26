@@ -1,3 +1,4 @@
+import { useGetEducationsQuery } from "@/features/api/educationsApi";
 import {
   Activity,
   ArrowRight,
@@ -45,6 +46,8 @@ interface MySpacePageProps {}
 
 export function MySpacePage({}: MySpacePageProps) {
   const router = useRouter();
+  const { data: educations, error, isLoading } = useGetEducationsQuery();
+
   const [currentTime, setCurrentTime] = useState(new Date());
   const [animatedValues, setAnimatedValues] = useState({
     jobs: 0,
@@ -222,21 +225,6 @@ export function MySpacePage({}: MySpacePageProps) {
       duration: "Jul 2019 - Feb 2021",
       location: "Pune, India",
       highlights: ["Built MVP from 0 to 10K users", "Designed user onboarding flow", "Achieved Product-Market Fit"],
-    },
-  ];
-
-  const education = [
-    {
-      degree: "Master of Business Administration (MBA)",
-      institution: "Indian Institute of Management, Ahmedabad",
-      year: "2019",
-      specialization: "Product Management & Strategy",
-    },
-    {
-      degree: "Bachelor of Technology (B.Tech)",
-      institution: "National Institute of Technology, Warangal",
-      year: "2017",
-      specialization: "Computer Science Engineering",
     },
   ];
 
@@ -683,18 +671,18 @@ export function MySpacePage({}: MySpacePageProps) {
                 <GraduationCap className="h-5 w-5 text-neon-purple" />
                 <h3 className="text-xl font-bold text-white">Education</h3>
               </div>
-              <Button variant="ghost" size="sm" className="glass hover:glass-strong border-neon-purple/30 text-neon-purple hover:text-neon-purple">
+              <Button variant="ghost" size="sm" className="glass hover:glass-strong border-neon-purple/30 text-neon-purple hover:text-neon-purple" onClick={() => router.push("/profile/educations")}>
                 <Edit3 className="h-4 w-4 mr-2" />
                 Edit
               </Button>
             </div>
             <div className="space-y-4">
-              {education.map((edu, index) => (
+              {educations?.map((edu, index) => (
                 <div key={index} className="p-4 glass rounded-xl">
                   <h4 className="font-semibold text-white">{edu.degree}</h4>
                   <p className="text-neon-purple">{edu.institution}</p>
                   <p className="text-sm text-muted-foreground">
-                    {edu.year} • {edu.specialization}
+                    {edu.end_year} • {edu.field_of_study}
                   </p>
                 </div>
               ))}
