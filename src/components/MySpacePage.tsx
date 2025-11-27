@@ -1,5 +1,6 @@
 import { useGetEducationsQuery } from "@/features/api/educationsApi";
 import { useGetExperiencesQuery } from "@/features/api/experiencesApi";
+import { useGetUserSkillsQuery } from "@/features/api/userSkillsApi";
 import {
   Activity,
   ArrowRight,
@@ -39,7 +40,6 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Progress } from "./ui/progress";
-import { Separator } from "./ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 interface MySpacePageProps {}
@@ -48,6 +48,7 @@ export function MySpacePage({}: MySpacePageProps) {
   const router = useRouter();
   const { data: educations, error, isLoading } = useGetEducationsQuery();
   const { data: experiences, error: experiencesError, isLoading: experiencesLoading } = useGetExperiencesQuery();
+  const { data: userSkills, error: userSkillsError, isLoading: userSkillsLoading } = useGetUserSkillsQuery();
 
   const [currentTime, setCurrentTime] = useState(new Date());
   const [animatedValues, setAnimatedValues] = useState({
@@ -677,25 +678,19 @@ export function MySpacePage({}: MySpacePageProps) {
               </Button>
             </div>
             <div className="space-y-4">
-              {["Professional", "Technical", "Design", "Marketing"].map((category) => (
-                <div key={category}>
-                  <h4 className="font-medium text-white mb-3">{category}</h4>
-                  <div className="space-y-3">
-                    {skills
-                      .filter((skill) => skill.category === category)
-                      .map((skill, index) => (
-                        <div key={index}>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="text-foreground">{skill.name}</span>
-                            <span className="font-medium text-neon-cyan">{skill.level}%</span>
-                          </div>
-                          <Progress value={skill.level} className="h-2 bg-glass-bg" />
-                        </div>
-                      ))}
-                  </div>
-                  {category !== "Marketing" && <Separator className="mt-4 bg-glass-border" />}
+              <div>
+                <div className="space-y-3">
+                  {userSkills?.map((skill, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-foreground">{skill.title}</span>
+                        <span className="font-medium text-neon-cyan">{skill.proficiency}%</span>
+                      </div>
+                      <Progress value={Number(skill.proficiency)} className="h-2 bg-glass-bg" />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </Card>
         </div>

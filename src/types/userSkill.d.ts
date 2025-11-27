@@ -1,0 +1,7 @@
+export type UserSkill = {
+  id?: number;
+  title: string;
+  category: string;
+  proficiency: number;
+  experience_level?: string;
+};

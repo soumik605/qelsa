@@ -1,6 +1,8 @@
-import { AlertCircle, ArrowLeft, Award, Briefcase, Check, Code, Crown, Lightbulb, Plus, Search, Sparkles, Target, Trash2, Upload, Users, X } from "lucide-react";
+import { useBulkModifyUserSkillsMutation, useGetUserSkillsQuery } from "@/features/api/userSkillsApi";
+import { UserSkill } from "@/types/userSkill";
+import { AlertCircle, ArrowLeft, Award, Briefcase, Check, Code, Lightbulb, Plus, Search, Sparkles, Target, Trash2, Upload, Users, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -8,9 +10,6 @@ import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
-
-export type SkillCategory = "Professional" | "Technical" | "Soft Skills";
-export type ExperienceLevel = "Beginner" | "Intermediate" | "Advanced" | "Expert";
 
 export interface SkillBadge {
   id: string;
@@ -20,24 +19,11 @@ export interface SkillBadge {
   color: string;
 }
 
-export interface Skill {
-  id: string;
-  name: string;
-  category: SkillCategory;
-  proficiency: number;
-  experienceLevel: ExperienceLevel;
-  badges: SkillBadge[];
-  hasEvidence: boolean;
-  yearsOfExperience?: number;
-}
-
-interface SkillsEditorPageProps {
-  skills: Skill[];
-  onSave: (skills: Skill[]) => void;
-  onBack: () => void;
-}
-
-const SKILL_CATEGORIES: SkillCategory[] = ["Professional", "Technical", "Soft Skills"];
+const SKILL_CATEGORIES = [
+  { value: "professional", label: "Professional" },
+  { value: "technical", label: "Technical" },
+  { value: "softskill", label: "Soft Skill" },
+];
 
 const PROFESSIONAL_SKILLS = [
   "Product Management",
@@ -91,14 +77,14 @@ const SOFT_SKILLS = [
 ];
 
 const RECOMMENDED_SKILLS_FOR_PM = [
-  { name: "Agile Methodologies", category: "Professional" as SkillCategory, demand: "High" },
-  { name: "Data-Driven Decision Making", category: "Professional" as SkillCategory, demand: "High" },
-  { name: "User Research", category: "Professional" as SkillCategory, demand: "Medium" },
-  { name: "A/B Testing", category: "Technical" as SkillCategory, demand: "Medium" },
-  { name: "Roadmap Planning", category: "Professional" as SkillCategory, demand: "High" },
+  { name: "Agile Methodologies", category: "professional", demand: "High" },
+  { name: "Data-Driven Decision Making", category: "professional", demand: "High" },
+  { name: "User Research", category: "professional", demand: "Medium" },
+  { name: "A/B Testing", category: "technical", demand: "Medium" },
+  { name: "Roadmap Planning", category: "professional", demand: "High" },
 ];
 
-function getExperienceLevelFromProficiency(proficiency: number): ExperienceLevel {
+function getExperienceLevelFromProficiency(proficiency: number) {
   if (proficiency >= 90) return "Expert";
   if (proficiency >= 70) return "Advanced";
   if (proficiency >= 40) return "Intermediate";
@@ -112,10 +98,11 @@ function getProficiencyColor(proficiency: number): string {
   return "text-neon-pink";
 }
 
-export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: SkillsEditorPageProps) {
+export function SkillsEditorPage() {
   const router = useRouter();
-  const [skills, setSkills] = useState<Skill[]>(initialSkills);
-  const [selectedCategory, setSelectedCategory] = useState<SkillCategory>("Professional");
+  const [skills, setSkills] = useState<UserSkill[]>([]);
+  console.log("🚀 ~ SkillsEditorPage ~ skills:", skills);
+  const [selectedCategory, setSelectedCategory] = useState("professional");
   const [searchQuery, setSearchQuery] = useState("");
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
@@ -123,35 +110,44 @@ export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: Skil
   const [showAddSkill, setShowAddSkill] = useState(false);
   const [newSkillName, setNewSkillName] = useState("");
 
-  const getSkillSuggestions = (category: SkillCategory): string[] => {
+  const { data: userSkills, error, isLoading } = useGetUserSkillsQuery();
+  const [bulkModifyUserSkills, { isLoading: isBulkModifying, error: bulkModifyError }] = useBulkModifyUserSkillsMutation();
+
+  // Sync skills state with fetched data
+  useEffect(() => {
+    if (userSkills) {
+      setSkills(userSkills);
+    }
+  }, [userSkills]);
+
+  const getSkillSuggestions = (category: string): string[] => {
     switch (category) {
-      case "Professional":
+      case "professional":
         return PROFESSIONAL_SKILLS;
-      case "Technical":
+      case "technical":
         return TECHNICAL_SKILLS;
-      case "Soft Skills":
+      case "softskill":
         return SOFT_SKILLS;
       default:
         return [];
     }
   };
 
-  const handleAddSkill = (skillName: string, category: SkillCategory) => {
-    const exists = skills.some((skill) => skill.name.toLowerCase() === skillName.toLowerCase());
+  const handleAddSkill = (skillName: string, category: string) => {
+    const exists = skills.some((skill) => skill.title.toLowerCase() === skillName.toLowerCase());
 
     if (exists) {
       toast.error("This skill already exists in your profile");
       return;
     }
 
-    const newSkill: Skill = {
-      id: Date.now().toString(),
-      name: skillName,
+    const newSkill: UserSkill = {
+      title: skillName,
       category,
       proficiency: 50,
-      experienceLevel: "Intermediate",
-      badges: [],
-      hasEvidence: false,
+      experience_level: "Intermediate",
+      // badges: [],
+      // hasEvidence: false,
     };
 
     setSkills([...skills, newSkill]);
@@ -160,19 +156,19 @@ export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: Skil
     toast.success(`${skillName} added successfully!`);
   };
 
-  const handleDeleteSkill = (skillId: string) => {
+  const handleDeleteSkill = (skillId: number) => {
     setSkills(skills?.filter((skill) => skill.id !== skillId));
     toast.success("Skill removed");
   };
 
-  const handleProficiencyChange = (skillId: string, proficiency: number) => {
+  const handleProficiencyChange = (skillTitle: string, proficiency: number) => {
     setSkills(
       skills.map((skill) =>
-        skill.id === skillId
+        skill.title === skillTitle
           ? {
               ...skill,
               proficiency,
-              experienceLevel: getExperienceLevelFromProficiency(proficiency),
+              experience_level: getExperienceLevelFromProficiency(proficiency),
             }
           : skill
       )
@@ -183,14 +179,14 @@ export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: Skil
     const issues: string[] = [];
 
     skills?.forEach((skill) => {
-      if (skill.proficiency >= 70 && !skill.hasEvidence) {
-        issues.push(`${skill.name} - High proficiency (${skill.proficiency}%) but no supporting evidence. Consider adding projects or certifications.`);
-      }
+      // if (skill.proficiency >= 70 && !skill.hasEvidence) {
+      //   issues.push(`${skill.title} - High proficiency (${skill.proficiency}%) but no supporting evidence. Consider adding projects or certifications.`);
+      // }
 
-      if (skill.category === "Technical" && skill.proficiency >= 60) {
+      if (skill.category === "technical" && skill.proficiency >= 60) {
         const random = Math.random();
         if (random > 0.7) {
-          issues.push(`${skill.name} - No recent projects found using this skill. Add supporting evidence or update proficiency.`);
+          issues.push(`${skill.title} - No recent projects found using this skill. Add supporting evidence or update proficiency.`);
         }
       }
     });
@@ -205,67 +201,39 @@ export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: Skil
     }
   };
 
-  const handleAutoAddFromResume = () => {
-    const resumeSkills = [
-      { name: "Agile Methodologies", category: "Professional" as SkillCategory, proficiency: 85 },
-      { name: "A/B Testing", category: "Technical" as SkillCategory, proficiency: 75 },
-      { name: "User Research", category: "Professional" as SkillCategory, proficiency: 80 },
-    ];
+  const handleAutoAddFromResume = () => {};
 
-    let addedCount = 0;
-    resumeSkills.forEach((resumeSkill) => {
-      const exists = skills.some((skill) => skill.name.toLowerCase() === resumeSkill.name.toLowerCase());
-
-      if (!exists) {
-        const newSkill: Skill = {
-          id: `resume-${Date.now()}-${addedCount}`,
-          name: resumeSkill.name,
-          category: resumeSkill.category,
-          proficiency: resumeSkill.proficiency,
-          experienceLevel: getExperienceLevelFromProficiency(resumeSkill.proficiency),
-          badges: [
-            {
-              id: `badge-${Date.now()}`,
-              name: "Resume Verified",
-              source: "Resume",
-              icon: "FileText",
-              color: "text-neon-cyan",
-            },
-          ],
-          hasEvidence: true,
-        };
-        setSkills((prev) => [...prev, newSkill]);
-        addedCount++;
-      }
-    });
-
-    toast.success(`Added ${addedCount} skills from your resume!`);
-  };
-
-  const handleAddRecommendedSkill = (skillName: string, category: SkillCategory) => {
+  const handleAddRecommendedSkill = (skillName: string, category: string) => {
     handleAddSkill(skillName, category);
     toast.info("This skill is in high demand for Product Manager roles");
   };
 
   const handleSaveAll = () => {
-    onSave(skills);
+    bulkModifyUserSkills(skills)
+      .unwrap()
+      .then(() => {
+        toast.success("Skills entry saved");
+        window.location.href = "/profile/skills";
+      })
+      .catch((error) => {
+        toast.error(error?.data?.message || "Failed to save skills entry");
+      });
     toast.success("Skills updated successfully!");
-    onBack();
   };
 
-  const filteredSkills = skills?.filter((skill) => {
-    const matchesCategory = skill.category === selectedCategory;
-    const matchesSearch = skill.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filteredSkills =
+    skills?.filter((skill) => {
+      const matchesCategory = skill.category === selectedCategory;
+      const matchesSearch = skill.title.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    }) || [];
 
   const getSkillStats = () => {
-    const total = skills?.length || 0;
-    const withBadges = skills?.filter((s) => s.badges.length > 0).length || 0;
-    const expert = skills?.filter((s) => s.experienceLevel === "Expert").length || 0;
-    const avgProficiency = Math.round(skills?.reduce((sum, s) => sum + s.proficiency, 0) / total || 0);
-
-    return { total, withBadges, expert, avgProficiency };
+    // const total = skills?.length || 0;
+    // const withBadges = skills?.filter((s) => s.badges.length > 0).length || 0;
+    // const expert = skills?.filter((s) => s.experience_level === "Expert").length || 0;
+    // const avgProficiency = Math.round(skills?.reduce((sum, s) => sum + s.proficiency, 0) / total || 0);
+    // return { total, withBadges, expert, avgProficiency };
   };
 
   const stats = getSkillStats();
@@ -295,9 +263,7 @@ export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: Skil
                 <h1 className="text-4xl font-bold">
                   <span className="bg-gradient-to-r from-neon-pink to-neon-yellow bg-clip-text text-transparent">Skills & Expertise</span>
                 </h1>
-                <p className="text-muted-foreground mt-1">
-                  {stats.total} skills • {stats.expert} expert level • {stats.avgProficiency}% avg proficiency
-                </p>
+                <p className="text-muted-foreground mt-1">{/* {stats.total} skills • {stats.expert} expert level • {stats.avgProficiency}% avg proficiency */}</p>
               </div>
             </div>
           </div>
@@ -419,12 +385,12 @@ export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: Skil
                   <Label className="text-white mb-2 block">Category</Label>
                   <select
                     value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value as SkillCategory)}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
                     className="w-full glass border border-glass-border rounded-lg px-3 py-2 focus:border-neon-cyan focus:outline-none bg-transparent text-white"
                   >
                     {SKILL_CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat} className="bg-gray-900">
-                        {cat}
+                      <option key={cat.value} value={cat.value} className="bg-gray-900">
+                        {cat.label}
                       </option>
                     ))}
                   </select>
@@ -476,18 +442,18 @@ export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: Skil
             <div className="flex gap-2 flex-wrap">
               {SKILL_CATEGORIES.map((category) => (
                 <Button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  variant={selectedCategory === category ? "default" : "outline"}
+                  key={category.value}
+                  onClick={() => setSelectedCategory(category.value)}
+                  variant={selectedCategory === category.value ? "default" : "outline"}
                   size="sm"
-                  className={selectedCategory === category ? "bg-gradient-to-r from-neon-pink to-neon-yellow text-black" : "glass hover:glass-strong border-glass-border"}
+                  className={selectedCategory === category.value ? "bg-gradient-to-r from-neon-pink to-neon-yellow text-black" : "glass hover:glass-strong border-glass-border"}
                 >
-                  {category === "Professional" && <Briefcase className="h-4 w-4 mr-2" />}
-                  {category === "Technical" && <Code className="h-4 w-4 mr-2" />}
-                  {category === "Soft Skills" && <Users className="h-4 w-4 mr-2" />}
-                  {category}
+                  {category.value === "professional" && <Briefcase className="h-4 w-4 mr-2" />}
+                  {category.value === "technical" && <Code className="h-4 w-4 mr-2" />}
+                  {category.value === "softskill" && <Users className="h-4 w-4 mr-2" />}
+                  {category.value.charAt(0).toUpperCase() + category.value.slice(1)}
                   <Badge variant="outline" className="ml-2 border-glass-border text-xs">
-                    {skills?.filter((s) => s.category === category).length}
+                    {skills?.filter((s) => s.category === category.value).length}
                   </Badge>
                 </Button>
               ))}
@@ -504,23 +470,23 @@ export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: Skil
             </Card>
           ) : (
             filteredSkills?.map((skill) => (
-              <Card key={skill.id} className="glass hover:glass-strong p-6 rounded-xl border border-glass-border transition-all">
+              <Card key={skill.title} className="glass hover:glass-strong p-6 rounded-xl border border-glass-border transition-all">
                 <div className="space-y-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <h3 className="font-bold text-white text-lg">{skill.name}</h3>
+                        <h3 className="font-bold text-white text-lg">{skill.title}</h3>
                         <Badge variant="outline" className={`${getProficiencyColor(skill.proficiency)} border-current`}>
-                          {skill.experienceLevel}
+                          {getExperienceLevelFromProficiency(skill.proficiency)}
                         </Badge>
-                        {!skill.hasEvidence && skill.proficiency >= 70 && (
+                        {/* {!skill.hasEvidence && skill.proficiency >= 70 && (
                           <Badge variant="outline" className="border-neon-pink/30 text-neon-pink text-xs">
                             <AlertCircle className="h-3 w-3 mr-1" />
                             Needs Evidence
                           </Badge>
-                        )}
+                        )} */}
                       </div>
-                      {skill.badges.length > 0 && (
+                      {/* {skill.badges.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-2">
                           {skill.badges.map((badge) => (
                             <Badge key={badge.id} variant="outline" className={`${badge.color} border-current text-xs`}>
@@ -529,7 +495,7 @@ export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: Skil
                             </Badge>
                           ))}
                         </div>
-                      )}
+                      )} */}
                     </div>
                     <Button onClick={() => handleDeleteSkill(skill.id)} variant="ghost" size="icon" className="glass hover:glass-strong text-destructive flex-shrink-0">
                       <Trash2 className="h-4 w-4" />
@@ -539,9 +505,9 @@ export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: Skil
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label className="text-sm text-muted-foreground">Proficiency: {skill.proficiency}%</Label>
-                      <span className={`text-sm font-medium ${getProficiencyColor(skill.proficiency)}`}>{skill.experienceLevel}</span>
+                      <span className={`text-sm font-medium ${getProficiencyColor(skill.proficiency)}`}>{getExperienceLevelFromProficiency(skill.proficiency)}</span>
                     </div>
-                    <Slider value={[skill.proficiency]} onValueChange={(value) => handleProficiencyChange(skill.id, value[0])} max={100} step={5} className="w-full" />
+                    <Slider value={[skill.proficiency]} onValueChange={(value) => handleProficiencyChange(skill.title, value[0])} max={100} step={5} className="w-full" />
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>Beginner</span>
                       <span>Intermediate</span>
@@ -559,7 +525,7 @@ export function SkillsEditorPage({ skills: initialSkills, onSave, onBack }: Skil
         <div className="flex justify-between items-center pt-4 border-t border-glass-border">
           <div className="text-sm text-muted-foreground">{skills?.length} total skills across all categories</div>
           <div className="flex gap-3">
-            <Button variant="outline" onClick={onBack} className="glass hover:glass-strong">
+            <Button variant="outline" className="glass hover:glass-strong">
               Cancel
             </Button>
             <Button onClick={handleSaveAll} className="bg-gradient-to-r from-neon-pink to-neon-yellow text-black hover:scale-105 transition-all">
