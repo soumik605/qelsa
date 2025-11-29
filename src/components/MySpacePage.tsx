@@ -548,7 +548,7 @@ export function MySpacePage({}: MySpacePageProps) {
               <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face" alt="Alex Johnson" />
               <AvatarFallback className="text-2xl bg-gradient-to-r from-neon-cyan to-neon-purple text-black">AJ</AvatarFallback>
             </Avatar>
-            <Button className="mt-4 glass hover:glass-strong border border-glass-border hover:border-neon-cyan transition-all duration-300">
+            <Button onClick={() => router.push("/profile/edit")} className="mt-4 glass hover:glass-strong border border-glass-border hover:border-neon-cyan transition-all duration-300">
               <Edit3 className="h-4 w-4 mr-2" />
               Edit Profile
             </Button>

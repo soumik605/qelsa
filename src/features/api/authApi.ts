@@ -1,3 +1,4 @@
+import { User } from "@/types/user";
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
 import { createApi, fetchBaseQuery, FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 
@@ -21,13 +22,6 @@ interface AuthResponse {
 interface RefreshResponse {
   accessToken: string;
   refreshToken: string;
-}
-
-interface Profile {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
 }
 
 // Redirect Helper
@@ -119,11 +113,20 @@ export const authApi = createApi({
       }),
     }),
 
-    getProfile: builder.query<Profile, void>({
+    getProfile: builder.query<User, void>({
       query: () => "/me",
       providesTags: ["Profile"],
+    }),
+
+    updateProfile: builder.mutation<User, Partial<User>>({
+      query: (profile) => ({
+        url: "/edit-profile",
+        method: "PUT",
+        body: profile,
+      }),
+      invalidatesTags: ["Profile"],
     }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetProfileQuery } = authApi;
+export const { useLoginMutation, useRegisterMutation, useGetProfileQuery, useUpdateProfileMutation } = authApi;

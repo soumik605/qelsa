@@ -1,0 +1,42 @@
+export type User = {
+  id?: number;
+  name?: string;
+  email: string;
+  profile_image?: string;
+  pronoun?: string;
+  linkedin_url?: string;
+  github_url?: string;
+  twitter_url?: string;
+  other_social_link?: string;
+  show_contact_to_recruiters?: boolean;
+  allow_profile_downloads?: boolean;
+  profile_view_analytics?: boolean;
+  profile_visibility?: string;
+  headline?: string;
+  expected_min_salary?: number;
+  expected_max_salary?: number;
+  expected_salary_currency?: string;
+  nationality?: string;
+  location?: string;
+  phone?: string;
+  username?: string;
+  custom_profile_url?: string;
+  want_to_relocate?: boolean;
+  work_preference?: string;
+  professional_summary?: string;
+  preffer_full_time?: boolean;
+  preffer_contract?: boolean;
+  preffer_internship?: boolean;
+  preffer_freelance?: boolean;
+  role: "user" | "admin";
+
+  website?: string;
+
+  password?: string;
+  gender?: string;
+  dob?: string;
+  is_active?: boolean;
+  about?: string;
+  last_login_at?: string;
+  city?: string;
+};
