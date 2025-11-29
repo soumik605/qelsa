@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useGetProfileQuery } from "../../features/api/authApi";
 
-const publicRoutes = ["/login", "/register", "/jobs"];
+const publicRoutes = ["/login", "/register", "/jobs/smart_matches"];
 
 export default function ProtectedRoute({ children }) {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function ProtectedRoute({ children }) {
 
     // Case 1: no token, and not public route → redirect to /jobs
     if (!token && !publicRoutes.includes(router.pathname)) {
-      router.replace("/jobs");
+      router.replace("/jobs/smart_matches");
       return;
     }
 
@@ -34,7 +34,7 @@ export default function ProtectedRoute({ children }) {
     if (error && !publicRoutes.includes(router.pathname)) {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-      router.replace("/jobs");
+      router.replace("/jobs/smart_matches");
       return;
     }
 

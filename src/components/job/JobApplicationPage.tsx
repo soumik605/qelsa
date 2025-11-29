@@ -1,6 +1,6 @@
+import { ScreeningQuestion } from "@/types/question";
 import { ArrowLeft, CheckCircle2, Send, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { ScreeningQuestion } from "../ScreeningQuestionsBuilder";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";

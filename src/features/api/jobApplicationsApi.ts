@@ -32,7 +32,16 @@ export const jobApplicationsApi = createApi({
 
       providesTags: ["Applications"],
     }),
+    createJobApplication: builder.mutation({
+      query: (body) => ({
+        url: `jobs/${body.id}/applications`,
+        method: "POST",
+        body: body.applicationData,
+      }),
+
+      // transformResponse: (response: { success: boolean; data: Job }) => response.data,
+    }),
   }),
 });
 
-export const { useGetJobApplicationsQuery } = jobApplicationsApi;
+export const { useGetJobApplicationsQuery, useCreateJobApplicationMutation } = jobApplicationsApi;

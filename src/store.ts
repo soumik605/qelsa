@@ -5,6 +5,7 @@ import { experiencesApi } from "./features/api/experiencesApi";
 import { jobApplicationsApi } from "./features/api/jobApplicationsApi";
 import { jobsApi } from "./features/api/jobsApi";
 import { pagesApi } from "./features/api/pagesApi";
+import { resumesApi } from "./features/api/resumeApi";
 import { userSkillsApi } from "./features/api/userSkillsApi";
 
 export const store = configureStore({
@@ -16,6 +17,7 @@ export const store = configureStore({
     [educationsApi.reducerPath]: educationsApi.reducer,
     [experiencesApi.reducerPath]: experiencesApi.reducer,
     [userSkillsApi.reducerPath]: userSkillsApi.reducer,
+    [resumesApi.reducerPath]: resumesApi.reducer,
     // add other reducers here
   },
   middleware: (getDefaultMiddleware) =>
@@ -26,5 +28,6 @@ export const store = configureStore({
       .concat(jobApplicationsApi.middleware)
       .concat(educationsApi.middleware)
       .concat(experiencesApi.middleware)
-      .concat(userSkillsApi.middleware),
+      .concat(userSkillsApi.middleware)
+      .concat(resumesApi.middleware),
 });

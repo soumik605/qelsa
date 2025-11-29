@@ -1,4 +1,5 @@
-import DOMPurify from "dompurify";
+import { useGetJobByIdQuery } from "@/features/api/jobsApi";
+import { useGetMyResumesQuery } from "@/features/api/resumeApi";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -8,9 +9,9 @@ import {
   BrainCircuit,
   Briefcase,
   Building2,
+  Calendar,
   CheckCircle,
   Clock,
-  DollarSign,
   ExternalLink,
   FileText,
   Globe,
@@ -20,8 +21,6 @@ import {
   Play,
   Send,
   Share2,
-  Sparkles,
-  Target,
   TrendingUp,
   Upload,
   X,
@@ -29,24 +28,27 @@ import {
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useGetJobByIdQuery } from "../../features/api/jobsApi";
+import { QuickApplyModal } from "../QuickApplyModal";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 export function JobDetailPage() {
   const [isSaved, setIsSaved] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [showSavedResumesDialog, setShowSavedResumesDialog] = useState(false);
+  const [showChatWidget, setShowChatWidget] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
   const [resumeAnalysis, setResumeAnalysis] = useState<any>(null);
   const [selectedSkillsTab, setSelectedSkillsTab] = useState("match");
+  const { data: my_resumes } = useGetMyResumesQuery();
 
   const router = useRouter();
+  const [showQuickApplyModal, setShowQuickApplyModal] = useState(false);
 
   const params = useParams<{ id: string }>();
   const id = params?.id;
@@ -62,6 +64,11 @@ export function JobDetailPage() {
   if (!id || isLoading) return <p>Loading job...</p>;
   if (error) return <p>Error loading job.</p>;
   if (!job) return <p>No job found.</p>;
+
+  const handleCompanyClick = () => {
+    // console.log("Company clicked:", job.company);
+    // onCompanyClick?.(job.company);
+  };
 
   const getWorkTypeIcon = (workType: string) => {
     switch (workType) {
@@ -183,7 +190,7 @@ export function JobDetailPage() {
       <div className="glass-strong border-b border-glass-border sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => router.push("/jobs")} size="sm" className="hover:bg-neon-cyan/10 hover:text-neon-cyan">
+            <Button variant="ghost" size="sm" onClick={() => router.push("/jobs/smart_matches")} className="hover:bg-neon-cyan/10 hover:text-neon-cyan">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Jobs
             </Button>
@@ -206,7 +213,7 @@ export function JobDetailPage() {
           <div className="flex items-start gap-6 mb-6">
             {job.company_logo && (
               <div className="relative flex-shrink-0">
-                <img src={job.company_logo} alt={job.company_name} className="w-16 h-16 rounded-xl object-cover border border-glass-border" />
+                <img src={job.company_logo} alt={job.page?.name || job.company_name} className="w-16 h-16 rounded-xl object-cover border border-glass-border" />
                 {/* {job.source.verified && (
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-neon-green rounded-full flex items-center justify-center">
                     <Shield className="w-3 h-3 text-black" />
@@ -220,7 +227,9 @@ export function JobDetailPage() {
                 <div>
                   <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">{job.title}</h1>
                   <div className="flex items-center gap-3 mb-3">
-                    <h2 className="text-xl text-muted-foreground">{job.company_name}</h2>
+                    <h2 className="text-xl text-muted-foreground hover:text-neon-cyan hover:underline transition-colors cursor-pointer" onClick={handleCompanyClick}>
+                      {job.page?.name || job.company_name}
+                    </h2>
                     {/* {job.companyRating && (
                       <div className="flex items-center gap-1">
                         <Star className="w-4 h-4 text-yellow-500 fill-current" />
@@ -254,37 +263,68 @@ export function JobDetailPage() {
                   <Clock className="w-4 h-4 text-neon-purple" />
                   <span>{job.experience}</span>
                 </div>
-                {(job.salary_max || job.salary_min) && (
+                {/* {job.salary && (
                   <div className="flex items-center gap-2 text-sm">
                     <DollarSign className="w-4 h-4 text-neon-green" />
-                    <span>{job.salary_max || job.salary_min}</span>
+                    <span>{job.salary}</span>
                   </div>
-                )}
+                )} */}
               </div>
 
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <div className="flex items-center gap-4">
-                  {/* <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    <span>Posted {new Date(job.postedDate).toLocaleDateString()}</span>
+                    <span>Posted {new Date(job.createdAt).toLocaleDateString()}</span>
                   </div>
-                  {job.applicationDeadline && (
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      <span>Deadline {new Date(job.applicationDeadline).toLocaleDateString()}</span>
-                    </div>
-                  )} */}
                 </div>
 
-                {/* <div className="flex items-center gap-2">
-                  {getSourceIcon(job.source.platform)}
-                  <span>{job.source.platform}</span>
-                  {job.source.exclusive && (
-                    <Badge variant="secondary" className="text-xs bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30">
-                      Exclusive
-                    </Badge>
+                <div className="flex items-center gap-2">
+                  {getSourceIcon(job.resource)}
+                  <span>{job.resource}</span>
+                </div>
+              </div>
+
+              {/* Apply Button Section - Moved to Top */}
+              <div className="mt-6 pt-6 border-t border-glass-border">
+                {/* {job.isFeaturedEmployer && (
+                  <Badge className="mb-3 bg-neon-purple/10 text-neon-purple border-neon-purple/30">
+                    <Star className="w-3 h-3 mr-1" />
+                    Featured Employer
+                  </Badge>
+                )} */}
+
+                {/* {isApplied && (
+                  <Badge className="mb-3 bg-neon-green/10 text-neon-green border-neon-green/30">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Applied {job.appliedDate && `on ${new Date(job.appliedDate).toLocaleDateString()}`}
+                  </Badge>
+                )} */}
+
+                <div className="space-y-4">
+                  {!isApplied ? (
+                    <div>
+                      {job.resource == "qelsa" ? (
+                        <Button onClick={() => setShowQuickApplyModal(true)} className="w-full bg-neon-green hover:bg-neon-green/90 text-black font-medium">
+                          <Zap className="w-4 h-4 mr-2" />
+                          Quick Apply
+                        </Button>
+                      ) : (
+                        <Button onClick={handleApplyJob} className="w-full bg-neon-cyan hover:bg-neon-cyan/90 text-black font-medium">
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          Apply
+                        </Button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center p-4 rounded-lg bg-neon-green/5 border border-neon-green/20">
+                      <CheckCircle className="w-6 h-6 text-neon-green mx-auto mb-2" />
+                      <p className="text-sm text-neon-green font-medium">Application submitted successfully!</p>
+                    </div>
                   )}
-                </div> */}
+
+                  <div className="text-xs text-muted-foreground text-center">By applying, you agree to share your profile with {job.page?.name || job.company_name}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -294,101 +334,41 @@ export function JobDetailPage() {
             {/* <div className="text-center">
               <div className="text-2xl font-bold text-neon-cyan">{job.views}</div>
               <div className="text-sm text-muted-foreground">Views</div>
-            </div>
-            {job.applicants && (
+            </div> */}
+            {job.applications && (
               <div className="text-center">
-                <div className="text-2xl font-bold text-neon-purple">{job.applicants}</div>
+                <div className="text-2xl font-bold text-neon-purple">{job.applications.length}</div>
                 <div className="text-sm text-muted-foreground">Applicants</div>
               </div>
             )}
-            {job.fitScore && (
+            {/* {job.fitScore && (
               <div className="text-center">
                 <div className="text-2xl font-bold text-neon-green">{job.fitScore}%</div>
                 <div className="text-sm text-muted-foreground">Match Score</div>
               </div>
             )} */}
             <div className="text-center">
-              {/* <div className="text-2xl font-bold text-neon-yellow">{job.source.platform === "Qelsa" ? "High" : "Medium"}</div> */}
+              <div className="text-2xl font-bold text-neon-yellow">{job.resource === "Qelsa" ? "High" : "Medium"}</div>
               <div className="text-sm text-muted-foreground">Priority</div>
             </div>
           </div>
         </Card>
 
-        {/* AI Insights Section */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* AI Skill Match */}
-          {/* {job.fitScore && (
-            <Card className="glass border-glass-border p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Target className="w-5 h-5 text-neon-purple" />
-                <h3 className="text-lg font-semibold">AI Skill Match</h3>
-              </div>
-
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-muted-foreground">Overall Match</span>
-                  <span className="text-lg font-bold text-neon-purple">{job.fitScore}%</span>
-                </div>
-                <Progress value={job.fitScore} className="h-3 mb-4" />
-              </div>
-
-              <Tabs value={selectedSkillsTab} onValueChange={setSelectedSkillsTab}>
-                <TabsList className="grid w-full grid-cols-3 mb-4">
-                  <TabsTrigger value="match" className="text-xs">
-                    Strong
-                  </TabsTrigger>
-                  <TabsTrigger value="partial" className="text-xs">
-                    Partial
-                  </TabsTrigger>
-                  <TabsTrigger value="missing" className="text-xs">
-                    Missing
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="match" className="space-y-2">
-                  {(job.skills || []).slice(0, 3).map((skill) => (
-                    <div key={skill} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-neon-green" />
-                      <span>{skill}</span>
-                    </div>
-                  ))}
-                </TabsContent>
-
-                <TabsContent value="partial" className="space-y-2">
-                  {(job.preferredSkills || []).slice(0, 3).map((skill) => (
-                    <div key={skill} className="flex items-center gap-2 text-sm">
-                      <AlertTriangle className="w-4 h-4 text-neon-yellow" />
-                      <span>{skill}</span>
-                    </div>
-                  ))}
-                </TabsContent>
-
-                <TabsContent value="missing" className="space-y-2">
-                  {(job.techStack || []).slice(0, 3).map((skill) => (
-                    <div key={skill} className="flex items-center gap-2 text-sm">
-                      <X className="w-4 h-4 text-red-400" />
-                      <span>{skill}</span>
-                    </div>
-                  ))}
-                </TabsContent>
-              </Tabs>
-            </Card>
-          )} */}
-
-          {/* AI Job Summary */}
+        {/* Job Summary Section */}
+        {/* {job.fitScore && (
           <Card className="glass border-glass-border p-6">
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-6">
               <Sparkles className="w-5 h-5 text-neon-cyan" />
-              <h3 className="text-lg font-semibold">AI Job Summary</h3>
+              <h3 className="text-lg font-semibold">Job Summary</h3>
             </div>
 
-            {/* <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{job.aiSummary}</p> */}
+            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{job.aiSummary}</p>
 
-            <div className="p-3 rounded-lg bg-neon-cyan/5 border border-neon-cyan/20">
+            <div className="p-4 rounded-lg bg-neon-cyan/5 border border-neon-cyan/20">
               <p className="text-sm text-neon-cyan font-medium">💡 This role is best suited for candidates with strong React skills, 2+ years experience, and passion for user experience.</p>
             </div>
           </Card>
-        </div>
+        )} */}
 
         {/* Resume Analysis */}
         {!resumeAnalysis && (
@@ -399,40 +379,94 @@ export function JobDetailPage() {
                 <h3 className="text-lg font-semibold">AI Resume Fit Analysis</h3>
               </div>
 
-              <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
-                <DialogTrigger asChild>
-                  <Button className="bg-neon-purple hover:bg-neon-purple/90 text-white">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload Resume
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Upload Your Resume</DialogTitle>
-                    <DialogDescription>Upload your resume to get AI-powered insights on how well you match this job.</DialogDescription>
-                  </DialogHeader>
+              <div className="flex gap-2">
+                {/* Use Saved Resume Button */}
+                {/* <Dialog open={showSavedResumesDialog} onOpenChange={setShowSavedResumesDialog}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10">
+                      <FileText className="w-4 h-4 mr-2" />
+                      Use Saved Resume
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="glass border-glass-border">
+                    <DialogHeader>
+                      <DialogTitle>Choose Resume</DialogTitle>
+                      <DialogDescription>Select a resume from your saved documents to analyze your match with this job.</DialogDescription>
+                    </DialogHeader>
 
-                  <div className="space-y-4">
-                    <div className="border-2 border-dashed border-glass-border rounded-lg p-8 text-center">
-                      <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground mb-2">Drop your resume here or click to browse</p>
-                      <Button variant="outline">Choose File</Button>
+                    <div className="space-y-3">
+                      {savedResumes.map((resume) => (
+                        <div
+                          key={resume.id}
+                          className="flex items-center justify-between p-4 rounded-lg border border-glass-border hover:border-neon-cyan/50 cursor-pointer transition-all"
+                          onClick={() => {
+                            handleUploadResume();
+                            setShowSavedResumesDialog(false);
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <FileText className="w-5 h-5 text-neon-purple" />
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium text-sm">{resume.name}</p>
+                                {resume.isPrimary && (
+                                  <Badge variant="outline" className="text-xs border-neon-green/30 text-neon-green">
+                                    Primary
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">Uploaded {resume.uploadDate}</p>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                      ))}
                     </div>
 
-                    <div className="flex gap-2">
-                      <Button onClick={handleUploadResume} className="flex-1">
-                        Analyze Resume
-                      </Button>
-                      <Button variant="outline" onClick={() => setShowUploadDialog(false)}>
-                        Cancel
-                      </Button>
+                    <Button variant="outline" className="w-full" onClick={() => setShowSavedResumesDialog(false)}>
+                      Cancel
+                    </Button>
+                  </DialogContent>
+                </Dialog> */}
+
+                {/* Upload New Resume Button */}
+                <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-neon-purple hover:bg-neon-purple/90 text-white">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload Resume
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="glass border-glass-border">
+                    <DialogHeader>
+                      <DialogTitle>Upload Your Resume</DialogTitle>
+                      <DialogDescription>Upload your resume to get AI-powered insights on how well you match this job.</DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4">
+                      <div className="border-2 border-dashed border-glass-border rounded-lg p-8 text-center">
+                        <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground mb-2">Drop your resume here or click to browse</p>
+                        <Button variant="outline">Choose File</Button>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button onClick={handleUploadResume} className="flex-1">
+                          Analyze Resume
+                        </Button>
+                        <Button variant="outline" onClick={() => setShowUploadDialog(false)}>
+                          Cancel
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
 
-            <p className="text-sm text-muted-foreground">Get personalized insights on your resume match and receive recommendations to improve your application.</p>
+            <p className="text-sm text-muted-foreground">
+              Get personalized insights on your resume match and receive recommendations to improve your application. Upload a new resume or use one previously saved in your profile.
+            </p>
           </Card>
         )}
 
@@ -506,12 +540,8 @@ export function JobDetailPage() {
           <div className="space-y-6">
             <div>
               <h4 className="font-medium text-neon-cyan mb-3">About the Role</h4>
-              <p
-                className="text-sm text-muted-foreground leading-relaxed mb-4"
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(job.description || "Job description not available."),
-                }}
-              />
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4">{job.description || "Job description not available."}</p>
+
               {/* {job.responsibilities && job.responsibilities.length > 0 && (
                 <ul className="space-y-2">
                   {job.responsibilities.map((responsibility, index) => (
@@ -526,74 +556,26 @@ export function JobDetailPage() {
 
             <Separator />
 
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* {job.requiredSkills && job.requiredSkills.length > 0 && (
+            {job.job_skills && job.job_skills.length > 0 && (
+              <>
                 <div>
                   <h4 className="font-medium text-neon-purple mb-3">Required Skills</h4>
                   <div className="flex flex-wrap gap-2">
-                    {job.requiredSkills.map((skill) => (
-                      <Badge key={skill} variant="secondary" className="text-xs">
-                        {skill}
+                    {(job.job_skills || []).map((skill) => (
+                      <Badge key={skill.id} variant="secondary" className="text-xs">
+                        {skill.title}
                       </Badge>
                     ))}
                   </div>
                 </div>
-              )} */}
 
-              {/* {job.preferredSkills && job.preferredSkills.length > 0 && (
-                <div>
-                  <h4 className="font-medium text-neon-green mb-3">Preferred Skills</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {job.preferredSkills.map((skill) => (
-                      <Badge key={skill} variant="outline" className="text-xs">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )} */}
-
-              {/* {!job.requiredSkills && !job.preferredSkills && job.skills && job.skills.length > 0 && (
-                <div>
-                  <h4 className="font-medium text-neon-purple mb-3">Skills</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {job.skills.map((skill) => (
-                      <Badge key={skill} variant="secondary" className="text-xs">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )} */}
-            </div>
-
-            <Separator />
-
-            {/* {job.techStack && job.techStack.length > 0 && (
-              <div>
-                <h4 className="font-medium text-neon-yellow mb-3">Tech Stack</h4>
-                <div className="flex flex-wrap gap-2">
-                  {job.techStack.map((tech) => (
-                    <Badge key={tech} className="text-xs bg-neon-yellow/10 text-neon-yellow border-neon-yellow/30">
-                      {tech}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )} */}
-
-            <Separator />
+                <Separator />
+              </>
+            )}
 
             <div>
-              <h4 className="font-medium text-neon-pink mb-3">About {job.page?.name}</h4>
+              <h4 className="font-medium text-neon-pink mb-3">About {job.page?.name || job.company_name}</h4>
               <p className="text-sm text-muted-foreground leading-relaxed">{job.page?.description || "Company description not available."}</p>
-
-              {/* {job.careerGrowth && (
-                <div className="mt-4 p-3 rounded-lg bg-neon-pink/5 border border-neon-pink/20">
-                  <h5 className="font-medium text-neon-pink mb-2">Career Growth Opportunities</h5>
-                  <p className="text-sm text-muted-foreground">{job.careerGrowth}</p>
-                </div>
-              )} */}
             </div>
 
             {/* {job.benefits && job.benefits.length > 0 && (
@@ -679,45 +661,6 @@ export function JobDetailPage() {
           </Button>
         </Card>
 
-        {/* Action Section */}
-        <Card className="glass border-glass-border p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Apply for this Role</h3>
-            {/* {isApplied && <Badge className="bg-neon-green/10 text-neon-green border-neon-green/30">Applied {job.appliedDate && `on ${new Date(job.appliedDate).toLocaleDateString()}`}</Badge>} */}
-          </div>
-
-          <div className="space-y-4">
-            {!isApplied ? (
-              <div className="grid gap-3">
-                {/* {job.isQuickApplyAvailable ? (
-                  <div className="grid md:grid-cols-2 gap-3">
-                    <Button onClick={handleApplyJob} className="bg-neon-green hover:bg-neon-green/90 text-black font-medium">
-                      <Zap className="w-4 h-4 mr-2" />
-                      Quick Apply
-                    </Button>
-                    <Button variant="outline" className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10">
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Apply on {job.source.platform}
-                    </Button>
-                  </div>
-                ) : (
-                  <Button onClick={handleApplyJob} className="w-full bg-neon-cyan hover:bg-neon-cyan/90 text-black font-medium">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Apply on {job.source.platform}
-                  </Button>
-                )} */}
-              </div>
-            ) : (
-              <div className="text-center p-4 rounded-lg bg-neon-green/5 border border-neon-green/20">
-                <CheckCircle className="w-6 h-6 text-neon-green mx-auto mb-2" />
-                <p className="text-sm text-neon-green font-medium">Application submitted successfully!</p>
-              </div>
-            )}
-
-            <div className="text-xs text-muted-foreground text-center">By applying, you agree to share your profile with {job.page?.name}</div>
-          </div>
-        </Card>
-
         {/* Learning Recommendations */}
         <Card className="glass border-glass-border p-6">
           <div className="flex items-center gap-3 mb-4">
@@ -781,6 +724,20 @@ export function JobDetailPage() {
           </Button>
         </Card>
       </div>
+
+      {/* Quick Apply Modal */}
+      <QuickApplyModal
+        isOpen={showQuickApplyModal}
+        onClose={() => setShowQuickApplyModal(false)}
+        job={job}
+        companyName={job.page?.name || job.company_name}
+        screeningQuestions={job.questionSets ? job.questionSets?.[0]?.questions : []}
+        onSubmit={() => {
+          setShowQuickApplyModal(false);
+          handleApplyJob();
+        }}
+        resumes={my_resumes}
+      />
     </div>
   );
 }

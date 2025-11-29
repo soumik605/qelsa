@@ -1,5 +1,7 @@
 import { useCreateJobMutation } from "@/features/api/jobsApi";
-import { Job, ScreeningQuestion } from "@/types/job";
+import { useGetMyPagesQuery } from "@/features/api/pagesApi";
+import { Job } from "@/types/job";
+import { ScreeningQuestion } from "@/types/question";
 import {
   AlertCircle,
   ArrowLeft,
@@ -34,14 +36,13 @@ import { Progress } from "../ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
-import { useGetMyPagesQuery } from "@/features/api/pagesApi";
 
 type PostingMode = "select" | "ai-copilot" | "manual";
 type PostingStep = "input" | "review" | "questions" | "final-review" | "published";
 
 export function JobPostingPage() {
   const [createJob, { isLoading, isSuccess, error }] = useCreateJobMutation();
-  const {data: my_pages} = useGetMyPagesQuery()
+  const { data: my_pages } = useGetMyPagesQuery();
   const router = useRouter();
   const [mode, setMode] = useState<PostingMode>("manual");
   const [step, setStep] = useState<PostingStep>("input");
@@ -50,7 +51,7 @@ export function JobPostingPage() {
   const [isPremium] = useState(false); // Set to true for premium users
   const [showScreeningQuestions, setShowScreeningQuestions] = useState(false);
   const [skillInput, setSkillInput] = useState("");
-  const [jobData, setJobData] = useState<Partial<Job>>({
+  const [jobData, setJobData] = useState({
     title: "",
     // company: "",
     location: "",
@@ -64,6 +65,7 @@ export function JobPostingPage() {
     skills: [],
     // benefits: [],
     screening_questions: [],
+    page_id: null,
   });
 
   // AI Insights (mock data)
@@ -147,13 +149,14 @@ export function JobPostingPage() {
         salary: formData.salary,
         experience: formData.experience,
         company_name: formData.company_name,
-        resource: 'qelsa',
+        resource: "qelsa",
         page_id: formData.page_id,
       },
       questionSet: {
         title: `Screening - ${new Date().toISOString()}`, // auto generate
       },
       questions,
+      skills: formData.skills || [],
     };
   }
 
@@ -508,7 +511,7 @@ export function JobPostingPage() {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <div className="glass-strong border-b border-glass-border">
           <div className="max-w-5xl mx-auto px-6 py-6">
-            <Button variant="ghost" onClick={() => router.push("/jobs")} className="mb-4 text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" onClick={() => router.push("/jobs/smart_matches")} className="mb-4 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Jobs
             </Button>
@@ -1064,8 +1067,6 @@ export function JobPostingPage() {
                           ))}
                         </SelectContent>
                       </Select>
-
-                    
                     </div>
                     <div>
                       <label className="text-sm font-medium mb-2 block">Location *</label>

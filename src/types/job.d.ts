@@ -1,3 +1,5 @@
+import { JobApplication } from "./jobApplication";
+import { JobSkill } from "./jobSkill";
 import { Page } from "./page";
 
 export type Job = {
@@ -21,6 +23,7 @@ export type Job = {
   status?: "active" | "paused" | "closed";
   workplace_type?: "on-site" | "remote" | "hybrid" | null;
   page_id?: number | null;
+  resource?: string | null;
 
   // Company fields
   company_name?: string | null;
@@ -40,21 +43,7 @@ export type Job = {
   page?: Page;
   is_bookmarked: boolean;
 
-  skills?: string[];
+  job_skills?: JobSkill[];
+  applications?: JobApplication[];
+  questionSets?: QuestionSet[];
 };
-
-export interface ScreeningQuestion {
-  id?: any;
-  type: "multiple_choice" | "yes_no" | "scale" | "short_text" | "short-answer" | "coding" | "behavioral";
-  title: string;
-  required: boolean;
-  is_knockout: boolean;
-  weight: number;
-  options?: string[];
-  correct_answer_id?: string | number;
-  min_value?: number;
-  max_value?: number;
-  knockout_condition?: "equals" | "less-than" | "greater-than" | "contains";
-  knockout_value?: string | number;
-  max_length?: number;
-}
