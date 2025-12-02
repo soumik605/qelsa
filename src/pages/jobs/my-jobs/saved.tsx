@@ -46,7 +46,7 @@ const Saved = () => {
 
   return (
     <Layout activeSection={"jobs"}>
-      <MyJobLayout>
+      <MyJobLayout active_page={"saved"}>
         <Box className="space-y-4">
           {savedJobs?.map((job) => (
             <Card key={job.id} className="glass border-glass-border p-6 hover:border-neon-cyan/50 transition-all">

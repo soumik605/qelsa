@@ -1,5 +1,7 @@
 "use client";
 
+import { PublicNavbar } from "@/components/PublicNavbar";
+import { useAuth } from "@/contexts/AuthContext";
 import { useCallback, useState } from "react";
 import { JobFilterSidebar } from "../components/job/JobFilterSidebar";
 import { MainNavigation } from "../components/MainNavigation";
@@ -9,6 +11,7 @@ const Layout = ({ activeSection, children }) => {
   const [showQelsaNavigation, setShowQelsaNavigation] = useState(false);
   const [showJobFilterSidebar, setShowJobFilterSidebar] = useState(false);
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   const handleProfileClick = useCallback(() => {
     setShowProfileDrawer(true);
@@ -27,7 +30,7 @@ const Layout = ({ activeSection, children }) => {
         <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-neon-purple/3 rounded-full blur-2xl opacity-50"></div>
       </div>
 
-      <MainNavigation activeSection={activeSection} onProfileClick={handleProfileClick} />
+      {isAuthenticated && user ? <MainNavigation activeSection={activeSection} onProfileClick={handleProfileClick} /> : <PublicNavbar />}
 
       {/* Main content with conditional spacing */}
       {/* <div className={activeSection === "qelsa-ai" ? "lg:pt-20" : "pb-20 lg:pb-0"}>{renderCurrentSection()}</div> */}

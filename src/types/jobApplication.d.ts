@@ -1,4 +1,5 @@
 import { Job } from "./job";
+import { ScreeningQuestion } from "./question";
 import { User } from "./user";
 
 export type JobApplication = {
@@ -12,6 +13,7 @@ export type JobApplication = {
   withdrawn_at?: Date | null;
   jobApplicationLogs: JobApplicationLog[];
   applied_days_ago?: number;
+  screening_questions: ScreeningQuestion[]
 };
 
 export type JobApplicationLog = {

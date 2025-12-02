@@ -1,8 +1,8 @@
-import { X, User, Settings, LogOut, Shield, Bell, Mail, Briefcase, GraduationCap, Star, Award, Calendar, MapPin, Phone, Globe, Github, Linkedin, Twitter } from 'lucide-react';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Separator } from './ui/separator';
-import { Switch } from './ui/switch';
+import { useAuth } from "@/contexts/AuthContext";
+import { Award, Bell, Briefcase, Calendar, Github, Globe, GraduationCap, Linkedin, LogOut, Mail, MapPin, Settings, Shield, Twitter, User, X } from "lucide-react";
+import { Button } from "./ui/button";
+import { Separator } from "./ui/separator";
+import { Switch } from "./ui/switch";
 
 interface ProfileDrawerProps {
   isOpen: boolean;
@@ -10,6 +10,8 @@ interface ProfileDrawerProps {
 }
 
 export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
+  const { user, isAuthenticated, logout } = useAuth();
+
   const handleNavigation = (section: string) => {
     onClose();
   };
@@ -19,11 +21,8 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
   return (
     <>
       {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-        onClick={onClose}
-      />
-      
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={onClose} />
+
       {/* Drawer */}
       <div className="fixed top-0 right-0 h-full w-80 lg:w-96 glass-strong border-l border-glass-border z-50 overflow-y-auto">
         {/* Header */}
@@ -36,12 +35,7 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
             </div>
             <h2 className="font-bold text-foreground">Profile</h2>
           </div>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onClose}
-            className="h-8 w-8 text-foreground hover:text-neon-cyan hover:bg-glass-bg transition-all duration-300"
-          >
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-foreground hover:text-neon-cyan hover:bg-glass-bg transition-all duration-300">
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -59,14 +53,16 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
                 <div className="w-3 h-3 bg-neon-green rounded-full animate-pulse"></div>
               </div>
             </div>
-            
-            <h3 className="text-lg font-bold text-foreground mb-1">Alex Johnson</h3>
-            <p className="text-sm text-muted-foreground mb-2">Product Manager</p>
-            <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mb-3">
-              <MapPin className="h-3 w-3" />
-              <span>San Francisco, CA</span>
-            </div>
-            
+
+            <h3 className="text-lg font-bold text-foreground mb-1">{user?.name}</h3>
+            <p className="text-sm text-muted-foreground mb-2">{user?.headline}</p>
+            {user?.city && (
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mb-3">
+                <MapPin className="h-3 w-3" />
+                <span>{user.city}</span>
+              </div>
+            )}
+
             {/* Quick Stats */}
             <div className="grid grid-cols-3 gap-3">
               <div className="glass rounded-lg p-3 text-center">
@@ -149,7 +145,7 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
             <div className="grid grid-cols-2 gap-3">
               <Button
                 variant="outline"
-                onClick={() => handleNavigation('profile')}
+                onClick={() => handleNavigation("profile")}
                 className="flex flex-col items-center gap-2 h-16 border-glass-border text-foreground hover:text-neon-cyan hover:border-neon-cyan"
               >
                 <User className="h-4 w-4" />
@@ -157,7 +153,7 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleNavigation('jobs')}
+                onClick={() => handleNavigation("jobs")}
                 className="flex flex-col items-center gap-2 h-16 border-glass-border text-foreground hover:text-neon-purple hover:border-neon-purple"
               >
                 <Briefcase className="h-4 w-4" />
@@ -165,7 +161,7 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleNavigation('connections')}
+                onClick={() => handleNavigation("connections")}
                 className="flex flex-col items-center gap-2 h-16 border-glass-border text-foreground hover:text-neon-pink hover:border-neon-pink"
               >
                 <User className="h-4 w-4" />
@@ -173,7 +169,7 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleNavigation('courses')}
+                onClick={() => handleNavigation("courses")}
                 className="flex flex-col items-center gap-2 h-16 border-glass-border text-foreground hover:text-neon-green hover:border-neon-green"
               >
                 <GraduationCap className="h-4 w-4" />
@@ -239,17 +235,18 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
 
         {/* Footer Actions */}
         <div className="sticky bottom-0 glass-strong border-t border-glass-border p-4 flex gap-3">
-          <Button
-            variant="outline"
-            onClick={() => handleNavigation('settings')}
-            className="flex-1 border-glass-border text-muted-foreground hover:text-foreground hover:border-neon-cyan"
-          >
+          <Button variant="outline" onClick={() => handleNavigation("settings")} className="flex-1 border-glass-border text-muted-foreground hover:text-foreground hover:border-neon-cyan">
             <Settings className="h-4 w-4 mr-2" />
             Settings
           </Button>
           <Button
             variant="outline"
             className="flex-1 border-glass-border text-muted-foreground hover:text-destructive hover:border-destructive"
+            onClick={() => {
+              localStorage.removeItem("accessToken");
+              localStorage.removeItem("refreshToken");
+              window.location.href = "/jobs";
+            }}
           >
             <LogOut className="h-4 w-4 mr-2" />
             Sign Out

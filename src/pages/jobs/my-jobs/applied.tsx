@@ -1,4 +1,5 @@
 import MyJobLayout from "@/components/job/MyJobLayout";
+import { Badge } from "@/components/ui/badge";
 import { useGetAppliedJobsQuery } from "@/features/api/jobsApi";
 import Layout from "@/layout";
 import { Box } from "@mui/material";
@@ -8,7 +9,8 @@ import { Card } from "../../../components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
 
 const Applied = () => {
-  const { data: appliedJobs, error, isLoading } = useGetAppliedJobsQuery();
+  const { data: applications, error, isLoading } = useGetAppliedJobsQuery();
+  console.log("🚀 ~ Applied ~ applications:", applications);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -33,69 +35,68 @@ const Applied = () => {
 
   return (
     <Layout activeSection={"jobs"}>
-      <MyJobLayout>
+      <MyJobLayout active_page={"applied"}>
         <Box className="space-y-4">
-          {appliedJobs?.map((job) => (
-            <Card key={job.id} className="glass border-glass-border p-6 hover:border-neon-green/50 transition-all">
+          {applications?.map((application) => (
+            <Card key={application.id} className="glass border-glass-border p-6 hover:border-neon-green/50 transition-all">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-lg font-semibold">{job.title}</h3>
-                    {/* <Badge variant="outline" className={`text-xs ${getStatusColor(job.status)}`}>
-                      {job.status.replace("-", " ")}
-                    </Badge>
-                    <Badge variant="outline" className={`text-xs ${getStatusColor(job.source.toLowerCase())}`}>
-                      {job.source}
+                    <h3 className="text-lg font-semibold">{application.job.title}</h3>
+                    {/* <Badge variant="outline" className={`text-xs ${getStatusColor(application.status)}`}>
+                      {application.status.replace("-", " ")}
                     </Badge> */}
+                    <Badge variant="outline" className={`text-xs ${getStatusColor(application.job.resource.toLowerCase())}`}>
+                      {application.job.resource}
+                    </Badge>
                   </div>
                   <p className="text-muted-foreground mb-4">
-                    {job.page?.name || job.company_name}
-                    {/* • Applied {job.appliedDate} */}
+                    {application.job.page?.name || application.job.company_name} • Applied {new Date(application.applied_at).toLocaleDateString()}
                   </p>
 
                   {/* Timeline */}
                   <div className="space-y-3 mb-4">
-                    {/* {job.timeline.map((event, idx) => (
-                      <div key={idx} className="flex items-start gap-3">
+                    {application.jobApplicationLogs.map((event, idx) => (
+                      <div key={idx} className="flex items-start items-center gap-3">
                         <div className="mt-1">
-                          {idx === job.timeline.length - 1 ? (
-                            <div className={`w-2 h-2 rounded-full ${job.status === "rejected" ? "bg-destructive" : "bg-neon-green"}`} />
+                          {idx === application.jobApplicationLogs.length - 1 ? (
+                            <div className={`w-2 h-2 rounded-full ${application.status === "rejected" ? "bg-destructive" : "bg-neon-green"}`} />
                           ) : (
                             <div className="w-2 h-2 rounded-full bg-muted-foreground/30" />
                           )}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium">{event.status}</p>
-                            <span className="text-xs text-muted-foreground">{event.date}</span>
+                            <p className="text-sm font-medium">{event.new_status}</p>
+                            <span className="text-xs text-muted-foreground">{new Date(event.createdAt).toLocaleDateString()}</span>
                           </div>
-                          {event.note && <p className="text-xs text-muted-foreground mt-1">{event.note}</p>}
+                          {/* {event.note && <p className="text-xs text-muted-foreground mt-1">{event.note}</p>} */}
                         </div>
                       </div>
-                    ))} */}
+                    ))}
                   </div>
 
                   {/* Next nudge recommendation */}
-                  {/* {job.nextNudgeDate && job.status !== "rejected" && (
+                  {/* {application.nextNudgeDate && application.status !== "rejected" && (
                     <div className="glass-strong rounded-lg p-3 mb-4">
                       <div className="flex items-center gap-2 text-neon-cyan">
                         <Bell className="w-4 h-4" />
-                        <span className="text-sm">Recommended follow-up: {job.nextNudgeDate}</span>
+                        <span className="text-sm">Recommended follow-up: {application.nextNudgeDate}</span>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">Based on typical {job.responseTime}-day response window</p>
+                      <p className="text-xs text-muted-foreground mt-1">Based on typical {application.responseTime}-day response window</p>
                     </div>
                   )} */}
                 </div>
               </div>
 
               <div className="flex gap-2">
-                {/* {job.status === "interview-scheduled" && (
+                {/* {application.status === "interview-scheduled" && (
                   <Button className="gradient-animated">
                     <Calendar className="w-4 h-4 mr-2" />
                     View Interview Details
                   </Button>
                 )}
-                {job.status === "viewed" && (
+                {application.status === "viewed" && (
                   <Button variant="outline" className="border-neon-cyan/30 text-neon-cyan">
                     <Bell className="w-4 h-4 mr-2" />
                     Send Follow-up

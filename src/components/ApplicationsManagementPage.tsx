@@ -25,6 +25,7 @@ import {
   UserCheck,
   Users,
   UserX,
+  XCircle,
   Zap,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -159,8 +160,6 @@ export function ApplicationsManagementPage() {
     switch (status) {
       case "shortlisted":
         return "border-neon-purple/30 text-neon-purple bg-neon-purple/10";
-      case "phone-screen":
-        return "border-neon-cyan/30 text-neon-cyan bg-neon-cyan/10";
       case "interview":
         return "border-neon-green/30 text-neon-green bg-neon-green/10";
       case "rejected":
@@ -251,24 +250,6 @@ export function ApplicationsManagementPage() {
               </div>
               <div className="flex items-center justify-between">
                 <p className="text-2xl font-bold">{completionRate}%</p>
-                {completionRate < 70 && (
-                  <Button size="sm" variant="outline" className="text-xs border-neon-cyan/30 text-neon-cyan">
-                    <Zap className="w-3 h-3 mr-1" />
-                    Simplify
-                  </Button>
-                )}
-              </div>
-            </Card>
-
-            <Card className="glass border-glass-border p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">Median Response Time</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <p className="text-2xl font-bold">{medianResponseTime} days</p>
-                <Badge variant="outline" className="text-xs border-neon-green/30 text-neon-green">
-                  Good
-                </Badge>
               </div>
             </Card>
           </div>
@@ -297,9 +278,9 @@ export function ApplicationsManagementPage() {
                   <Star className="w-4 h-4 mr-2" />
                   Shortlist
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => handleBulkAction("phone-screen")}>
-                  <Phone className="w-4 h-4 mr-2" />
-                  Phone Screen
+                <Button size="sm" variant="outline" onClick={() => handleBulkAction("reject")}>
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Reject
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => handleBulkAction("message")}>
                   <Send className="w-4 h-4 mr-2" />
@@ -317,14 +298,14 @@ export function ApplicationsManagementPage() {
 
       {/* Two-Pane Layout */}
       <div className="max-w-[1800px] mx-auto px-6 py-8">
+        {/* NLP Search Bar - Full Width */}
+        <div className="mb-6">
+          <CandidateNLPSearch onSearch={handleNLPSearch} onClear={handleClearNLPSearch} isLoading={isSearching} />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Applicants List */}
           <div className="lg:col-span-1">
-            {/* NLP Search Bar */}
-            <div className="mb-4">
-              <CandidateNLPSearch onSearch={handleNLPSearch} onClear={handleClearNLPSearch} isLoading={isSearching} />
-            </div>
-
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Applicants</h2>
               <Select value={sortBy} onValueChange={setSortBy}>
@@ -340,7 +321,7 @@ export function ApplicationsManagementPage() {
             </div>
 
             {/* Empty State or Candidate List */}
-            {sortedApplications?.length === 0 && nlpFilters.length > 0 ? (
+            {sortedApplications.length === 0 && nlpFilters.length > 0 ? (
               <Card className="glass border-glass-border p-12 flex flex-col items-center justify-center text-center">
                 <Users className="w-16 h-16 text-muted-foreground/50 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No candidates match your filters</h3>
@@ -372,7 +353,7 @@ export function ApplicationsManagementPage() {
                       ))}
                     </>
                   ) : (
-                    sortedApplications?.map((application) => (
+                    sortedApplications.map((application) => (
                       <Card
                         key={application.id}
                         className={`glass border-glass-border p-4 cursor-pointer transition-all hover:border-neon-cyan/50 ${
@@ -395,27 +376,21 @@ export function ApplicationsManagementPage() {
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="font-semibold truncate">{application?.user?.name}</h3>
+                              <h3 className="font-semibold truncate">{application.user.name}</h3>
                               <Badge variant="outline" className={`text-xs ${getStatusColor(application.status)}`}>
                                 {application.status.replace("-", " ")}
                               </Badge>
                             </div>
 
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                              <span>{application?.user?.yearsExperience}y exp</span>
-                              <span>•</span>
-                              {/* <Badge variant="outline" className={`text-xs ${getSourceColor(application.source)}`}>
-                                {application.source}
-                              </Badge> */}
-                            </div>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">{/* <span>{application.yearsExperience}y exp</span> */}</div>
 
                             <div className="flex flex-wrap gap-1 mb-2">
                               {/* {application.keySkills.slice(0, 3).map((skill, idx) => (
                                 <Badge key={idx} variant="outline" className="text-xs border-neon-purple/30 text-neon-purple">
                                   {skill}
                                 </Badge>
-                              ))}
-                              {application.keySkills.length > 3 && (
+                              ))} */}
+                              {/* {application.keySkills.length > 3 && (
                                 <Badge variant="outline" className="text-xs">
                                   +{application.keySkills.length - 3}
                                 </Badge>
@@ -423,7 +398,7 @@ export function ApplicationsManagementPage() {
                             </div>
 
                             <div className="flex items-center justify-between text-xs">
-                              <span className="text-muted-foreground">Applied {application.applied_days_ago}d ago</span>
+                              {/* <span className="text-muted-foreground">Applied {application.appliedDaysAgo}d ago</span> */}
                               <div className="flex items-center gap-1">
                                 <Target className="w-3 h-3 text-neon-cyan" />
                                 {/* <span className="text-neon-cyan">{application.matchScore}%</span> */}
@@ -441,7 +416,7 @@ export function ApplicationsManagementPage() {
             )}
           </div>
 
-          {/* Right: Application Detail with Profile/Resume Tabs */}
+          {/* Right: Applicant Detail with Profile/Resume Tabs */}
           <div className="lg:col-span-2">
             {selectedApplication ? (
               <Card className="glass border-glass-border">
@@ -456,9 +431,9 @@ export function ApplicationsManagementPage() {
                       <UserCheck className="w-4 h-4 mr-2" />
                       Shortlist
                     </Button>
-                    <Button variant="outline" className="flex-1 border-neon-green/30 text-neon-green">
-                      <Phone className="w-4 h-4 mr-2" />
-                      Phone Screen
+                    <Button variant="outline" className="flex-1 border-destructive/30 text-destructive">
+                      <XCircle className="w-4 h-4 mr-2" />
+                      Reject
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -511,26 +486,26 @@ export function ApplicationsManagementPage() {
                             </Badge>
                           </div>
                           {/* <p className="text-sm text-muted-foreground mb-3">
-                            <strong className="text-foreground">Strong fit for this role.</strong> {selectedApplication?.user?.name} has {selectedApplication.user?.yearsExperience} years of relevant
-                            experience and matches {selectedApplication.mustHavesMatched} of {selectedApplication.mustHavesTotal} must-have requirements.
+                            <strong className="text-foreground">Strong fit for this role.</strong> {selectedApplicant.name} has {selectedApplicant.yearsExperience} years of relevant experience and
+                            matches {selectedApplication.mustHavesMatched} of {selectedApplication.mustHavesTotal} must-have requirements.
                             {selectedApplication.matchScore >= 90
                               ? " Excellent technical alignment with the job description. Highly recommended for interview."
                               : " Good foundation with some skill gaps. Consider for phone screening to assess cultural fit and growth potential."}
                           </p> */}
-                          <div className="flex items-center gap-2 text-xs">
+                          {/* <div className="flex items-center gap-2 text-xs">
                             <Badge variant="outline" className="border-neon-green/30 text-neon-green">
                               <CheckCircle2 className="w-3 h-3 mr-1" />
-                              {/* {selectedApplication.mustHavesMatched} must-haves matched */}
+                              {selectedApplication.mustHavesMatched} must-haves matched
                             </Badge>
-                            {/* {selectedApplication.mustHavesMatched < selectedApplication.mustHavesTotal && (
+                            {selectedApplication.mustHavesMatched < selectedApplication.mustHavesTotal && (
                               <Badge variant="outline" className="border-neon-yellow/30 text-neon-yellow">
                                 {selectedApplication.mustHavesTotal - selectedApplication.mustHavesMatched} gaps
                               </Badge>
                             )}
                             <Badge variant="outline" className="border-neon-cyan/30 text-neon-cyan">
                               {selectedApplication.matchScore}% overall match
-                            </Badge> */}
-                          </div>
+                            </Badge> 
+                          </div> */}
                         </div>
 
                         {/* Contact and Basics */}
@@ -539,7 +514,7 @@ export function ApplicationsManagementPage() {
                           <div className="glass-strong rounded-lg p-4 space-y-3">
                             <div>
                               <h4 className="text-lg font-semibold">{selectedApplication?.user?.name}</h4>
-                              <p className="text-sm text-muted-foreground">{selectedApplication.user?.currentRole}</p>
+                              <p className="text-sm text-muted-foreground">{selectedApplication.user?.role}</p>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                               <div className="flex items-center gap-2">
@@ -558,16 +533,11 @@ export function ApplicationsManagementPage() {
                               </div>
                               <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-neon-cyan flex-shrink-0" />
-                                <span>Applied {selectedApplication.applied_days_ago}d ago</span>
+                                {/* <span>Applied {selectedApplication.appliedDaysAgo}d ago</span> */}
                               </div>
                               <div className="flex items-center gap-2">
                                 <Briefcase className="w-4 h-4 text-neon-cyan flex-shrink-0" />
-                                <span>{selectedApplication.user?.yearsExperience} years experience</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {/* <Badge variant="outline" className={`text-xs ${getSourceColor(selectedApplication.source)}`}>
-                                  {selectedApplication.source}
-                                </Badge> */}
+                                {/* <span>{selectedApplication.user?.yearsExperience} years experience</span> */}
                               </div>
                             </div>
                           </div>
@@ -580,23 +550,52 @@ export function ApplicationsManagementPage() {
                             <div className="flex items-center justify-between mb-3">
                               <span className="text-sm text-muted-foreground">JD Requirements</span>
                               <Badge variant="outline" className="border-neon-green/30 text-neon-green">
-                                {/* {selectedApplication.mustHavesMatched}/{selectedApplication.mustHavesTotal} */}
+                                {/* {selectedApplicant.mustHavesMatched}/{selectedApplicant.mustHavesTotal} */}
                               </Badge>
                             </div>
                             <div className="space-y-2">
-                              {/* {currentJobPosting?.mustHaves.map((item, idx) => (
+                              {/* {currentJobPosting.mustHaves.map((item, idx) => (
                                 <div key={idx} className="flex items-center gap-2 text-sm">
-                                  {idx < selectedApplication.mustHavesMatched ? (
+                                  {idx < selectedApplicant.mustHavesMatched ? (
                                     <CheckCircle2 className="w-4 h-4 text-neon-green flex-shrink-0" />
                                   ) : (
                                     <XCircle className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                   )}
-                                  <span className={idx < selectedApplication.mustHavesMatched ? "" : "text-muted-foreground"}>{item}</span>
+                                  <span className={idx < selectedApplicant.mustHavesMatched ? "" : "text-muted-foreground"}>{item}</span>
                                 </div>
                               ))} */}
                             </div>
                           </div>
                         </div>
+
+                        {/* Screening Questions */}
+                        {selectedApplication.screening_questions && selectedApplication.screening_questions.length > 0 && (
+                          <div>
+                            <h3 className="font-semibold mb-3">Screening Questions</h3>
+                            <div className="glass-strong rounded-lg p-4">
+                              <div className="space-y-4">
+                                {selectedApplication.screening_questions.map((sq, idx) => (
+                                  <div key={idx} className="pb-4 last:pb-0 border-b last:border-b-0 border-glass-border">
+                                    <div className="flex items-start gap-2 mb-2">
+                                      <FileText className="w-4 h-4 text-neon-purple flex-shrink-0 mt-0.5" />
+                                      <p className="text-sm font-medium text-muted-foreground">{sq.title}</p>
+                                    </div>
+                                    <div className="ml-6">
+                                      <div className="flex items-start gap-2">
+                                        {/* {sq.isIdeal ? (
+                                          <CheckCircle2 className="w-4 h-4 text-neon-green flex-shrink-0 mt-0.5" />
+                                        ) : (
+                                          <AlertCircle className="w-4 h-4 text-neon-yellow flex-shrink-0 mt-0.5" />
+                                        )} */}
+                                        {/* <p className="text-sm">{sq.answer}</p> */}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
                         {/* Qelsa Profile Snapshot */}
                         <div>
@@ -616,8 +615,8 @@ export function ApplicationsManagementPage() {
                             </h4>
                             <div className="space-y-3">
                               <div className="pb-3 border-b border-glass-border">
-                                <p className="font-medium text-sm">{selectedApplication.user?.currentRole}</p>
-                                <p className="text-xs text-muted-foreground">Current • {selectedApplication.user?.yearsExperience} years</p>
+                                <p className="font-medium text-sm">{selectedApplication.user?.role}</p>
+                                {/* <p className="text-xs text-muted-foreground">Current • {selectedApplication.user?.yearsExperience} years</p> */}
                               </div>
                               <Button variant="ghost" size="sm" className="w-full text-xs text-neon-cyan">
                                 Show more experience
@@ -627,13 +626,13 @@ export function ApplicationsManagementPage() {
                           </div>
 
                           {/* Education */}
-                          <div className="glass-strong rounded-lg p-4">
+                          <div className="glass-strong rounded-lg p-4 mb-3">
                             <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
                               <GraduationCap className="w-4 h-4 text-neon-cyan" />
                               Education
                             </h4>
                             <div className="space-y-3">
-                              {/* {selectedApplication.education.slice(0, 1).map((edu, idx) => (
+                              {/* {selectedApplicant.education.slice(0, 1).map((edu, idx) => (
                                 <div key={idx} className="pb-3 border-b border-glass-border">
                                   <p className="font-medium text-sm">{edu.degree}</p>
                                   <p className="text-xs text-muted-foreground">
@@ -641,7 +640,7 @@ export function ApplicationsManagementPage() {
                                   </p>
                                 </div>
                               ))} */}
-                              {/* {selectedApplication.education.length > 1 && (
+                              {/* {selectedApplicant.education.length > 1 && (
                                 <Button variant="ghost" size="sm" className="w-full text-xs text-neon-cyan">
                                   Show more education
                                   <ChevronRight className="w-3 h-3 ml-1" />
@@ -649,6 +648,87 @@ export function ApplicationsManagementPage() {
                               )} */}
                             </div>
                           </div>
+
+                          {/* Job Preferences */}
+                          {/* {selectedApplication.jobPreferences && (
+                            <div className="glass-strong rounded-lg p-4">
+                              <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                                <Target className="w-4 h-4 text-neon-cyan" />
+                                Job Preferences
+                              </h4>
+                              <div className="space-y-3 text-sm">
+                                {selectedApplication.jobPreferences.jobTypes && (
+                                  <div>
+                                    <p className="text-xs text-muted-foreground mb-1">Job Type</p>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {selectedApplication.jobPreferences.jobTypes.map((type, idx) => (
+                                        <Badge key={idx} variant="outline" className="text-xs border-neon-purple/30 text-neon-purple">
+                                          {type}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                {selectedApplication.jobPreferences.workArrangement && (
+                                  <div>
+                                    <p className="text-xs text-muted-foreground mb-1">Work Arrangement</p>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {selectedApplication.jobPreferences.workArrangement.map((arr, idx) => (
+                                        <Badge key={idx} variant="outline" className="text-xs border-neon-cyan/30 text-neon-cyan">
+                                          <Home className="w-3 h-3 mr-1" />
+                                          {arr}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                {selectedApplication.jobPreferences.desiredSalary && (
+                                  <div className="flex items-center gap-2">
+                                    <DollarSign className="w-4 h-4 text-neon-green flex-shrink-0" />
+                                    <div>
+                                      <p className="text-xs text-muted-foreground">Desired Salary</p>
+                                      <p className="font-medium text-sm text-neon-green">{selectedApplication.jobPreferences.desiredSalary}</p>
+                                    </div>
+                                  </div>
+                                )}
+                                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-glass-border">
+                                  {selectedApplication.jobPreferences.willingToRelocate !== undefined && (
+                                    <div>
+                                      <p className="text-xs text-muted-foreground mb-1">Willing to Relocate</p>
+                                      <p className="font-medium text-sm">{selectedApplication.jobPreferences.willingToRelocate ? "Yes" : "No"}</p>
+                                    </div>
+                                  )}
+                                  {selectedApplication.jobPreferences.noticePeriod && (
+                                    <div>
+                                      <p className="text-xs text-muted-foreground mb-1">Notice Period</p>
+                                      <p className="font-medium text-sm">{selectedApplication.jobPreferences.noticePeriod}</p>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {selectedApplication.jobPreferences.culturalPreferences && (
+                                  <div className="pt-3 border-t border-glass-border space-y-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <Heart className="w-4 h-4 text-neon-pink" />
+                                      <h5 className="text-sm font-semibold">Cultural Preferences</h5>
+                                    </div>
+
+                                    {selectedApplication.jobPreferences.culturalPreferences.cultureAttributes && (
+                                      <div>
+                                        <div className="flex flex-wrap gap-1.5">
+                                          {selectedApplication.jobPreferences.culturalPreferences.cultureAttributes.map((attr, idx) => (
+                                            <Badge key={idx} variant="outline" className="text-xs border-neon-cyan/30 text-neon-cyan">
+                                              {attr}
+                                            </Badge>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )} */}
                         </div>
 
                         {/* Matched Skills */}
@@ -764,14 +844,14 @@ export function ApplicationsManagementPage() {
                             <div className="glass-strong rounded-lg p-4 sticky top-0">
                               <h4 className="text-sm font-semibold mb-3">JD Match Summary</h4>
                               <div className="space-y-2 mb-4">
-                                {/* {currentJobPosting?.mustHaves.slice(0, 4).map((item, idx) => (
+                                {/* {currentJobPosting.mustHaves.slice(0, 4).map((item, idx) => (
                                   <div key={idx} className="flex items-center gap-2 text-xs">
-                                    {idx < selectedApplication.mustHavesMatched ? (
+                                    {idx < selectedApplicant.mustHavesMatched ? (
                                       <CheckCircle2 className="w-3 h-3 text-neon-green flex-shrink-0" />
                                     ) : (
                                       <XCircle className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                                     )}
-                                    <span className={idx < selectedApplication.mustHavesMatched ? "text-foreground" : "text-muted-foreground"}>{item}</span>
+                                    <span className={idx < selectedApplicant.mustHavesMatched ? "text-foreground" : "text-muted-foreground"}>{item}</span>
                                   </div>
                                 ))} */}
                               </div>
@@ -793,12 +873,12 @@ export function ApplicationsManagementPage() {
                               <div className="bg-white/5 rounded-lg p-6 min-h-[600px]">
                                 <div className="max-w-2xl mx-auto space-y-6">
                                   <div className="text-center pb-4 border-b border-glass-border">
-                                    <h3 className="text-xl font-bold mb-2">{selectedApplication?.user?.name}</h3>
-                                    <p className="text-sm text-muted-foreground mb-2">{selectedApplication.user?.currentRole}</p>
+                                    <h3 className="text-xl font-bold mb-2">{selectedApplication.user.name}</h3>
+                                    <p className="text-sm text-muted-foreground mb-2">{selectedApplication.user.role}</p>
                                     <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-                                      <span>{selectedApplication.user?.email}</span>
+                                      <span>{selectedApplication.user.email}</span>
                                       <span>•</span>
-                                      <span>{selectedApplication.user?.location}</span>
+                                      <span>{selectedApplication.user.location}</span>
                                     </div>
                                   </div>
 
@@ -808,8 +888,8 @@ export function ApplicationsManagementPage() {
                                       <div>
                                         <div className="flex items-start justify-between mb-2">
                                           <div>
-                                            <p className="font-semibold text-sm">{selectedApplication.user?.currentRole}</p>
-                                            <p className="text-xs text-muted-foreground">Current • {selectedApplication.user?.yearsExperience} years</p>
+                                            <p className="font-semibold text-sm">{selectedApplication.user.role}</p>
+                                            {/* <p className="text-xs text-muted-foreground">Current • {selectedApplication.user.yearsExperience} years</p> */}
                                           </div>
                                         </div>
                                         <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
@@ -834,14 +914,14 @@ export function ApplicationsManagementPage() {
                                   <div>
                                     <h4 className="text-sm font-bold mb-3 text-neon-cyan">EDUCATION</h4>
                                     <div className="space-y-3">
-                                      {selectedApplication.user?.education?.map((edu, idx) => (
+                                      {/* {selectedApplication.education.map((edu, idx) => (
                                         <div key={idx}>
                                           <p className="font-semibold text-sm">{edu.degree}</p>
                                           <p className="text-xs text-muted-foreground">
                                             {edu.institution} • {edu.year}
                                           </p>
                                         </div>
-                                      ))}
+                                      ))} */}
                                     </div>
                                   </div>
                                 </div>

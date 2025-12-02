@@ -1,6 +1,7 @@
 // features/api/jobsApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Job } from "../../types/job";
+import { JobApplication } from "@/types/jobApplication";
 
 export const jobsApi = createApi({
   reducerPath: "jobsApi",
@@ -60,7 +61,7 @@ export const jobsApi = createApi({
       providesTags: ["Jobs"],
     }),
 
-    getAppliedJobs: builder.query<Job[], { city?: string; search?: string; page_id?: string } | void>({
+    getAppliedJobs: builder.query<JobApplication[], { city?: string; search?: string; page_id?: string } | void>({
       query: (filters) => {
         const params = new URLSearchParams();
 
@@ -70,10 +71,10 @@ export const jobsApi = createApi({
           if (filters.page_id) params.append("page_id", filters.page_id);
         }
 
-        return `jobs?${params.toString()}`;
+        return `jobs/applied?${params.toString()}`;
       },
 
-      transformResponse: (response: { success: boolean; data: Job[] }) => {
+      transformResponse: (response: { success: boolean; data: JobApplication[] }) => {
         return response.data;
       },
 
@@ -110,7 +111,7 @@ export const jobsApi = createApi({
           if (filters.page_id) params.append("page_id", filters.page_id);
         }
 
-        return `jobs?${params.toString()}`;
+        return `jobs/posted?${params.toString()}`;
       },
 
       transformResponse: (response: { success: boolean; data: Job[] }) => {
@@ -130,7 +131,7 @@ export const jobsApi = createApi({
           if (filters.page_id) params.append("page_id", filters.page_id);
         }
 
-        return `jobs?${params.toString()}`;
+        return `jobs/saved?${params.toString()}`;
       },
 
       transformResponse: (response: { success: boolean; data: Job[] }) => {

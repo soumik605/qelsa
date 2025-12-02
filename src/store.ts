@@ -7,9 +7,11 @@ import { jobsApi } from "./features/api/jobsApi";
 import { pagesApi } from "./features/api/pagesApi";
 import { resumesApi } from "./features/api/resumeApi";
 import { userSkillsApi } from "./features/api/userSkillsApi";
+import authReducer from "./features/slices/authSlice";
 
 export const store = configureStore({
   reducer: {
+    auth: authReducer,
     [jobsApi.reducerPath]: jobsApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [pagesApi.reducerPath]: pagesApi.reducer,
@@ -31,3 +33,6 @@ export const store = configureStore({
       .concat(userSkillsApi.middleware)
       .concat(resumesApi.middleware),
 });
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

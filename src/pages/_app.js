@@ -1,14 +1,20 @@
+import RouteGuard from "@/components/auth/RouteGuard";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Provider } from "react-redux";
-import "../styles/globals.css";
 import { store } from "../store";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import "../styles/globals.css";
 
 export default function App({ Component, pageProps }) {
   return (
     <Provider store={store}>
-      <ProtectedRoute>
-        <Component {...pageProps} />
-      </ProtectedRoute>
+      <AuthProvider>
+        <RouteGuard>
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID}>
+            <Component {...pageProps} />
+          </GoogleOAuthProvider>
+        </RouteGuard>
+      </AuthProvider>
     </Provider>
   );
 }

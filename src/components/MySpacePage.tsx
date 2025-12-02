@@ -1,3 +1,4 @@
+import { useAuth } from "@/contexts/AuthContext";
 import { useGetEducationsQuery } from "@/features/api/educationsApi";
 import { useGetExperiencesQuery } from "@/features/api/experiencesApi";
 import { useGetUserSkillsQuery } from "@/features/api/userSkillsApi";
@@ -46,6 +47,7 @@ interface MySpacePageProps {}
 
 export function MySpacePage({}: MySpacePageProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const { data: educations, error, isLoading } = useGetEducationsQuery();
   const { data: experiences, error: experiencesError, isLoading: experiencesLoading } = useGetExperiencesQuery();
   const { data: userSkills, error: userSkillsError, isLoading: userSkillsLoading } = useGetUserSkillsQuery();
@@ -227,7 +229,7 @@ export function MySpacePage({}: MySpacePageProps) {
             <h1 className="text-5xl font-bold mb-4">
               <span className="bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent">Welcome back,</span>
               <br />
-              <span className="text-white">Alex! 👋</span>
+              <span className="text-white">{user?.name}! 👋</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">Your AI-powered career journey continues. Let&apos;s make today count and unlock new opportunities! 🚀</p>
           </div>

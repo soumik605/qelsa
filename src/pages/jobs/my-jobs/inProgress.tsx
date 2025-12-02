@@ -33,7 +33,7 @@ const InProgress = () => {
 
   return (
     <Layout activeSection={"jobs"}>
-      <MyJobLayout>
+      <MyJobLayout active_page={"in_progress"}>
         <Box className="space-y-4">
           {inProgressJobs?.map((job) => (
             <Card key={job.id} className="glass border-glass-border p-6 hover:border-neon-purple/50 transition-all">
