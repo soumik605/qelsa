@@ -5,7 +5,7 @@ const Index = () => {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/jobs/smart_matches");
+    router.push("/jobs/all");
   }, [router]);
 
   return null;

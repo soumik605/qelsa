@@ -7,7 +7,7 @@ const MyJobLayout = ({ active_page, children }) => {
   const router = useRouter();
 
   return (
-    <Layout>
+    <Layout active_job_page="my-jobs">
       <div className="mt-[-2rem] min-h-screen">
         <div className="glass-strong border-glass-border w-fit p-1 rounded-2xl flex space-x-1 mt-1 mb-6">
             <Button onClick={() => router.push("/jobs/my-jobs/saved")} className={`text-white flex items-center text-white px-1 py-0.5 ${active_page === "saved" ? "bg-neon-cyan/20" : ""}`}>

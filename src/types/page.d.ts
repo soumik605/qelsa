@@ -1,3 +1,5 @@
+import { User } from "./user";
+
 export type Page = {
   id?: number;
   name: string;
@@ -13,4 +15,5 @@ export type Page = {
   instagram_url?: string;
   youtube_url?: string;
   can_manage: boolean;
+  owner?: User;
 };

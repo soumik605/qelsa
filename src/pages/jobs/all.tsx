@@ -23,7 +23,7 @@ const All = () => {
 
   return (
     <Layout activeSection={"jobs"}>
-      <JobLayout>
+      <JobLayout active_job_page="all">
         <div className="space-y-6">
           {/* Stats Bar */}
           <div className="flex items-center justify-between">
@@ -184,14 +184,14 @@ const All = () => {
 
                     {/* Skills */}
                     <div className="flex flex-wrap gap-1.5">
-                      {job.skills?.slice(0, 3).map((skill, index) => (
+                      {job.job_skills?.slice(0, 3).map((skill, index) => (
                         <Badge key={index} variant="secondary" className="text-xs bg-white/5 hover:bg-white/10 border-white/10">
-                          {skill}
+                          {skill.title}
                         </Badge>
                       ))}
-                      {job.skills?.length > 3 && (
+                      {job.job_skills?.length > 3 && (
                         <Badge variant="secondary" className="text-xs bg-white/5 border-white/10">
-                          +{job.skills.length - 3}
+                          +{job.job_skills.length - 3}
                         </Badge>
                       )}
                     </div>

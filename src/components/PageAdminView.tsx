@@ -93,7 +93,7 @@ export function PageAdminView() {
       {/* Header */}
       <div className="glass-strong border-b border-glass-border">
         <div className="max-w-7xl mx-auto px-6 py-6">
-          <Button variant="ghost" className="mb-4 text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" className="mb-4 text-muted-foreground hover:text-foreground" onClick={() => router.back()}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Pages
           </Button>

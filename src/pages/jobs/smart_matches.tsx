@@ -8,7 +8,7 @@ const SmartMatches = () => {
 
   return (
     <Layout activeSection={"jobs"}>
-      <JobLayout>
+      <JobLayout active_job_page="smart_matches">
         <JobDiscoveryRails jobs={jobs} />
       </JobLayout>
     </Layout>

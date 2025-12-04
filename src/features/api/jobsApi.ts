@@ -1,7 +1,7 @@
 // features/api/jobsApi.ts
+import { JobApplication } from "@/types/jobApplication";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Job } from "../../types/job";
-import { JobApplication } from "@/types/jobApplication";
 
 export const jobsApi = createApi({
   reducerPath: "jobsApi",
@@ -170,6 +170,16 @@ export const jobsApi = createApi({
 
       invalidatesTags: ["Jobs", "Cities", "Types"],
     }),
+
+    toggleSaveJob: builder.mutation({
+      query: (jobId) => ({
+        url: `jobs/${jobId}/toggle-save`,
+        method: "POST",
+      }),
+
+      transformResponse: (response: { success: boolean; data: Job }) => response.data,
+      invalidatesTags: (result, error, jobId) => [{ type: "Job", id: jobId }, "Jobs"],
+    }),
   }),
 });
 
@@ -184,4 +194,5 @@ export const {
   useGetCitiesQuery,
   useGetJobTypesQuery,
   useCreateJobMutation,
+  useToggleSaveJobMutation,
 } = jobsApi;

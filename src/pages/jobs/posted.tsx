@@ -209,7 +209,7 @@ export default function Posted() {
                           </div>
                           <div className="flex items-center gap-1.5">
                             <Calendar className="w-4 h-4" />
-                            <span>Posted {new Date(job.published_date).toLocaleDateString()}</span>
+                            <span>Posted {new Date(job.createdAt).toLocaleDateString()}</span>
                           </div>
                         </div>
                       </div>

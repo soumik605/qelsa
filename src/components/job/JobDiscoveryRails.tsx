@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { useToggleSaveJobMutation } from "@/features/api/jobsApi";
 
 interface Rail {
   id: string;
@@ -103,7 +104,7 @@ interface RailSectionProps {
   jobs: Job[];
 }
 
-function RailSection({ rail, onScroll, onTogglePin, onToggleHide, onToggleBookmark, jobs }: RailSectionProps) {
+function RailSection({ rail, onScroll, onTogglePin, onToggleHide, jobs }: RailSectionProps) {
   const router = useRouter();
   const Icon = rail.icon;
   const colorClasses = {
@@ -165,7 +166,7 @@ function RailSection({ rail, onScroll, onTogglePin, onToggleHide, onToggleBookma
       <div className="relative">
         <div id={`rail-${rail.id}`} className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
           {jobs?.map((job) => (
-            <JobRailCard key={job.id} job={job} onClick={() => router.push(`/jobs/${job.id}`)} isCompared={false} onToggleBookmark={onToggleBookmark} isBookmarked={job.is_bookmarked} />
+            <JobRailCard key={job.id} job={job} onClick={() => router.push(`/jobs/${job.id}`)} isCompared={false} isBookmarked={job.is_bookmarked} />
           ))}
         </div>
       </div>
@@ -177,11 +178,11 @@ interface JobRailCardProps {
   job: Job;
   onClick: () => void;
   isCompared: boolean;
-  onToggleBookmark?: (job: Job) => void;
   isBookmarked: boolean;
 }
 
-function JobRailCard({ job, onClick, isCompared, onToggleBookmark, isBookmarked }: JobRailCardProps) {
+function JobRailCard({ job, onClick, isCompared, isBookmarked }: JobRailCardProps) {
+  const [toggleSaveJob] = useToggleSaveJobMutation();
   const getSourceColor = (platform: string) => {
     switch (platform) {
       case "Qelsa":
@@ -229,19 +230,17 @@ function JobRailCard({ job, onClick, isCompared, onToggleBookmark, isBookmarked 
           )} */}
 
           {/* Bookmark Checkbox */}
-          {onToggleBookmark && (
-            <Button
+          <Button
               variant="ghost"
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                onToggleBookmark(job);
+                toggleSaveJob(job.id);
               }}
               className={`h-8 w-8 p-0 flex-shrink-0 ${isBookmarked ? "bg-neon-cyan/20 text-neon-cyan hover:bg-neon-cyan/30" : "hover:bg-white/5"}`}
             >
               {isBookmarked ? <BookmarkCheck className="w-4 h-4 fill-current" /> : <Bookmark className="w-4 h-4" />}
             </Button>
-          )}
         </div>
 
         {/* Job Details */}

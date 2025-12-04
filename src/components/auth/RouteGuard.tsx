@@ -5,7 +5,7 @@ import { useGetProfileQuery } from "@/features/api/authApi";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-const PUBLIC_ROUTES = ["/login", "/register", "/auth", "/jobs/smart_matches", "/jobs"];
+const PUBLIC_ROUTES = ["/login", "/register", "/auth", "/jobs/all", "/jobs"];
 const PUBLIC_DYNAMIC = /^\/jobs\/\d+$/;
 
 export default function RouteGuard({ children }) {
@@ -51,7 +51,7 @@ export default function RouteGuard({ children }) {
 
     // ⭐ CASE 3 — Logged in user visiting login/register
     if (profile && ["/login", "/register", "/auth"].includes(path)) {
-      router.replace("/jobs/smart_matches");
+      router.replace("/jobs/all");
     }
   }, [token, isClient, isFetching, error, profile, router.pathname]);
 

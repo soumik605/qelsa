@@ -208,7 +208,7 @@ export function PagesHub({}: PagesHubProps) {
                 <Building2 className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No pages yet</h3>
                 <p className="text-muted-foreground mb-6 max-w-md mx-auto">Create your first page to showcase your company, build a community, or establish your personal brand.</p>
-                <Button className="gradient-animated">
+                <Button className="gradient-animated" onClick={() => router.push("create-page")}>
                   <Plus className="w-4 h-4 mr-2" />
                   Create Your First Page
                 </Button>

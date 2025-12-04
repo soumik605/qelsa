@@ -1,8 +1,10 @@
+import { useAuth } from "@/contexts/AuthContext";
 import { useGetJobsQuery } from "@/features/api/jobsApi";
 import { useGetPageByIdQuery } from "@/features/api/pagesApi";
-import { ArrowLeft, Briefcase, Building2, Calendar, CheckCircle, ChevronRight, ExternalLink, MapPin, Share2, Star, Users } from "lucide-react";
+import { ArrowLeft, Briefcase, Building2, Calendar, CheckCircle, ChevronRight, Edit3, ExternalLink, MapPin, Share2, Star, Users } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Separator } from "./ui/separator";
@@ -14,6 +16,7 @@ export function CompanyPage() {
   const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const [isFollowing, setIsFollowing] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const { user } = useAuth();
 
   const handleFollowCompany = () => {
     setIsFollowing(!isFollowing);
@@ -60,11 +63,7 @@ export function CompanyPage() {
           <div className="flex items-start gap-6">
             {/* Company Logo */}
             <div className="relative flex-shrink-0">
-              <img
-                src={pageData.logo || "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=120&h=120&fit=crop&crop=center"}
-                alt={pageData.name}
-                className="w-24 h-24 rounded-xl object-cover border-2 border-glass-border bg-background"
-              />
+              <img src={pageData.logo} alt={pageData.name} className="w-24 h-24 rounded-xl object-cover border-2 border-glass-border bg-background" />
             </div>
 
             {/* Company Info */}
@@ -80,9 +79,33 @@ export function CompanyPage() {
                       <span className="text-muted-foreground">({pageData.totalReviews} reviews)</span> */}
                     </div>
                     <Separator orientation="vertical" className="h-4" />
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      <Users className="w-4 h-4" />
-                      {/* <span>{pageData.followers.toLocaleString()} followers</span> */}
+                    {/* Follower Avatars and Stats */}
+                    <div className="flex items-center gap-2">
+                      {/* Overlapping Avatars */}
+                      <div className="flex -space-x-2">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple border-2 border-background overflow-hidden">
+                          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" alt="Follower" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink border-2 border-background overflow-hidden">
+                          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="Follower" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-pink to-neon-cyan border-2 border-background overflow-hidden">
+                          <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt="Follower" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple border-2 border-background overflow-hidden">
+                          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop" alt="Follower" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="w-6 h-6 rounded-full glass border-2 border-background flex items-center justify-center">
+                          <span className="text-[10px] font-medium text-muted-foreground">+1</span>
+                        </div>
+                      </div>
+
+                      {/* Follower Stats */}
+                      <div className="flex items-center gap-3">
+                        {/* <span className="font-medium">{(pageData.followers / 1000).toFixed(1)}k Followers</span> */}
+                        <span className="text-muted-foreground">·</span>
+                        <Badge className="bg-neon-cyan/20 text-neon-cyan border-0 hover:bg-neon-cyan/30">3 Mutual</Badge>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -105,6 +128,17 @@ export function CompanyPage() {
                   <Button variant="outline" className="border-glass-border hover:bg-white/5">
                     <Share2 className="w-4 h-4" />
                   </Button>
+                  {pageData?.owner?.id == user?.id && (
+                    <Button
+                      onClick={() => {
+                        router.push(`/pages/${pageData.id}/manage`);
+                      }}
+                      className="bg-neon-purple hover:bg-neon-purple/90 text-black"
+                    >
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      Edit
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -135,8 +169,7 @@ export function CompanyPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="glass border-glass-border">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="jobs">Jobs ({pageJobs?.length || 0})</TabsTrigger>
-            <TabsTrigger value="culture">Culture & Values</TabsTrigger>
+            {/* <TabsTrigger value="jobs">Jobs ({pageData.openJobs})</TabsTrigger> */}
             <TabsTrigger value="updates">Updates</TabsTrigger>
           </TabsList>
 
@@ -158,6 +191,27 @@ export function CompanyPage() {
                   </div>
                 </Card>
 
+                {/* Company Culture Attributes */}
+                {/* {pageData.cultureAttributes && pageData.cultureAttributes.length > 0 && (
+                  <Card className="glass border-glass-border p-6">
+                    <h2 className="text-xl font-semibold mb-2">Company Culture</h2>
+                    {pageData.cultureStatement && <p className="text-muted-foreground mb-4 italic">&quot;{pageData.cultureStatement}&quot;</p>}
+                    <div className="flex flex-wrap gap-2">
+                      {pageData.cultureAttributes.map((attrKey: string) => {
+                        const attr = CULTURE_ATTRIBUTES.find((a) => a.key === attrKey);
+                        if (!attr) return null;
+                        const AttrIcon = attr.icon;
+                        return (
+                          <Badge key={attrKey} variant="secondary" className="bg-neon-cyan/10 border border-neon-cyan/30 text-white px-3 py-1.5 flex items-center gap-2">
+                            <AttrIcon className="h-3.5 w-3.5" />
+                            {attr.name}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  </Card>
+                )} */}
+
                 {/* Company Stats */}
                 <Card className="glass border-glass-border p-6">
                   <h2 className="text-xl font-semibold mb-6">Company Highlights</h2>
@@ -167,34 +221,6 @@ export function CompanyPage() {
                         <div className="text-2xl font-bold text-neon-cyan mb-1">{stat.value}</div>
                         <div className="font-medium mb-1">{stat.label}</div>
                         <div className="text-xs text-muted-foreground">{stat.subtitle}</div>
-                      </div>
-                    ))} */}
-                  </div>
-                </Card>
-
-                {/* Culture Ratings */}
-                <Card className="glass border-glass-border p-6">
-                  <h2 className="text-xl font-semibold mb-6">Culture & Benefits</h2>
-                  <div className="space-y-4 mb-6">
-                    {/* {Object.entries(pageData.culture).map(([key, value]) => (
-                      <div key={key}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</span>
-                          <span className="text-sm font-medium">{value}/5</span>
-                        </div>
-                        <Progress value={value * 20} className="h-2" />
-                      </div>
-                    ))} */}
-                  </div>
-
-                  <Separator className="my-6" />
-
-                  <h3 className="font-semibold mb-4">Benefits & Perks</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {/* {pageData.benefits.map((benefit, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <CheckCircle className="w-4 h-4 text-neon-green mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">{benefit}</span>
                       </div>
                     ))} */}
                   </div>
@@ -259,7 +285,7 @@ export function CompanyPage() {
               <h2 className="text-xl font-semibold mb-6">Open Positions at {pageData.name}</h2>
               <div className="space-y-4">
                 {pageJobs?.map((job) => (
-                  <Card key={job.id} className="glass-strong border-glass-border hover:border-neon-cyan/30 transition-all cursor-pointer p-5">
+                  <Card key={job.id} className="glass-strong border-glass-border hover:border-neon-cyan/30 transition-all cursor-pointer p-5" onClick={() => router.push(`/jobs/${job.id}`)}>
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <h3 className="font-semibold mb-2 hover:text-neon-cyan transition-colors">{job.title}</h3>
@@ -278,16 +304,16 @@ export function CompanyPage() {
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
-                          {/* {job.skills.slice(0, 4).map((skill, index) => (
+                          {job.job_skills.slice(0, 4).map((skill, index) => (
                             <Badge key={index} variant="secondary" className="text-xs bg-white/5">
-                              {skill}
+                              {skill.title}
                             </Badge>
                           ))}
-                          {job.skills.length > 4 && (
+                          {job.job_skills.length > 4 && (
                             <Badge variant="secondary" className="text-xs bg-white/5">
-                              +{job.skills.length - 4}
+                              +{job.job_skills.length - 4}
                             </Badge>
-                          )} */}
+                          )}
                         </div>
                       </div>
                       {/* {job.fitScore && (
@@ -299,24 +325,6 @@ export function CompanyPage() {
                     </div>
                   </Card>
                 ))}
-              </div>
-            </Card>
-          </TabsContent>
-
-          {/* Culture Tab */}
-          <TabsContent value="culture" className="space-y-6">
-            <Card className="glass border-glass-border p-6">
-              <h2 className="text-xl font-semibold mb-6">Our Values</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* {pageData.values.map((value, index) => (
-                  <div key={index} className="p-4 rounded-lg glass-strong">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Award className="w-5 h-5 text-neon-cyan" />
-                      <h3 className="font-semibold">{value.title}</h3>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{value.description}</p>
-                  </div>
-                ))} */}
               </div>
             </Card>
           </TabsContent>

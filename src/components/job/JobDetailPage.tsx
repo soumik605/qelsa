@@ -35,8 +35,10 @@ import { Card } from "../ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function JobDetailPage() {
+  const {user} = useAuth()
   const [isSaved, setIsSaved] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
@@ -60,6 +62,7 @@ export function JobDetailPage() {
   } = useGetJobByIdQuery(id!, {
     skip: !id,
   });
+  console.log("🚀 ~ JobDetailPage ~ job:", job)
 
   if (!id || isLoading) return <p>Loading job...</p>;
   if (error) return <p>Error loading job.</p>;
