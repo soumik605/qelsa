@@ -180,6 +180,27 @@ export const jobsApi = createApi({
       transformResponse: (response: { success: boolean; data: Job }) => response.data,
       invalidatesTags: (result, error, jobId) => [{ type: "Job", id: jobId }, "Jobs"],
     }),
+    deleteJob: builder.mutation({
+      query: (jobId) => ({
+        url: `jobs/${jobId}`,
+        method: "DELETE",
+      }),
+
+      transformResponse: (response: { success: boolean; data: Job }) => response.data,
+
+      invalidatesTags: ["Jobs", "Cities", "Types"],
+    }),
+    editJob: builder.mutation({
+      query: ({ jobId, body }) => ({
+        url: `jobs/${jobId}`,
+        method: "PUT",
+        body,
+      }),
+
+      transformResponse: (response: { success: boolean; data: Job }) => response.data,
+
+      invalidatesTags: (result, error, { jobId }) => [{ type: "Job", id: jobId }, "Jobs"],
+    }),
   }),
 });
 
@@ -195,4 +216,6 @@ export const {
   useGetJobTypesQuery,
   useCreateJobMutation,
   useToggleSaveJobMutation,
+  useDeleteJobMutation,
+  useEditJobMutation,
 } = jobsApi;

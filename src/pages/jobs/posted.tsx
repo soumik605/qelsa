@@ -1,4 +1,4 @@
-import { useGetPostedJobsQuery } from "@/features/api/jobsApi";
+import { useDeleteJobMutation, useEditJobMutation, useGetPostedJobsQuery } from "@/features/api/jobsApi";
 import Layout from "@/layout";
 import { ArrowLeft, Briefcase, Calendar, Edit2, ExternalLink, Eye, MapPin, MoreVertical, PauseCircle, PlayCircle, Plus, Search, Star, Trash2, TrendingUp, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -34,6 +34,8 @@ export default function Posted() {
   const [statusFilter, setStatusFilter] = useState<"active" | "paused" | "closed">("active");
   const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
   const { data: postedJobs = [] } = useGetPostedJobsQuery();
+  const [deleteJob] = useDeleteJobMutation();
+  const [editJob] = useEditJobMutation();
 
   const filteredJobs = postedJobs.filter((job) => {
     // const matchesSearch = job.title.toLowerCase().includes(searchQuery.toLowerCase()) || job.skills.some((skill) => skill.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -43,7 +45,7 @@ export default function Posted() {
     return job;
   });
 
-  const activeJobs = postedJobs.filter((job) => job.status === "active");
+  const activeJobs = postedJobs.filter((job) => job.status === "open");
   const pausedJobs = postedJobs.filter((job) => job.status === "paused");
   const closedJobs = postedJobs.filter((job) => job.status === "closed");
 
@@ -64,14 +66,20 @@ export default function Posted() {
     }
   };
 
-  const handleTogglePause = (jobId: number) => {
-    console.log("Toggle pause for job:", jobId);
-    // Implementation for pausing/resuming job
+  const handleTogglePause = async (jobId: number, status: "open" | "paused" | "closed" | "draft") => {
+    try {
+      await editJob({ jobId, body: { status } }).unwrap();
+    } catch (error) {
+      console.error("Failed to update job:", error);
+    }
   };
 
-  const handleDeleteJob = (jobId: number) => {
-    console.log("Delete job:", jobId);
-    // Implementation for deleting job
+  const handleDeleteJob = async (jobId: number) => {
+    try {
+      await deleteJob(jobId).unwrap();
+    } catch (error) {
+      console.error("Failed to delete job:", error);
+    }
   };
 
   return (
@@ -216,11 +224,11 @@ export default function Posted() {
 
                       {/* Skills */}
                       <div className="flex flex-wrap gap-2">
-                        {/* {job.skills.map((skill, index) => (
+                        {job.job_skills?.map((skill, index) => (
                           <Badge key={index} variant="secondary" className="bg-white/5 hover:bg-white/10 border-white/10">
-                            {skill}
+                            {skill.title}
                           </Badge>
-                        ))} */}
+                        ))}
                       </div>
 
                       {/* Metrics */}
@@ -267,7 +275,12 @@ export default function Posted() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" className="glass border-neon-cyan/30 hover:border-neon-cyan hover:bg-neon-cyan/10" onClick={() => router.push(`/jobs/${job.id}/applications`)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="glass border-neon-cyan/30 hover:border-neon-cyan hover:bg-neon-cyan/10"
+                        onClick={() => router.push(`/jobs/${job.id}/applications`)}
+                      >
                         <Users className="w-4 h-4 mr-2" />
                         View Applications
                       </Button>
@@ -288,13 +301,13 @@ export default function Posted() {
                             View Public Page
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className="bg-white/10" />
-                          {job.status === "active" ? (
-                            <DropdownMenuItem onClick={() => handleTogglePause(job.id)} className="cursor-pointer text-neon-yellow">
+                          {job.status === "open" ? (
+                            <DropdownMenuItem onClick={() => handleTogglePause(job.id, "paused")} className="cursor-pointer text-neon-yellow">
                               <PauseCircle className="w-4 h-4 mr-2" />
                               Pause Job
                             </DropdownMenuItem>
                           ) : job.status === "paused" ? (
-                            <DropdownMenuItem onClick={() => handleTogglePause(job.id)} className="cursor-pointer text-neon-green">
+                            <DropdownMenuItem onClick={() => handleTogglePause(job.id, "open")} className="cursor-pointer text-neon-green">
                               <PlayCircle className="w-4 h-4 mr-2" />
                               Resume Job
                             </DropdownMenuItem>
