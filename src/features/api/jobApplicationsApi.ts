@@ -41,7 +41,20 @@ export const jobApplicationsApi = createApi({
 
       // transformResponse: (response: { success: boolean; data: Job }) => response.data,
     }),
+    editBulkStatus: builder.mutation({
+      query: (data) => ({
+        url: `jobs/bulk-update-status`,
+        method: "PUT",
+        body: {
+          application_ids: data.applicationIds,
+          new_status: data.new_status,
+        },
+      }),
+
+      transformResponse: (response: { success: boolean; data: JobApplication[] }) => response.data,
+      invalidatesTags: ["Applications"],
+    }),
   }),
 });
 
-export const { useGetJobApplicationsQuery, useCreateJobApplicationMutation } = jobApplicationsApi;
+export const { useGetJobApplicationsQuery, useCreateJobApplicationMutation, useEditBulkStatusMutation } = jobApplicationsApi;

@@ -1,5 +1,5 @@
-import { useGetJobApplicationsQuery } from "@/features/api/jobApplicationsApi";
-import { useGetJobByIdQuery } from "@/features/api/jobsApi";
+import { useEditBulkStatusMutation, useGetJobApplicationsQuery } from "@/features/api/jobApplicationsApi";
+import { useEditJobMutation, useGetJobByIdQuery } from "@/features/api/jobsApi";
 import { JobApplication } from "@/types/jobApplication";
 import {
   Archive,
@@ -8,10 +8,12 @@ import {
   CheckCircle2,
   ChevronRight,
   Clock,
+  DollarSign,
   Download,
   ExternalLink,
   FileText,
   GraduationCap,
+  Home,
   Mail,
   MapPin,
   MessageSquare,
@@ -60,6 +62,8 @@ export function ApplicationsManagementPage() {
 
   const { data: currentJobPosting } = useGetJobByIdQuery(id);
   const { data: applicants, error, isLoading } = useGetJobApplicationsQuery({ jobId: id });
+  const [editJob] = useEditJobMutation();
+  const [editBulkStatus] = useEditBulkStatusMutation();
 
   const filteredApplications = useMemo(() => {
     let filtered = (applicants ?? []).filter((application) => {
@@ -136,12 +140,31 @@ export function ApplicationsManagementPage() {
   const medianResponseTime = 2.3; // days
 
   const handleBulkAction = useCallback(
-    (action: string) => {
-      console.log(`Bulk action: ${action} for applicants:`, selectedApplications);
-      setSelectedApplications([]);
+    async (action: string) => {
+      try {
+        await editBulkStatus({
+          applicationIds: selectedApplications,
+          new_status: action,
+        }).unwrap();
+
+        setSelectedApplications([]);
+      } catch (error) {
+        console.error("Error performing bulk action:", error);
+      }
     },
-    [selectedApplications]
+    [selectedApplications, editBulkStatus]
   );
+
+  const handleApplicationStatus = async (action, applicationId) => {
+    try {
+      await editBulkStatus({
+        applicationIds: [applicationId],
+        new_status: action,
+      }).unwrap();
+    } catch (error) {
+      console.error("Error performing bulk action:", error);
+    }
+  };
 
   const handleSendMessage = useCallback(() => {
     console.log("Sending message:", messageText);
@@ -274,11 +297,11 @@ export function ApplicationsManagementPage() {
                 <Badge variant="outline" className="border-neon-purple/30 text-neon-purple">
                   {selectedApplications.length} selected
                 </Badge>
-                <Button size="sm" variant="outline" onClick={() => handleBulkAction("shortlist")}>
+                <Button size="sm" variant="outline" onClick={() => handleBulkAction("sorted")}>
                   <Star className="w-4 h-4 mr-2" />
                   Shortlist
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => handleBulkAction("reject")}>
+                <Button size="sm" variant="outline" onClick={() => handleBulkAction("rejected")}>
                   <XCircle className="w-4 h-4 mr-2" />
                   Reject
                 </Button>
@@ -398,9 +421,7 @@ export function ApplicationsManagementPage() {
                             </div>
 
                             <div className="flex items-center justify-between text-xs">
-                              <span className="text-muted-foreground">
-                                Applied {Math.floor((Date.now() - new Date(application.createdAt).getTime()) / (1000 * 60 * 60 * 24))}d ago
-                              </span>
+                              <span className="text-muted-foreground">Applied {Math.floor((Date.now() - new Date(application.createdAt).getTime()) / (1000 * 60 * 60 * 24))}d ago</span>
                               <div className="flex items-center gap-1">
                                 <Target className="w-3 h-3 text-neon-cyan" />
                                 {/* <span className="text-neon-cyan">{application.matchScore}%</span> */}
@@ -429,11 +450,11 @@ export function ApplicationsManagementPage() {
                       <MessageSquare className="w-4 h-4 mr-2" />
                       Message
                     </Button>
-                    <Button variant="outline" className="flex-1 border-neon-purple/30 text-neon-purple">
+                    <Button variant="outline" className="flex-1 border-neon-purple/30 text-neon-purple" onClick={() => handleApplicationStatus("sorted", selectedApplication.id)}>
                       <UserCheck className="w-4 h-4 mr-2" />
                       Shortlist
                     </Button>
-                    <Button variant="outline" className="flex-1 border-destructive/30 text-destructive">
+                    <Button variant="outline" className="flex-1 border-destructive/30 text-destructive" onClick={() => handleApplicationStatus("rejected", selectedApplication.id)}>
                       <XCircle className="w-4 h-4 mr-2" />
                       Reject
                     </Button>
@@ -453,7 +474,7 @@ export function ApplicationsManagementPage() {
                           Share Profile
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem className="text-destructive" onClick={() => handleApplicationStatus("rejected", selectedApplication.id)}>
                           <UserX className="w-4 h-4 mr-2" />
                           Reject
                         </DropdownMenuItem>
@@ -616,14 +637,18 @@ export function ApplicationsManagementPage() {
                               Experience
                             </h4>
                             <div className="space-y-3">
-                              <div className="pb-3 border-b border-glass-border">
-                                <p className="font-medium text-sm">{selectedApplication.user?.role}</p>
-                                {/* <p className="text-xs text-muted-foreground">Current • {selectedApplication.user?.yearsExperience} years</p> */}
-                              </div>
-                              <Button variant="ghost" size="sm" className="w-full text-xs text-neon-cyan">
-                                Show more experience
-                                <ChevronRight className="w-3 h-3 ml-1" />
-                              </Button>
+                              {selectedApplication.user?.experiences.slice(0, 1).map((exp, idx) => (
+                                <div key={idx} className="pb-3 border-b border-glass-border">
+                                  <p className="font-medium text-sm">{exp.title}</p>
+                                  <p className="text-xs text-muted-foreground">{exp.company_name}</p>
+                                </div>
+                              ))}
+                              {selectedApplication.user.experiences.length > 1 && (
+                                <Button variant="ghost" size="sm" className="w-full text-xs text-neon-cyan">
+                                  Show more experience
+                                  <ChevronRight className="w-3 h-3 ml-1" />
+                                </Button>
+                              )}
                             </div>
                           </div>
 
@@ -634,20 +659,20 @@ export function ApplicationsManagementPage() {
                               Education
                             </h4>
                             <div className="space-y-3">
-                              {/* {selectedApplicant.education.slice(0, 1).map((edu, idx) => (
+                              {selectedApplication.user?.educations.slice(0, 1).map((edu, idx) => (
                                 <div key={idx} className="pb-3 border-b border-glass-border">
                                   <p className="font-medium text-sm">{edu.degree}</p>
                                   <p className="text-xs text-muted-foreground">
-                                    {edu.institution} • {edu.year}
+                                    {edu.institution} • {edu.end_year}
                                   </p>
                                 </div>
-                              ))} */}
-                              {/* {selectedApplicant.education.length > 1 && (
+                              ))}
+                              {selectedApplication.user.educations.length > 1 && (
                                 <Button variant="ghost" size="sm" className="w-full text-xs text-neon-cyan">
                                   Show more education
                                   <ChevronRight className="w-3 h-3 ml-1" />
                                 </Button>
-                              )} */}
+                              )}
                             </div>
                           </div>
 
@@ -675,24 +700,24 @@ export function ApplicationsManagementPage() {
                                   <div>
                                     <p className="text-xs text-muted-foreground mb-1">Work Arrangement</p>
                                     <div className="flex flex-wrap gap-1.5">
-                                      {/* {selectedApplication.user.work_preference.map((arr, idx) => (
-                                        <Badge key={idx} variant="outline" className="text-xs border-neon-cyan/30 text-neon-cyan">
-                                          <Home className="w-3 h-3 mr-1" />
-                                          {arr}
-                                        </Badge>
-                                      ))} */}
+                                      <Badge variant="outline" className="text-xs border-neon-cyan/30 text-neon-cyan">
+                                        <Home className="w-3 h-3 mr-1" />
+                                        {selectedApplication.user.work_preference}
+                                      </Badge>
                                     </div>
                                   </div>
                                 )}
-                                {/* {selectedApplication.user.desiredSalary && (
+                                {(selectedApplication.user.expected_min_salary || selectedApplication.user.expected_max_salary) && (
                                   <div className="flex items-center gap-2">
                                     <DollarSign className="w-4 h-4 text-neon-green flex-shrink-0" />
                                     <div>
                                       <p className="text-xs text-muted-foreground">Desired Salary</p>
-                                      <p className="font-medium text-sm text-neon-green">{selectedApplication.user.desiredSalary}</p>
+                                      <p className="font-medium text-sm text-neon-green">
+                                        {selectedApplication.user.expected_min_salary} - {selectedApplication.user.expected_max_salary}
+                                      </p>
                                     </div>
                                   </div>
-                                )} */}
+                                )}
                                 <div className="grid grid-cols-2 gap-3 pt-2 border-t border-glass-border">
                                   {selectedApplication.user.want_to_relocate !== undefined && (
                                     <div>

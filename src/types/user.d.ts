@@ -1,3 +1,5 @@
+import { Education } from "./education";
+import { Experience } from "./experience";
 import { UserSkill } from "./userSkill";
 
 export type User = {
@@ -42,4 +44,6 @@ export type User = {
   last_login_at?: string;
   city?: string;
   skills?: UserSkill[];
+  educations?: Education[];
+  experiences?: Experience[];
 };

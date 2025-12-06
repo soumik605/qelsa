@@ -31,21 +31,19 @@ interface PostedJob {
 export default function Posted() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"active" | "paused" | "closed">("active");
+  const [statusFilter, setStatusFilter] = useState<"open" | "paused" | "closed">("open");
   const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
   const { data: postedJobs = [] } = useGetPostedJobsQuery();
   const [deleteJob] = useDeleteJobMutation();
   const [editJob] = useEditJobMutation();
 
   const filteredJobs = postedJobs.filter((job) => {
-    // const matchesSearch = job.title.toLowerCase().includes(searchQuery.toLowerCase()) || job.skills.some((skill) => skill.toLowerCase().includes(searchQuery.toLowerCase()));
-    // const matchesStatus = job.status === statusFilter;
-    // return matchesSearch && matchesStatus;
-
-    return job;
+    const matchesSearch = job.title.toLowerCase().includes(searchQuery.toLowerCase()) || job.job_skills.some((skill) => skill.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesStatus = job.status === statusFilter;
+    return matchesSearch && matchesStatus;
   });
 
-  const activeJobs = postedJobs.filter((job) => job.status === "open");
+  const openJobs = postedJobs.filter((job) => job.status === "open");
   const pausedJobs = postedJobs.filter((job) => job.status === "paused");
   const closedJobs = postedJobs.filter((job) => job.status === "closed");
 
@@ -55,7 +53,7 @@ export default function Posted() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "active":
+      case "open":
         return "bg-neon-green/20 text-neon-green border-neon-green/30";
       case "paused":
         return "bg-neon-yellow/20 text-neon-yellow border-neon-yellow/30";
@@ -114,7 +112,7 @@ export default function Posted() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Active Jobs</p>
-                    <p className="text-2xl font-bold text-neon-green">{activeJobs.length}</p>
+                    <p className="text-2xl font-bold text-neon-green">{openJobs.length}</p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-neon-green/10 flex items-center justify-center">
                     <Briefcase className="w-6 h-6 text-neon-green" />
@@ -174,8 +172,8 @@ export default function Posted() {
 
               <Tabs value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)} className="w-auto">
                 <TabsList className="glass-strong border-glass-border">
-                  <TabsTrigger value="active" className="data-[state=active]:text-neon-green">
-                    Active ({activeJobs.length})
+                  <TabsTrigger value="open" className="data-[state=active]:text-neon-green">
+                    Active ({openJobs.length})
                   </TabsTrigger>
                   <TabsTrigger value="paused" className="data-[state=active]:text-neon-yellow">
                     Paused ({pausedJobs.length})
