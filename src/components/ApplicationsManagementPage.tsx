@@ -385,20 +385,22 @@ export function ApplicationsManagementPage() {
                             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">{/* <span>{application.yearsExperience}y exp</span> */}</div>
 
                             <div className="flex flex-wrap gap-1 mb-2">
-                              {/* {application.keySkills.slice(0, 3).map((skill, idx) => (
+                              {application.user.skills.slice(0, 3).map((skill, idx) => (
                                 <Badge key={idx} variant="outline" className="text-xs border-neon-purple/30 text-neon-purple">
-                                  {skill}
+                                  {skill.title}
                                 </Badge>
-                              ))} */}
-                              {/* {application.keySkills.length > 3 && (
+                              ))}
+                              {application.user.skills.length > 3 && (
                                 <Badge variant="outline" className="text-xs">
-                                  +{application.keySkills.length - 3}
+                                  +{application.user.skills.length - 3}
                                 </Badge>
-                              )} */}
+                              )}
                             </div>
 
                             <div className="flex items-center justify-between text-xs">
-                              {/* <span className="text-muted-foreground">Applied {application.appliedDaysAgo}d ago</span> */}
+                              <span className="text-muted-foreground">
+                                Applied {Math.floor((Date.now() - new Date(application.createdAt).getTime()) / (1000 * 60 * 60 * 24))}d ago
+                              </span>
                               <div className="flex items-center gap-1">
                                 <Target className="w-3 h-3 text-neon-cyan" />
                                 {/* <span className="text-neon-cyan">{application.matchScore}%</span> */}
@@ -514,7 +516,7 @@ export function ApplicationsManagementPage() {
                           <div className="glass-strong rounded-lg p-4 space-y-3">
                             <div>
                               <h4 className="text-lg font-semibold">{selectedApplication?.user?.name}</h4>
-                              <p className="text-sm text-muted-foreground">{selectedApplication.user?.role}</p>
+                              <p className="text-sm text-muted-foreground">{selectedApplication.user?.headline}</p>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                               <div className="flex items-center gap-2">
@@ -529,11 +531,11 @@ export function ApplicationsManagementPage() {
                               )}
                               <div className="flex items-center gap-2">
                                 <MapPin className="w-4 h-4 text-neon-cyan flex-shrink-0" />
-                                <span>{selectedApplication.user?.location}</span>
+                                <span>{selectedApplication.user?.work_preference}</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-neon-cyan flex-shrink-0" />
-                                {/* <span>Applied {selectedApplication.appliedDaysAgo}d ago</span> */}
+                                <span>Applied {Math.floor((Date.now() - new Date(selectedApplication.createdAt).getTime()) / (1000 * 60 * 60 * 24))}d ago</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Briefcase className="w-4 h-4 text-neon-cyan flex-shrink-0" />
@@ -569,16 +571,16 @@ export function ApplicationsManagementPage() {
                         </div>
 
                         {/* Screening Questions */}
-                        {selectedApplication.screening_questions && selectedApplication.screening_questions.length > 0 && (
+                        {selectedApplication.job_application_answers && selectedApplication.job_application_answers.length > 0 && (
                           <div>
                             <h3 className="font-semibold mb-3">Screening Questions</h3>
                             <div className="glass-strong rounded-lg p-4">
                               <div className="space-y-4">
-                                {selectedApplication.screening_questions.map((sq, idx) => (
+                                {selectedApplication.job_application_answers.map((sq, idx) => (
                                   <div key={idx} className="pb-4 last:pb-0 border-b last:border-b-0 border-glass-border">
                                     <div className="flex items-start gap-2 mb-2">
                                       <FileText className="w-4 h-4 text-neon-purple flex-shrink-0 mt-0.5" />
-                                      <p className="text-sm font-medium text-muted-foreground">{sq.title}</p>
+                                      <p className="text-sm font-medium text-muted-foreground">{sq.question}</p>
                                     </div>
                                     <div className="ml-6">
                                       <div className="flex items-start gap-2">
@@ -587,7 +589,7 @@ export function ApplicationsManagementPage() {
                                         ) : (
                                           <AlertCircle className="w-4 h-4 text-neon-yellow flex-shrink-0 mt-0.5" />
                                         )} */}
-                                        {/* <p className="text-sm">{sq.answer}</p> */}
+                                        <p className="text-sm">{sq.answer}</p>
                                       </div>
                                     </div>
                                   </div>
@@ -650,73 +652,73 @@ export function ApplicationsManagementPage() {
                           </div>
 
                           {/* Job Preferences */}
-                          {/* {selectedApplication.jobPreferences && (
+                          {selectedApplication.user && (
                             <div className="glass-strong rounded-lg p-4">
                               <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
                                 <Target className="w-4 h-4 text-neon-cyan" />
                                 Job Preferences
                               </h4>
                               <div className="space-y-3 text-sm">
-                                {selectedApplication.jobPreferences.jobTypes && (
+                                {/* {selectedApplication.user.jobTypes && (
                                   <div>
                                     <p className="text-xs text-muted-foreground mb-1">Job Type</p>
                                     <div className="flex flex-wrap gap-1.5">
-                                      {selectedApplication.jobPreferences.jobTypes.map((type, idx) => (
+                                      {selectedApplication.user.jobTypes.map((type, idx) => (
                                         <Badge key={idx} variant="outline" className="text-xs border-neon-purple/30 text-neon-purple">
                                           {type}
                                         </Badge>
                                       ))}
                                     </div>
                                   </div>
-                                )}
-                                {selectedApplication.jobPreferences.workArrangement && (
+                                )} */}
+                                {selectedApplication.user.work_preference && (
                                   <div>
                                     <p className="text-xs text-muted-foreground mb-1">Work Arrangement</p>
                                     <div className="flex flex-wrap gap-1.5">
-                                      {selectedApplication.jobPreferences.workArrangement.map((arr, idx) => (
+                                      {/* {selectedApplication.user.work_preference.map((arr, idx) => (
                                         <Badge key={idx} variant="outline" className="text-xs border-neon-cyan/30 text-neon-cyan">
                                           <Home className="w-3 h-3 mr-1" />
                                           {arr}
                                         </Badge>
-                                      ))}
+                                      ))} */}
                                     </div>
                                   </div>
                                 )}
-                                {selectedApplication.jobPreferences.desiredSalary && (
+                                {/* {selectedApplication.user.desiredSalary && (
                                   <div className="flex items-center gap-2">
                                     <DollarSign className="w-4 h-4 text-neon-green flex-shrink-0" />
                                     <div>
                                       <p className="text-xs text-muted-foreground">Desired Salary</p>
-                                      <p className="font-medium text-sm text-neon-green">{selectedApplication.jobPreferences.desiredSalary}</p>
+                                      <p className="font-medium text-sm text-neon-green">{selectedApplication.user.desiredSalary}</p>
                                     </div>
                                   </div>
-                                )}
+                                )} */}
                                 <div className="grid grid-cols-2 gap-3 pt-2 border-t border-glass-border">
-                                  {selectedApplication.jobPreferences.willingToRelocate !== undefined && (
+                                  {selectedApplication.user.want_to_relocate !== undefined && (
                                     <div>
                                       <p className="text-xs text-muted-foreground mb-1">Willing to Relocate</p>
-                                      <p className="font-medium text-sm">{selectedApplication.jobPreferences.willingToRelocate ? "Yes" : "No"}</p>
+                                      <p className="font-medium text-sm">{selectedApplication.user.want_to_relocate ? "Yes" : "No"}</p>
                                     </div>
                                   )}
-                                  {selectedApplication.jobPreferences.noticePeriod && (
+                                  {/* {selectedApplication.user.noticePeriod && (
                                     <div>
                                       <p className="text-xs text-muted-foreground mb-1">Notice Period</p>
-                                      <p className="font-medium text-sm">{selectedApplication.jobPreferences.noticePeriod}</p>
+                                      <p className="font-medium text-sm">{selectedApplication.user.noticePeriod}</p>
                                     </div>
-                                  )}
+                                  )} */}
                                 </div>
 
-                                {selectedApplication.jobPreferences.culturalPreferences && (
+                                {/* {selectedApplication.user.culturalPreferences && (
                                   <div className="pt-3 border-t border-glass-border space-y-3">
                                     <div className="flex items-center gap-2 mb-2">
                                       <Heart className="w-4 h-4 text-neon-pink" />
                                       <h5 className="text-sm font-semibold">Cultural Preferences</h5>
                                     </div>
 
-                                    {selectedApplication.jobPreferences.culturalPreferences.cultureAttributes && (
+                                    {selectedApplication.user.culturalPreferences.cultureAttributes && (
                                       <div>
                                         <div className="flex flex-wrap gap-1.5">
-                                          {selectedApplication.jobPreferences.culturalPreferences.cultureAttributes.map((attr, idx) => (
+                                          {selectedApplication.user.culturalPreferences.cultureAttributes.map((attr, idx) => (
                                             <Badge key={idx} variant="outline" className="text-xs border-neon-cyan/30 text-neon-cyan">
                                               {attr}
                                             </Badge>
@@ -725,10 +727,10 @@ export function ApplicationsManagementPage() {
                                       </div>
                                     )}
                                   </div>
-                                )}
+                                )} */}
                               </div>
                             </div>
-                          )} */}
+                          )}
                         </div>
 
                         {/* Matched Skills */}

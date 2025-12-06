@@ -7,9 +7,11 @@ import { Archive, ExternalLink, Eye, MessageSquare, MoreVertical, TrendingUp } f
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 const Applied = () => {
   const { data: applications, error, isLoading } = useGetAppliedJobsQuery();
+  const router = useRouter();
   console.log("🚀 ~ Applied ~ applications:", applications);
 
   const getStatusColor = (status: string) => {
@@ -102,7 +104,7 @@ const Applied = () => {
                     Send Follow-up
                   </Button>
                 )} */}
-                <Button variant="outline" className="border-glass-border">
+                <Button variant="outline" className="border-glass-border" onClick={() => router.push(`/jobs/${application.job.id}`)}>
                   <Eye className="w-4 h-4 mr-2" />
                   View Application
                 </Button>
@@ -113,7 +115,7 @@ const Applied = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="glass border-glass-border">
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push(`/jobs/${application.job.id}`)}>
                       <ExternalLink className="w-4 h-4 mr-2" />
                       View Job Posting
                     </DropdownMenuItem>

@@ -1,4 +1,5 @@
 import { Job } from "./job";
+import { JobApplicationAnswer } from "./jobApplicationAnswers";
 import { ScreeningQuestion } from "./question";
 import { User } from "./user";
 
@@ -6,6 +7,7 @@ export type JobApplication = {
   id: number;
   job: Job;
   user: User;
+  user_id: number;
   status: "applied" | "sorted" | "rejected" | "hold" | "cancelled";
   appliedAt: string;
   updatedAt: string;
@@ -14,6 +16,9 @@ export type JobApplication = {
   jobApplicationLogs: JobApplicationLog[];
   applied_days_ago?: number;
   screening_questions: ScreeningQuestion[]
+  job_application_answers: JobApplicationAnswer[]
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type JobApplicationLog = {

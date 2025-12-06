@@ -235,7 +235,7 @@ export default function Posted() {
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4 text-neon-purple" />
                           <span className="text-sm">
-                            {/* <span className="font-semibold text-foreground">{job.applications}</span> */}
+                            <span className="font-semibold text-foreground">{job.applications?.length || 0}</span>
                             <span className="text-muted-foreground ml-1">applications</span>
                           </span>
                         </div>

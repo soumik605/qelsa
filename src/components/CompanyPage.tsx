@@ -304,12 +304,12 @@ export function CompanyPage() {
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
-                          {job.job_skills.slice(0, 4).map((skill, index) => (
+                          {job.job_skills?.slice(0, 4).map((skill, index) => (
                             <Badge key={index} variant="secondary" className="text-xs bg-white/5">
                               {skill.title}
                             </Badge>
                           ))}
-                          {job.job_skills.length > 4 && (
+                          {job.job_skills?.length > 4 && (
                             <Badge variant="secondary" className="text-xs bg-white/5">
                               +{job.job_skills.length - 4}
                             </Badge>

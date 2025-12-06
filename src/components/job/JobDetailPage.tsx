@@ -1,4 +1,5 @@
-import { useGetJobByIdQuery } from "@/features/api/jobsApi";
+import { useAuth } from "@/contexts/AuthContext";
+import { useGetJobByIdQuery, useToggleSaveJobMutation } from "@/features/api/jobsApi";
 import { useGetMyResumesQuery } from "@/features/api/resumeApi";
 import {
   AlertTriangle,
@@ -35,11 +36,9 @@ import { Card } from "../ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
-import { useAuth } from "@/contexts/AuthContext";
 
 export function JobDetailPage() {
-  const {user} = useAuth()
-  const [isSaved, setIsSaved] = useState(false);
+  const { user } = useAuth();
   const [isApplied, setIsApplied] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [showSavedResumesDialog, setShowSavedResumesDialog] = useState(false);
@@ -48,6 +47,7 @@ export function JobDetailPage() {
   const [resumeAnalysis, setResumeAnalysis] = useState<any>(null);
   const [selectedSkillsTab, setSelectedSkillsTab] = useState("match");
   const { data: my_resumes } = useGetMyResumesQuery();
+  const [toggleSaveJob] = useToggleSaveJobMutation();
 
   const router = useRouter();
   const [showQuickApplyModal, setShowQuickApplyModal] = useState(false);
@@ -62,7 +62,6 @@ export function JobDetailPage() {
   } = useGetJobByIdQuery(id!, {
     skip: !id,
   });
-  console.log("🚀 ~ JobDetailPage ~ job:", job)
 
   if (!id || isLoading) return <p>Loading job...</p>;
   if (error) return <p>Error loading job.</p>;
@@ -100,7 +99,7 @@ export function JobDetailPage() {
   };
 
   const handleSaveJob = () => {
-    setIsSaved(!isSaved);
+    // setIsSaved(!isSaved);
   };
 
   const handleApplyJob = () => {
@@ -187,6 +186,11 @@ export function JobDetailPage() {
     },
   ];
 
+
+  const applied = job.applications?.some(application => {
+    return application.user_id === user?.id;
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
       {/* Header */}
@@ -202,8 +206,8 @@ export function JobDetailPage() {
               <Button variant="ghost" size="sm" onClick={handleShareJob} className="hover:bg-neon-purple/10 hover:text-neon-purple">
                 <Share2 className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={handleSaveJob} className="hover:bg-neon-cyan/10 hover:text-neon-cyan">
-                {isSaved ? <BookmarkCheck className="w-4 h-4 text-neon-cyan" /> : <Bookmark className="w-4 h-4" />}
+              <Button variant="ghost" size="sm" onClick={() => toggleSaveJob(job.id)} className="hover:bg-neon-cyan/10 hover:text-neon-cyan">
+                {job?.is_bookmarked ? <BookmarkCheck className="w-4 h-4 text-neon-cyan"  /> : <Bookmark className="w-4 h-4" />}
               </Button>
             </div>
           </div>
@@ -305,7 +309,7 @@ export function JobDetailPage() {
                 )} */}
 
                 <div className="space-y-4">
-                  {!isApplied ? (
+                  {!applied ? (
                     <div>
                       {job.resource == "qelsa" ? (
                         <Button onClick={() => setShowQuickApplyModal(true)} className="w-full bg-neon-green hover:bg-neon-green/90 text-black font-medium">

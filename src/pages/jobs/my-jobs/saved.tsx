@@ -1,14 +1,17 @@
 import MyJobLayout from "@/components/job/MyJobLayout";
-import { useGetSavedJobsQuery } from "@/features/api/jobsApi";
+import { useGetSavedJobsQuery, useToggleSaveJobMutation } from "@/features/api/jobsApi";
 import Layout from "@/layout";
 import { Box } from "@mui/material";
 import { Archive, ArrowRight, Bell, DollarSign, Eye, MessageSquare, MoreVertical, Share2, Star, Target, Trash2, Zap } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 const Saved = () => {
   const { data: savedJobs, error, isLoading } = useGetSavedJobsQuery();
+  const [toggleSaveJob] = useToggleSaveJobMutation();
+  const router = useRouter();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -138,7 +141,7 @@ const Saved = () => {
                       <MessageSquare className="w-4 h-4 mr-2" />
                       Add Note
                     </Button>
-                    <Button size="sm" variant="outline" className="border-glass-border">
+                    <Button size="sm" variant="outline" className="border-glass-border" onClick={() => router.push(`/jobs/${job.id}`)}>
                       <ArrowRight className="w-4 h-4 mr-2" />
                       Apply Now
                     </Button>
@@ -152,7 +155,7 @@ const Saved = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="glass border-glass-border">
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push(`/jobs/${job.id}`)}>
                       <Eye className="w-4 h-4 mr-2" />
                       View Details
                     </DropdownMenuItem>
@@ -165,7 +168,7 @@ const Saved = () => {
                       Archive
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-destructive">
+                    <DropdownMenuItem className="text-destructive" onClick={() => toggleSaveJob(job.id)}>
                       <Trash2 className="w-4 h-4 mr-2" />
                       Remove
                     </DropdownMenuItem>

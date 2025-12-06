@@ -547,8 +547,8 @@ export function MySpacePage({}: MySpacePageProps) {
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex flex-col items-center lg:items-start">
             <Avatar className="w-32 h-32 ring-4 ring-neon-cyan/20 ring-offset-4 ring-offset-background">
-              <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face" alt="Alex Johnson" />
-              <AvatarFallback className="text-2xl bg-gradient-to-r from-neon-cyan to-neon-purple text-black">AJ</AvatarFallback>
+              <AvatarImage src={user?.custom_profile_url} alt={user?.name} />
+              <AvatarFallback className="text-2xl bg-gradient-to-r from-neon-cyan to-neon-purple text-black">{user?.name?.[0]}</AvatarFallback>
             </Avatar>
             <Button onClick={() => router.push("/profile/edit")} className="mt-4 glass hover:glass-strong border border-glass-border hover:border-neon-cyan transition-all duration-300">
               <Edit3 className="h-4 w-4 mr-2" />
@@ -558,12 +558,12 @@ export function MySpacePage({}: MySpacePageProps) {
 
           <div className="flex-1 space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Alex Johnson</h1>
-              <p className="text-xl text-neon-cyan mb-4">Senior Product Manager</p>
+              <h1 className="text-3xl font-bold text-white mb-2">{user?.name}</h1>
+              <p className="text-xl text-neon-cyan mb-4">{user?.headline}</p>
               <div className="flex flex-wrap gap-4 text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  <span>Bangalore, India</span>
+                  <span>{user?.location}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
@@ -579,8 +579,7 @@ export function MySpacePage({}: MySpacePageProps) {
             <div>
               <h3 className="font-semibold text-white mb-2">Professional Summary</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Experienced Product Manager with 5+ years in building scalable B2B and B2C products. Led cross-functional teams to deliver innovative solutions that increased user engagement by 40%
-                and revenue by ₹2.5Cr. Passionate about leveraging data-driven insights to create exceptional user experiences.
+                {user?.about}
               </p>
             </div>
 

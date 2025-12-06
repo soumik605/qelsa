@@ -1,3 +1,5 @@
+import { UserSkill } from "./userSkill";
+
 export type User = {
   id?: number | string;
   name?: string;
@@ -39,4 +41,5 @@ export type User = {
   about?: string;
   last_login_at?: string;
   city?: string;
+  skills?: UserSkill[];
 };
