@@ -309,7 +309,7 @@ export function JobDetailPage() {
                 )} */}
 
                 <div className="space-y-4">
-                  {!applied ? (
+                  {applied ? (
                     <div>
                       {job.resource == "qelsa" ? (
                         <Button onClick={() => setShowQuickApplyModal(true)} className="w-full bg-neon-green hover:bg-neon-green/90 text-black font-medium">

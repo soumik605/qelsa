@@ -236,7 +236,7 @@ export function CompanyPage() {
                     <div>
                       <div className="text-sm text-muted-foreground mb-1">Website</div>
                       <a href={pageData.website} target="_blank" rel="noopener noreferrer" className="text-sm text-neon-cyan hover:underline flex items-center gap-1">
-                        {pageData.website.replace("https://", "")}
+                        {pageData.website?.replace("https://", "")}
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>

@@ -1,6 +1,7 @@
 import { Job } from "./job";
 import { JobApplicationAnswer } from "./jobApplicationAnswers";
 import { ScreeningQuestion } from "./question";
+import { Resume } from "./resume";
 import { User } from "./user";
 
 export type JobApplication = {
@@ -15,8 +16,9 @@ export type JobApplication = {
   withdrawn_at?: Date | null;
   jobApplicationLogs: JobApplicationLog[];
   applied_days_ago?: number;
-  screening_questions: ScreeningQuestion[]
-  job_application_answers: JobApplicationAnswer[]
+  screening_questions: ScreeningQuestion[];
+  job_application_answers: JobApplicationAnswer[];
+  resume?: Resume;
   createdAt: string;
   updatedAt: string;
 };

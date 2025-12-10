@@ -1,6 +1,9 @@
 import { useEditBulkStatusMutation, useGetJobApplicationsQuery } from "@/features/api/jobApplicationsApi";
 import { useEditJobMutation, useGetJobByIdQuery } from "@/features/api/jobsApi";
 import { JobApplication } from "@/types/jobApplication";
+import { Viewer, Worker } from "@react-pdf-viewer/core";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import {
   Archive,
   ArrowLeft,
@@ -882,7 +885,31 @@ export function ApplicationsManagementPage() {
                                   </div>
                                 ))} */}
                               </div>
-                              <Button size="sm" variant="outline" className="w-full border-neon-cyan/30 text-neon-cyan">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full border-neon-cyan/30 text-neon-cyan"
+                                onClick={async () => {
+                                  try {
+                                    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}${selectedApplication.resume?.file_url}`;
+                                    if (!url) return;
+                                    const res = await fetch(url);
+                                    if (!res.ok) throw new Error("Failed to download file");
+                                    const blob = await res.blob();
+                                    const filename = "resume.pdf";
+                                    const blobUrl = window.URL.createObjectURL(blob);
+                                    const a = document.createElement("a");
+                                    a.href = blobUrl;
+                                    a.download = filename;
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    a.remove();
+                                    window.URL.revokeObjectURL(blobUrl);
+                                  } catch (err) {
+                                    console.error("Download error:", err);
+                                  }
+                                }}
+                              >
                                 <Download className="w-3 h-3 mr-2" />
                                 Download Resume
                               </Button>
@@ -890,6 +917,7 @@ export function ApplicationsManagementPage() {
                           </div>
 
                           {/* Resume Viewer */}
+
                           <div className="lg:col-span-2">
                             <div className="glass-strong rounded-lg p-6">
                               <div className="flex items-center justify-between mb-4">
@@ -897,62 +925,13 @@ export function ApplicationsManagementPage() {
                               </div>
 
                               {/* Resume Content Preview */}
-                              <div className="bg-white/5 rounded-lg p-6 min-h-[600px]">
-                                <div className="max-w-2xl mx-auto space-y-6">
-                                  <div className="text-center pb-4 border-b border-glass-border">
-                                    <h3 className="text-xl font-bold mb-2">{selectedApplication.user.name}</h3>
-                                    <p className="text-sm text-muted-foreground mb-2">{selectedApplication.user.role}</p>
-                                    <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-                                      <span>{selectedApplication.user.email}</span>
-                                      <span>•</span>
-                                      <span>{selectedApplication.user.location}</span>
-                                    </div>
-                                  </div>
+                              {/* <iframe src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${selectedApplication.resume?.file_url}`} width="100%" height="90vh" style={{ border: "none" }} /> */}
 
-                                  <div>
-                                    <h4 className="text-sm font-bold mb-3 text-neon-cyan">EXPERIENCE</h4>
-                                    <div className="space-y-4">
-                                      <div>
-                                        <div className="flex items-start justify-between mb-2">
-                                          <div>
-                                            <p className="font-semibold text-sm">{selectedApplication.user.role}</p>
-                                            {/* <p className="text-xs text-muted-foreground">Current • {selectedApplication.user.yearsExperience} years</p> */}
-                                          </div>
-                                        </div>
-                                        <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
-                                          <li>Led development of scalable web applications serving 1M+ users</li>
-                                          <li>Architected microservices infrastructure reducing response time by 40%</li>
-                                          <li>Mentored team of 5 junior developers and established code review practices</li>
-                                        </ul>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div>
-                                    <h4 className="text-sm font-bold mb-3 text-neon-cyan">SKILLS</h4>
-                                    <div className="space-y-2">
-                                      <div>
-                                        <p className="text-xs font-semibold mb-1">Technical:</p>
-                                        {/* <p className="text-xs text-muted-foreground">{selectedApplication.keySkills.join(", ")}</p> */}
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div>
-                                    <h4 className="text-sm font-bold mb-3 text-neon-cyan">EDUCATION</h4>
-                                    <div className="space-y-3">
-                                      {/* {selectedApplication.education.map((edu, idx) => (
-                                        <div key={idx}>
-                                          <p className="font-semibold text-sm">{edu.degree}</p>
-                                          <p className="text-xs text-muted-foreground">
-                                            {edu.institution} • {edu.year}
-                                          </p>
-                                        </div>
-                                      ))} */}
-                                    </div>
-                                  </div>
+                              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                                <div style={{ height: "90vh" }}>
+                                  <Viewer fileUrl={`${process.env.NEXT_PUBLIC_API_BASE_URL}${selectedApplication.resume?.file_url}`} />
                                 </div>
-                              </div>
+                              </Worker>
                             </div>
                           </div>
                         </div>

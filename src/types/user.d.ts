@@ -33,9 +33,12 @@ export type User = {
   preffer_internship?: boolean;
   preffer_freelance?: boolean;
   role: "user" | "admin";
-
   website?: string;
-
+  profile_type?: "student" | "professional" | "career-switcher";
+  find_job: boolean;
+  explore_career: boolean;
+  upskill_and_learn: boolean;
+  prepare_interview: boolean;
   password?: string;
   gender?: string;
   dob?: string;

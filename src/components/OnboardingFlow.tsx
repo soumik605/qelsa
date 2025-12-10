@@ -1,32 +1,11 @@
-import { useState } from 'react';
-import { 
-  ArrowRight, 
-  Sparkles, 
-  Target, 
-  BookOpen, 
-  Users, 
-  MessageSquare,
-  CheckCircle,
-  User,
-  Building,
-  GraduationCap,
-  RefreshCw
-} from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Card } from './ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-
-interface OnboardingFlowProps {
-  onComplete: (userData: UserData) => void;
-}
-
-interface UserData {
-  fullName: string;
-  username: string;
-  profileType: 'student' | 'professional' | 'career-switcher';
-  goals: string[];
-}
+import { useAuth } from "@/contexts/AuthContext";
+import { useUpdateProfileMutation } from "@/features/api/authApi";
+import { User } from "@/types/user";
+import { ArrowRight, BookOpen, Building, CheckCircle, GraduationCap, MessageSquare, RefreshCw, Sparkles, Target, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import { Card } from "./ui/card";
+import { Input } from "./ui/input";
 
 interface GoalOption {
   id: string;
@@ -38,72 +17,99 @@ interface GoalOption {
 
 const goalOptions: GoalOption[] = [
   {
-    id: 'find-jobs',
-    label: 'Find Jobs',
-    description: 'Discover opportunities that match your skills',
+    id: "find_job",
+    label: "Find Jobs",
+    description: "Discover opportunities that match your skills",
     icon: Target,
-    color: 'neon-cyan'
+    color: "neon-cyan",
   },
   {
-    id: 'career-paths',
-    label: 'Explore Career Paths',
-    description: 'Plan your career journey with AI guidance',
+    id: "explore_career",
+    label: "Explore Career Paths",
+    description: "Plan your career journey with AI guidance",
     icon: Users,
-    color: 'neon-purple'
+    color: "neon-purple",
   },
   {
-    id: 'upskill-learn',
-    label: 'Upskill & Learn',
-    description: 'Develop new skills for career growth',
+    id: "upskill_and_learn",
+    label: "Upskill & Learn",
+    description: "Develop new skills for career growth",
     icon: BookOpen,
-    color: 'neon-green'
+    color: "neon-green",
   },
   {
-    id: 'interview-prep',
-    label: 'Prepare for Interviews',
-    description: 'Practice and ace your next interview',
+    id: "prepare_interview",
+    label: "Prepare for Interviews",
+    description: "Practice and ace your next interview",
     icon: MessageSquare,
-    color: 'neon-pink'
-  }
+    color: "neon-pink",
+  },
 ];
 
 const profileTypeOptions = [
-  { 
-    value: 'student', 
-    label: 'Student', 
+  {
+    value: "student",
+    label: "Student",
     icon: GraduationCap,
-    description: 'Currently studying or recent graduate'
+    description: "Currently studying or recent graduate",
   },
-  { 
-    value: 'professional', 
-    label: 'Professional', 
+  {
+    value: "professional",
+    label: "Professional",
     icon: Building,
-    description: 'Experienced working professional'
+    description: "Experienced working professional",
   },
-  { 
-    value: 'career-switcher', 
-    label: 'Career Switcher', 
+  {
+    value: "career-switcher",
+    label: "Career Switcher",
     icon: RefreshCw,
-    description: 'Looking to change career paths'
-  }
+    description: "Looking to change career paths",
+  },
 ];
 
-export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
+export function OnboardingFlow() {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
-  const [userData, setUserData] = useState<UserData>({
-    fullName: '',
-    username: '',
-    profileType: 'professional',
-    goals: []
+  const [userData, setUserData] = useState<User>({
+    name: user?.name || "",
+    username: user?.username || "",
+    email: user?.email || "",
+    role: user?.role || "user",
+    profile_type: user?.profile_type || "student",
+    find_job: user?.find_job || false,
+    explore_career: user?.explore_career || false,
+    upskill_and_learn: user?.upskill_and_learn || false,
+    prepare_interview: user?.prepare_interview || false,
   });
-  const [suggestedUsername, setSuggestedUsername] = useState('');
 
-  const generateUsername = (fullName: string) => {
-    if (!fullName.trim()) return '';
-    const cleaned = fullName.toLowerCase().replace(/[^a-z\s]/g, '').trim();
-    const parts = cleaned.split(' ').filter(Boolean);
-    if (parts.length === 0) return '';
-    
+  // Update userData when user changes
+  useEffect(() => {
+    if (user) {
+      setUserData({
+        name: user.name || "",
+        username: user.username || "",
+        email: user.email || "",
+        role: user.role || "user",
+        profile_type: user.profile_type || "student",
+        find_job: user.find_job || false,
+        explore_career: user.explore_career || false,
+        upskill_and_learn: user.upskill_and_learn || false,
+        prepare_interview: user.prepare_interview || false,
+      });
+    }
+  }, [user]);
+  const [suggestedUsername, setSuggestedUsername] = useState("");
+  const [updateProfile] = useUpdateProfileMutation();
+
+  const generateUsername = (name: string) => {
+    if (!name.trim()) return "";
+    const cleaned = name
+      .toLowerCase()
+      .replace(/[^a-z\s]/g, "")
+      .trim();
+    const parts = cleaned.split(" ").filter(Boolean);
+    if (parts.length === 0) return "";
+
     if (parts.length === 1) {
       return parts[0];
     } else {
@@ -112,20 +118,18 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   };
 
   const handleNameChange = (name: string) => {
-    setUserData(prev => ({ ...prev, fullName: name }));
+    setUserData((prev) => ({ ...prev, name: name }));
     const suggested = generateUsername(name);
     setSuggestedUsername(suggested);
     if (!userData.username || userData.username === suggestedUsername) {
-      setUserData(prev => ({ ...prev, username: suggested }));
+      setUserData((prev) => ({ ...prev, username: suggested }));
     }
   };
 
   const handleGoalToggle = (goalId: string) => {
-    setUserData(prev => ({
+    setUserData((prev) => ({
       ...prev,
-      goals: prev.goals.includes(goalId)
-        ? prev.goals.filter(g => g !== goalId)
-        : [...prev.goals, goalId]
+      [goalId]: !prev[goalId as keyof User],
     }));
   };
 
@@ -133,17 +137,26 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     } else {
-      onComplete(userData);
+      try {
+        if (currentStep !== 0) updateProfile(userData).unwrap();
+      } catch (error) {
+        console.log("Failed to update profile", error);
+      }
     }
   };
 
   const canProceed = () => {
     switch (currentStep) {
-      case 0: return true;
-      case 1: return userData.fullName.trim() && userData.username.trim();
-      case 2: return userData.goals.length > 0;
-      case 3: return true;
-      default: return false;
+      case 0:
+        return true;
+      case 1:
+        return userData.name.trim() && userData.username.trim();
+      case 2:
+        return userData.find_job || userData.explore_career || userData.upskill_and_learn || userData.prepare_interview;
+      case 3:
+        return true;
+      default:
+        return false;
     }
   };
 
@@ -162,7 +175,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   <div className="absolute inset-0 w-24 h-24 rounded-3xl bg-gradient-to-r from-neon-cyan to-neon-purple opacity-50 blur-xl animate-pulse"></div>
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 <h1 className="text-5xl font-bold bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink bg-clip-text text-transparent animate-in slide-in-from-top-4 duration-700 delay-500">
                   Welcome to Qelsa AI
@@ -192,7 +205,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               </div>
             </div>
 
-            <Button 
+            <Button
               onClick={handleNext}
               size="lg"
               className="gradient-animated text-black font-bold text-lg px-8 py-4 shadow-2xl glow-cyan hover:glow-purple transition-all duration-300 hover:scale-105 animate-in zoom-in-50 duration-700 delay-1200"
@@ -216,7 +229,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-white">Full Name</label>
                 <Input
-                  value={userData.fullName}
+                  value={userData.name}
                   onChange={(e) => handleNameChange(e.target.value)}
                   placeholder="Enter your full name"
                   className="h-12 glass border-glass-border bg-input-background text-white placeholder:text-muted-foreground focus:border-neon-cyan focus:glow-cyan transition-all"
@@ -230,18 +243,13 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neon-cyan font-medium">@</span>
                   <Input
                     value={userData.username}
-                    onChange={(e) => setUserData(prev => ({ ...prev, username: e.target.value }))}
+                    onChange={(e) => setUserData((prev) => ({ ...prev, username: e.target.value }))}
                     placeholder="username"
                     className="h-12 pl-8 glass border-glass-border bg-input-background text-white placeholder:text-muted-foreground focus:border-neon-cyan focus:glow-cyan transition-all"
                   />
                 </div>
                 {suggestedUsername && userData.username !== suggestedUsername && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setUserData(prev => ({ ...prev, username: suggestedUsername }))}
-                    className="text-neon-cyan hover:text-neon-cyan text-xs"
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => setUserData((prev) => ({ ...prev, username: suggestedUsername }))} className="text-neon-cyan hover:text-neon-cyan text-xs">
                     Use suggested: @{suggestedUsername}
                   </Button>
                 )}
@@ -253,28 +261,22 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 <div className="grid grid-cols-1 gap-3">
                   {profileTypeOptions.map((option) => {
                     const Icon = option.icon;
-                    const isSelected = userData.profileType === option.value;
-                    
+                    const isSelected = userData.profile_type === option.value;
+
                     return (
                       <button
                         key={option.value}
-                        onClick={() => setUserData(prev => ({ ...prev, profileType: option.value as any }))}
+                        onClick={() => setUserData((prev) => ({ ...prev, profile_type: option.value as any }))}
                         className={`flex items-center gap-4 p-4 rounded-xl text-left transition-all duration-300 ${
-                          isSelected
-                            ? 'glass-strong border-neon-cyan glow-cyan'
-                            : 'glass border-glass-border hover:border-neon-cyan/50 hover:glow-cyan'
+                          isSelected ? "glass-strong border-neon-cyan glow-cyan" : "glass border-glass-border hover:border-neon-cyan/50 hover:glow-cyan"
                         }`}
                       >
-                        <Icon className={`h-6 w-6 ${isSelected ? 'text-neon-cyan' : 'text-muted-foreground'}`} />
+                        <Icon className={`h-6 w-6 ${isSelected ? "text-neon-cyan" : "text-muted-foreground"}`} />
                         <div className="flex-1">
-                          <h4 className={`font-medium ${isSelected ? 'text-neon-cyan' : 'text-white'}`}>
-                            {option.label}
-                          </h4>
+                          <h4 className={`font-medium ${isSelected ? "text-neon-cyan" : "text-white"}`}>{option.label}</h4>
                           <p className="text-sm text-muted-foreground">{option.description}</p>
                         </div>
-                        {isSelected && (
-                          <CheckCircle className="h-5 w-5 text-neon-cyan" />
-                        )}
+                        {isSelected && <CheckCircle className="h-5 w-5 text-neon-cyan" />}
                       </button>
                     );
                   })}
@@ -283,7 +285,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
 
             <div className="flex justify-center">
-              <Button 
+              <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
                 size="lg"
@@ -308,32 +310,24 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {goalOptions.map((goal) => {
                   const Icon = goal.icon;
-                  const isSelected = userData.goals.includes(goal.id);
-                  
+                  const isSelected = userData[goal.id];
+
                   return (
                     <Card
                       key={goal.id}
                       className={`p-6 cursor-pointer transition-all duration-300 hover:scale-105 ${
-                        isSelected
-                          ? `glass-strong border-${goal.color} glow-${goal.color.split('-')[1]}`
-                          : 'glass border-glass-border hover:border-neon-cyan/50 hover:glow-cyan'
+                        isSelected ? `glass-strong border-${goal.color} glow-${goal.color.split("-")[1]}` : "glass border-glass-border hover:border-neon-cyan/50 hover:glow-cyan"
                       }`}
                       onClick={() => handleGoalToggle(goal.id)}
                     >
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <Icon className={`h-8 w-8 ${isSelected ? `text-${goal.color}` : 'text-muted-foreground'}`} />
-                          {isSelected && (
-                            <CheckCircle className={`h-6 w-6 text-${goal.color}`} />
-                          )}
+                          <Icon className={`h-8 w-8 ${isSelected ? `text-${goal.color}` : "text-muted-foreground"}`} />
+                          {isSelected && <CheckCircle className={`h-6 w-6 text-${goal.color}`} />}
                         </div>
                         <div>
-                          <h3 className={`font-bold text-lg mb-2 ${isSelected ? `text-${goal.color}` : 'text-white'}`}>
-                            {goal.label}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            {goal.description}
-                          </p>
+                          <h3 className={`font-bold text-lg mb-2 ${isSelected ? `text-${goal.color}` : "text-white"}`}>{goal.label}</h3>
+                          <p className="text-sm text-muted-foreground">{goal.description}</p>
                         </div>
                       </div>
                     </Card>
@@ -341,28 +335,27 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 })}
               </div>
 
-              {userData.goals.length > 0 && (
+              {(userData.find_job || userData.explore_career || userData.upskill_and_learn || userData.prepare_interview) && (
                 <div className="mt-6 p-4 glass rounded-xl border border-neon-cyan/30">
                   <div className="flex items-center gap-2 mb-2">
                     <Sparkles className="h-4 w-4 text-neon-cyan" />
                     <span className="text-sm font-medium text-neon-cyan">Selected Goals</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {userData.goals.map(goalId => {
-                      const goal = goalOptions.find(g => g.id === goalId);
-                      return goal ? (
-                        <span key={goalId} className="px-3 py-1 text-xs glass rounded-full text-neon-cyan">
+                    {goalOptions
+                      .filter((goal) => userData[goal.id as keyof User])
+                      .map((goal) => (
+                        <span key={goal.id} className="px-3 py-1 text-xs glass rounded-full text-neon-cyan">
                           {goal.label}
                         </span>
-                      ) : null;
-                    })}
+                      ))}
                   </div>
                 </div>
               )}
             </div>
 
             <div className="flex justify-center">
-              <Button 
+              <Button
                 onClick={handleNext}
                 disabled={!canProceed()}
                 size="lg"
@@ -387,14 +380,12 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   <div className="absolute inset-0 w-20 h-20 rounded-full bg-gradient-to-r from-neon-cyan to-neon-purple opacity-50 blur-xl animate-pulse"></div>
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 <h2 className="text-4xl font-bold text-white">
                   All set, <span className="text-neon-cyan">@{userData.username}</span>!
                 </h2>
-                <p className="text-xl text-muted-foreground max-w-md mx-auto">
-                  Let&apos;s get started on your career journey.
-                </p>
+                <p className="text-xl text-muted-foreground max-w-md mx-auto">Let&apos;s get started on your career journey.</p>
               </div>
             </div>
 
@@ -405,32 +396,29 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Name:</span>
-                    <span className="text-white">{userData.fullName}</span>
+                    <span className="text-white">{userData.name}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Type:</span>
-                    <span className="text-neon-cyan">
-                      {profileTypeOptions.find(p => p.value === userData.profileType)?.label}
-                    </span>
+                    <span className="text-neon-cyan">{profileTypeOptions.find((p) => p.value === userData.profile_type)?.label}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Goals:</span>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {userData.goals.map(goalId => {
-                        const goal = goalOptions.find(g => g.id === goalId);
-                        return goal ? (
-                          <span key={goalId} className="px-2 py-1 text-xs glass rounded text-neon-green">
+                      {goalOptions
+                        .filter((goal) => userData[goal.id as keyof User])
+                        .map((goal) => (
+                          <span key={goal.id} className="px-2 py-1 text-xs glass rounded text-neon-green">
                             {goal.label}
                           </span>
-                        ) : null;
-                      })}
+                        ))}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <Button 
+            <Button
               onClick={handleNext}
               size="lg"
               className="gradient-animated text-black font-bold text-lg px-8 py-4 shadow-2xl glow-cyan hover:glow-purple transition-all duration-300 hover:scale-105"
@@ -461,27 +449,16 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         <div className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50">
           <div className="flex items-center gap-2 glass rounded-full px-6 py-3">
             {[1, 2, 3].map((step) => (
-              <div
-                key={step}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  step <= currentStep
-                    ? 'bg-neon-cyan glow-cyan'
-                    : 'bg-glass-border'
-                }`}
-              />
+              <div key={step} className={`w-3 h-3 rounded-full transition-all duration-300 ${step <= currentStep ? "bg-neon-cyan glow-cyan" : "bg-glass-border"}`} />
             ))}
-            <span className="ml-3 text-sm text-muted-foreground">
-              Step {currentStep} of 3
-            </span>
+            <span className="ml-3 text-sm text-muted-foreground">Step {currentStep} of 3</span>
           </div>
         </div>
       )}
 
       {/* Main Content */}
       <div className="flex items-center justify-center min-h-screen px-4 py-8">
-        <div className="w-full max-w-4xl">
-          {renderStep()}
-        </div>
+        <div className="w-full max-w-4xl">{renderStep()}</div>
       </div>
     </div>
   );
