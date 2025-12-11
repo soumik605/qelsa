@@ -29,7 +29,6 @@ export function CompanyPage() {
   } = useGetPageByIdQuery(id ?? "", {
     skip: !id,
   });
-  console.log("🚀 ~ PageView ~ pageData:", pageData);
 
   const { data: pageJobs, isLoading: jobsLoading, error: jobsError } = useGetJobsQuery({ page_id: id });
 
@@ -169,7 +168,7 @@ export function CompanyPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="glass border-glass-border">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            {/* <TabsTrigger value="jobs">Jobs ({pageData.openJobs})</TabsTrigger> */}
+            <TabsTrigger value="jobs">Jobs ({pageData.jobs.length || 0})</TabsTrigger>
             <TabsTrigger value="updates">Updates</TabsTrigger>
           </TabsList>
 
@@ -300,7 +299,7 @@ export function CompanyPage() {
                           </div>
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
-                            <span>Posted {new Date(job.published_date).toLocaleDateString()}</span>
+                            <span>Posted {new Date(job.createdAt).toLocaleDateString()}</span>
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
