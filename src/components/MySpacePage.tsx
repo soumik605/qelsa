@@ -41,6 +41,7 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Progress } from "./ui/progress";
+import { Separator } from "./ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 interface MySpacePageProps {}
@@ -219,6 +220,13 @@ export function MySpacePage({}: MySpacePageProps) {
     { name: "Growth Hacking", level: 80, category: "Marketing" },
   ];
 
+  function getExperienceLevelFromProficiency(proficiency: number) {
+    if (proficiency >= 90) return "Expert";
+    if (proficiency >= 70) return "Advanced";
+    if (proficiency >= 40) return "Intermediate";
+    return "Beginner";
+  }
+
   const dashboardContent = (
     <div className="space-y-8">
       {/* Welcome Banner */}
@@ -241,7 +249,11 @@ export function MySpacePage({}: MySpacePageProps) {
               <Sparkles className="h-4 w-4 ml-2 group-hover:rotate-45 transition-transform" />
             </Button>
 
-            <Button variant="outline" className="group glass hover:glass-strong transition-all duration-300 px-8 py-3 rounded-2xl border border-glass-border hover:border-neon-purple hover:scale-105">
+            <Button
+              variant="outline"
+              className="group glass hover:glass-strong transition-all duration-300 px-8 py-3 rounded-2xl border border-glass-border hover:border-neon-purple hover:scale-105"
+              onClick={() => router.push("/jobs/all")}
+            >
               <Rocket className="h-5 w-5 mr-2 group-hover:-rotate-12 transition-transform" />
               Explore Jobs
             </Button>
@@ -578,9 +590,7 @@ export function MySpacePage({}: MySpacePageProps) {
 
             <div>
               <h3 className="font-semibold text-white mb-2">Professional Summary</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {user?.about}
-              </p>
+              <p className="text-muted-foreground leading-relaxed">{user?.about}</p>
             </div>
 
             <div className="flex gap-3">
@@ -667,7 +677,7 @@ export function MySpacePage({}: MySpacePageProps) {
           </Card>
 
           {/* Skills */}
-          <Card className="glass hover:glass-strong p-6 rounded-2xl border border-glass-border transition-all duration-300">
+          {/* <Card className="glass hover:glass-strong p-6 rounded-2xl border border-glass-border transition-all duration-300">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <Award className="h-5 w-5 text-neon-pink" />
@@ -691,6 +701,112 @@ export function MySpacePage({}: MySpacePageProps) {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          </Card> */}
+
+          <Card className="glass hover:glass-strong p-6 rounded-2xl border border-glass-border transition-all duration-300">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Award className="h-5 w-5 text-neon-pink" />
+                <h3 className="text-xl font-bold text-white">Skills & Expertise</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" className="glass hover:glass-strong border-neon-cyan/30 text-neon-cyan hover:text-neon-cyan" onClick={() => router.push("/profile/skills")}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  View All
+                </Button>
+                <Button variant="ghost" size="sm" className="glass hover:glass-strong border-neon-pink/30 text-neon-pink hover:text-neon-pink" onClick={() => router.push("/profile/skills")}>
+                  <Edit3 className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {/* Top Skills Section */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Star className="h-4 w-4 text-neon-yellow fill-neon-yellow" />
+                  <h4 className="font-medium text-white">Top Skills</h4>
+                </div>
+                {userSkills?.some((s) => s.is_top_skill) ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {userSkills
+                      .filter((skill) => skill.is_top_skill)
+                      .map((skill) => (
+                        <div key={skill.id} className="p-4 glass-strong rounded-xl border border-neon-yellow/20">
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="font-medium text-white">{skill.title}</span>
+                            <Star className="h-4 w-4 text-neon-yellow fill-neon-yellow flex-shrink-0" />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              variant="outline"
+                              className={`text-xs ${
+                                getExperienceLevelFromProficiency(skill.proficiency) === "Expert"
+                                  ? "bg-neon-yellow/10 border-neon-yellow/30 text-neon-yellow"
+                                  : getExperienceLevelFromProficiency(skill.proficiency) === "Advanced"
+                                  ? "bg-neon-green/10 border-neon-green/30 text-neon-green"
+                                  : getExperienceLevelFromProficiency(skill.proficiency) === "Intermediate"
+                                  ? "bg-neon-cyan/10 border-neon-cyan/30 text-neon-cyan"
+                                  : "bg-neon-pink/10 border-neon-pink/30 text-neon-pink"
+                              }`}
+                            >
+                              {getExperienceLevelFromProficiency(skill.proficiency)}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  <div className="p-6 glass-strong rounded-xl border border-glass-border text-center">
+                    <Star className="h-8 w-8 text-neon-yellow/30 fill-neon-yellow/30 mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">No top skills selected yet. Showcase up to 3 of your strongest skills.</p>
+                  </div>
+                )}
+                <Separator className="mt-6 bg-glass-border" />
+              </div>
+
+              {/* All Skills by Category - Limited to 3 per category, excluding top skills */}
+              <div className="space-y-4">
+                {["professional", "technical", "softskill"].map((category) => {
+                  // Filter out top skills from category sections
+                  const categorySkills = userSkills?.filter((skill) => skill.category === category && !skill.is_top_skill).slice(0, 3); // Show only 3 skills per category
+
+                  if (categorySkills?.length === 0) return null;
+
+                  return (
+                    <div key={category}>
+                      <h4 className="font-medium text-white mb-3">{category}</h4>
+                      <div className="space-y-3">
+                        {categorySkills?.map((skill) => (
+                          <div key={skill.id}>
+                            <div className="flex justify-between text-sm">
+                              <div className="flex items-center gap-2">
+                                <span className="text-foreground">{skill.title}</span>
+                              </div>
+                              <span
+                                className={`font-medium ${
+                                  skill.experience_level === "Expert"
+                                    ? "text-neon-yellow"
+                                    : skill.experience_level === "Advanced"
+                                    ? "text-neon-green"
+                                    : skill.experience_level === "Intermediate"
+                                    ? "text-neon-cyan"
+                                    : "text-neon-pink"
+                                }`}
+                              >
+                                {skill.experience_level}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {category !== "Soft Skills" && <Separator className="mt-4 bg-glass-border" />}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </Card>

@@ -1,7 +1,7 @@
 import { SkillsEditorPage } from "@/components/SkillsEditorPage";
 import Layout from "@/layout";
 
-const Skills = () => {
+const EditSkills = () => {
   return (
     <Layout activeSection={"profile"}>
       <SkillsEditorPage />
@@ -9,4 +9,4 @@ const Skills = () => {
   );
 };
 
-export default Skills;
+export default EditSkills;

@@ -1,6 +1,6 @@
 import { useBulkModifyUserSkillsMutation, useGetUserSkillsQuery } from "@/features/api/userSkillsApi";
 import { UserSkill } from "@/types/userSkill";
-import { AlertCircle, ArrowLeft, Award, Briefcase, Check, Code, Lightbulb, Plus, Search, Sparkles, Target, Trash2, Upload, Users, X } from "lucide-react";
+import { AlertCircle, ArrowLeft, Award, Briefcase, Check, Code, Lightbulb, Plus, Search, Sparkles, Star, Target, Trash2, Upload, Users, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -101,7 +101,6 @@ function getProficiencyColor(proficiency: number): string {
 export function SkillsEditorPage() {
   const router = useRouter();
   const [skills, setSkills] = useState<UserSkill[]>([]);
-  console.log("🚀 ~ SkillsEditorPage ~ skills:", skills);
   const [selectedCategory, setSelectedCategory] = useState("professional");
   const [searchQuery, setSearchQuery] = useState("");
   const [showRecommendations, setShowRecommendations] = useState(false);
@@ -146,6 +145,7 @@ export function SkillsEditorPage() {
       category,
       proficiency: 50,
       experience_level: "Intermediate",
+      is_top_skill: false,
       // badges: [],
       // hasEvidence: false,
     };
@@ -173,6 +173,29 @@ export function SkillsEditorPage() {
           : skill
       )
     );
+  };
+
+  const handleToggleTopSkill = (skillId: number) => {
+    const skill = skills.find((s) => s.id === skillId);
+    if (!skill) return;
+
+    const currentTopSkills = skills.filter((s) => s.is_top_skill);
+    if (!skill.is_top_skill && currentTopSkills.length >= 3) {
+      toast.error("You can only showcase up to 3 top skills", {
+        description: "Remove one of your current top skills first",
+      });
+      return;
+    }
+
+    setSkills(skills.map((s) => (s.id === skillId ? { ...s, is_top_skill: !s.is_top_skill } : s)));
+
+    if (!skill.is_top_skill) {
+      toast.success(`${skill.title} added to top skills!`, {
+        description: "This skill will be showcased on your profile",
+      });
+    } else {
+      toast.info(`${skill.title} removed from top skills`);
+    }
   };
 
   const handleRunValidation = () => {
@@ -476,9 +499,15 @@ export function SkillsEditorPage() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <h3 className="font-bold text-white text-lg">{skill.title}</h3>
-                        <Badge variant="outline" className={`${getProficiencyColor(skill.proficiency)} border-current`}>
-                          {getExperienceLevelFromProficiency(skill.proficiency)}
-                        </Badge>
+                        {/* <Badge variant="outline" className={`${getProficiencyColor(skill.proficiency)} border-current`}>
+                          {skill.experienceLevel}
+                        </Badge> */}
+                        {skill.is_top_skill && (
+                          <Badge variant="outline" className="border-neon-yellow/30 text-neon-yellow text-xs">
+                            <Star className="h-3 w-3 mr-1 fill-neon-yellow" />
+                            Top Skill
+                          </Badge>
+                        )}
                         {/* {!skill.hasEvidence && skill.proficiency >= 70 && (
                           <Badge variant="outline" className="border-neon-pink/30 text-neon-pink text-xs">
                             <AlertCircle className="h-3 w-3 mr-1" />
@@ -497,9 +526,20 @@ export function SkillsEditorPage() {
                         </div>
                       )} */}
                     </div>
-                    <Button onClick={() => handleDeleteSkill(skill.id)} variant="ghost" size="icon" className="glass hover:glass-strong text-destructive flex-shrink-0">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <Button
+                        onClick={() => handleToggleTopSkill(skill.id)}
+                        variant="ghost"
+                        size="icon"
+                        className={`glass hover:glass-strong ${skill.is_top_skill ? "text-neon-yellow border border-neon-yellow/30" : "text-muted-foreground"}`}
+                        title={skill.is_top_skill ? "Remove from top skills" : "Add to top skills"}
+                      >
+                        <Star className={`h-4 w-4 ${skill.is_top_skill ? "fill-neon-yellow" : ""}`} />
+                      </Button>
+                      <Button onClick={() => handleDeleteSkill(skill.id)} variant="ghost" size="icon" className="glass hover:glass-strong text-destructive">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="space-y-2">
