@@ -13,6 +13,7 @@ import {
   Coffee,
   Download,
   Eye,
+  EyeOff,
   FileText,
   Github,
   Globe,
@@ -166,6 +167,8 @@ const initialUser: UserProfile = {
   username: "",
   custom_profile_url: "",
   want_to_relocate: false,
+  relocate_location: "",
+  show_phone_number: false,
   work_preference: "hybrid",
   professional_summary: "",
   preffer_full_time: false,
@@ -1030,20 +1033,20 @@ export function ProfileEditorPage() {
                       </button>
                     </div>
 
-                    {/* {profile.want_to_relocate && (
+                    {profile.want_to_relocate && (
                       <Input
-                        value={profile.relocation_regions.join(", ")}
+                        value={profile.relocate_location}
                         onChange={(e) => {
                           setProfile({
                             ...profile,
-                            relocation_regions: e.target.value.split(",").map((r) => r.trim()),
+                            relocate_location: e.target.value,
                           });
                           setIsDraft(true);
                         }}
                         placeholder="e.g., USA, Europe, Singapore"
                         className="glass border-glass-border focus:border-neon-cyan"
                       />
-                    )} */}
+                    )}
                   </div>
 
                   {/* Job Types */}
@@ -1477,16 +1480,16 @@ export function ProfileEditorPage() {
                         <Label htmlFor="phone" className="text-white">
                           Phone
                         </Label>
-                        {/* <button
+                        <button
                           onClick={() => {
-                            setProfile({ ...profile, phoneVisible: !profile.phoneVisible });
+                            setProfile({ ...profile, show_phone_number: !profile.show_phone_number });
                             setIsDraft(true);
                           }}
                           className="flex items-center gap-1 text-xs text-muted-foreground hover:text-white transition-colors"
                         >
-                          {profile.phoneVisible ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-                          {profile.phoneVisible ? "Visible" : "Hidden"}
-                        </button> */}
+                          {profile.show_phone_number ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                          {profile.show_phone_number ? "Visible" : "Hidden"}
+                        </button>
                       </div>
                       <Input
                         id="phone"

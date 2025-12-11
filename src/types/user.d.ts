@@ -35,10 +35,10 @@ export type User = {
   role: "user" | "admin";
   website?: string;
   profile_type?: "student" | "professional" | "career-switcher";
-  find_job: boolean;
-  explore_career: boolean;
-  upskill_and_learn: boolean;
-  prepare_interview: boolean;
+  find_job?: boolean;
+  explore_career?: boolean;
+  upskill_and_learn?: boolean;
+  prepare_interview?: boolean;
   password?: string;
   gender?: string;
   dob?: string;
@@ -46,6 +46,10 @@ export type User = {
   about?: string;
   last_login_at?: string;
   city?: string;
+  relocate_location?: string;
+  website?: string;
+  show_phone_number?: boolean
+
   skills?: UserSkill[];
   educations?: Education[];
   experiences?: Experience[];
