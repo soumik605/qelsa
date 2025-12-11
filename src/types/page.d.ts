@@ -1,3 +1,4 @@
+import { Job } from "./job";
 import { User } from "./user";
 
 export type Page = {
@@ -16,4 +17,5 @@ export type Page = {
   youtube_url?: string;
   can_manage: boolean;
   owner?: User;
+  jobs?: Job[];
 };

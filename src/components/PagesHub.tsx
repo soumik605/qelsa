@@ -84,15 +84,15 @@ export function PagesHub({}: PagesHubProps) {
 
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="text-center">
-          {/* <p className="text-lg font-bold text-neon-cyan">{page.followers.toLocaleString()}</p> */}
+          <p className="text-lg font-bold text-neon-cyan">0</p>
           <p className="text-xs text-muted-foreground">Followers</p>
         </div>
         <div className="text-center">
-          {/* <p className="text-lg font-bold text-neon-purple">{page.jobPostings}</p> */}
+          <p className="text-lg font-bold text-neon-purple">{page.jobs.length || 0}</p>
           <p className="text-xs text-muted-foreground">Jobs</p>
         </div>
         <div className="text-center">
-          {/* <p className="text-lg font-bold text-neon-green">{page.updates}</p> */}
+          <p className="text-lg font-bold text-neon-green">0</p>
           <p className="text-xs text-muted-foreground">Updates</p>
         </div>
       </div>
