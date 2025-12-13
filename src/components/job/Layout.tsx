@@ -1,39 +1,20 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useGetCitiesQuery, useGetJobsQuery, useGetJobTypesQuery } from "@/features/api/jobsApi";
-import { Briefcase, Filter, Plus, Search, Sparkles } from "lucide-react";
+import { useLazyGetJobsQuery } from "@/features/api/jobsApi";
+import { Briefcase, Filter, Plus, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { NLPJobSearch } from "../NLPJobSearch";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { JobAIAssistantDrawer } from "./JobAIAssistantDrawer";
-import { JobSearchSuggestions } from "./JobSearchSuggestions";
 
-const Layout = ({ active_job_page, children }) => {
+const Layout = ({ active_job_page, children, jobs, filters, setFilters, query, setQuery, onSearch }) => {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [locationFilter, setLocationFilter] = useState("all");
-  const [experienceFilter, setExperienceFilter] = useState("all");
-  const [workTypeFilter, setWorkTypeFilter] = useState("all");
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [aiAssistantJob, setAiAssistantJob] = useState(null);
-  const [viewMode, setViewMode] = useState<"discover" | "all" | "my-jobs">("discover");
-  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
   const { user, isAuthenticated } = useAuth();
 
-  const {
-    data: jobs,
-    error,
-    isLoading,
-  } = useGetJobsQuery({
-    search: searchQuery,
-    city: locationFilter,
-    // company: "",
-  });
-
-  const { data: cities, error: cityError, isLoading: cityLoading } = useGetCitiesQuery();
-  const { data: jobTypes, error: typeError, isLoading: typeLoading } = useGetJobTypesQuery();
+  const [triggerGetJobs, { data: jobsList, error, isLoading }] = useLazyGetJobsQuery();
 
   if (isLoading) return <p>Loading jobs...</p>;
   if (error) return <p>Error loading jobs.</p>;
@@ -80,74 +61,9 @@ const Layout = ({ active_job_page, children }) => {
           </div>
 
           {/* Search and Filters */}
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1 relative search-container z-[9999]">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input placeholder="Search for jobs, companies, or skills..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 glass border-glass-border" />
-              </div>
-
-              {/* Search Suggestions Dropdown */}
-              {showSearchSuggestions && searchQuery.length >= 2 && (
-                <JobSearchSuggestions
-                  query={searchQuery}
-                  allJobs={jobs}
-                  onSelectSuggestion={(suggestion) => {
-                    if (Search) {
-                      // onSearch(suggestion, jobs);
-                      setShowSearchSuggestions(false);
-                      setSearchQuery("");
-                    }
-                  }}
-                  onSelectJob={(job) => {
-                    // handleJobClick(job);
-                    setShowSearchSuggestions(false);
-                  }}
-                />
-              )}
-            </div>
-
-            <div className="flex gap-3">
-              <Select value={locationFilter} onValueChange={setLocationFilter}>
-                <SelectTrigger className="w-40 glass border-glass-border">
-                  <SelectValue placeholder="Location" />
-                </SelectTrigger>
-                <SelectContent className="glass-strong border-glass-border z-50">
-                  <SelectItem value="all">All Locations</SelectItem>
-                  {cities?.map((city: string) => (
-                    <SelectItem key={city} value={city}>
-                      {city}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={workTypeFilter} onValueChange={setWorkTypeFilter}>
-                <SelectTrigger className="w-32 glass border-glass-border">
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent className="glass-strong border-glass-border z-50">
-                  <SelectItem value="all">All Types</SelectItem>
-                  {jobTypes?.map((type: string) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={experienceFilter} onValueChange={setExperienceFilter}>
-                <SelectTrigger className="w-32 glass border-glass-border">
-                  <SelectValue placeholder="Experience" />
-                </SelectTrigger>
-                <SelectContent className="glass-strong border-glass-border z-50">
-                  <SelectItem value="all">All Experience Levels</SelectItem>
-                  <SelectItem value="1-3 years">1-3 years</SelectItem>
-                  <SelectItem value="3-5 years">3-5 years</SelectItem>
-                  <SelectItem value="5-7 years">5-7 years</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-4">
+            {/* NLP Search Component */}
+            <NLPJobSearch filters={filters} setFilters={setFilters} query={query} setQuery={setQuery} onSearch={onSearch} />
           </div>
 
           {/* View Mode Tabs */}

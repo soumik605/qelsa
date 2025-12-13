@@ -371,6 +371,7 @@ export function ProfileEditorPage() {
     try {
       await updateProfile(profile).unwrap();
       setLastSaved(new Date());
+      toast.success("Profile published successfully!");
     } catch (error: any) {
       toast.error("Failed to save profile", {
         description: error?.data?.message || "An error occurred while saving your profile. Please try again.",

@@ -2,6 +2,7 @@
 import { JobApplication } from "@/types/jobApplication";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Job } from "../../types/job";
+import { buildJobQueryParams, JobFilters } from "./utils/buildJobQueryParams";
 
 export const jobsApi = createApi({
   reducerPath: "jobsApi",
@@ -21,43 +22,21 @@ export const jobsApi = createApi({
   tagTypes: ["Jobs", "Job", "Cities", "Types"],
 
   endpoints: (builder) => ({
-    getJobs: builder.query<Job[], { city?: string; search?: string; page_id?: string } | void>({
+    getJobs: builder.query<any, JobFilters | void>({
       query: (filters) => {
-        const params = new URLSearchParams();
-
-        if (filters) {
-          if (filters.city) params.append("city", filters.city);
-          if (filters.search) params.append("search", filters.search);
-          if (filters.page_id) params.append("page_id", filters.page_id);
-        }
-
+        const params = buildJobQueryParams(filters);
         return `jobs?${params.toString()}`;
       },
-
-      transformResponse: (response: { success: boolean; data: Job[] }) => {
-        return response.data;
-      },
-
+      transformResponse: (response: any) => response.data,
       providesTags: ["Jobs"],
     }),
 
-    getDiscoverJobs: builder.query<Job[], { city?: string; search?: string; page_id?: string } | void>({
+    getDiscoverJobs: builder.query<Job[], JobFilters | void>({
       query: (filters) => {
-        const params = new URLSearchParams();
-
-        if (filters) {
-          if (filters.city) params.append("city", filters.city);
-          if (filters.search) params.append("search", filters.search);
-          if (filters.page_id) params.append("page_id", filters.page_id);
-        }
-
+        const params = buildJobQueryParams(filters);
         return `jobs?${params.toString()}`;
       },
-
-      transformResponse: (response: { success: boolean; data: Job[] }) => {
-        return response.data;
-      },
-
+      transformResponse: (response: { success: boolean; data: Job[] }) => response.data,
       providesTags: ["Jobs"],
     }),
 
@@ -206,7 +185,9 @@ export const jobsApi = createApi({
 
 export const {
   useGetJobsQuery,
+  useLazyGetJobsQuery,
   useGetDiscoverJobsQuery,
+  useLazyGetDiscoverJobsQuery,
   useGetAppliedJobsQuery,
   useGetInProgressJobsQuery,
   useGetPostedJobsQuery,
