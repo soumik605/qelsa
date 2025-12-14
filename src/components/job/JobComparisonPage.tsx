@@ -3,39 +3,13 @@ import { useState } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
-
-interface Job {
-  id: string;
-  title: string;
-  company: string;
-  logo?: string;
-  location: string;
-  workType: string;
-  experience: string;
-  salary?: string;
-  source: {
-    platform: "Qelsa" | "LinkedIn" | "Indeed" | "Naukri" | "AngelList" | "Glassdoor";
-    verified?: boolean;
-    exclusive?: boolean;
-  };
-  description?: string;
-  responsibilities?: string[];
-  requirements?: string[];
-  benefits?: string[];
-  companyInfo?: {
-    size?: string;
-    industry?: string;
-    rating?: number;
-    reviews?: number;
-  };
-  skillMatch?: number;
-}
+import { Job } from "@/types/job";
 
 interface JobComparisonPageProps {
   jobs: Job[];
   onBack: () => void;
-  onApply: (jobId: string) => void;
-  onRemoveJob: (jobId: string) => void;
+  // onApply: (jobId: number) => void;
+  onRemoveJob: (jobId: number) => void;
 }
 
 type PreferenceKey = "salary" | "growth" | "workLife" | "stability";
@@ -47,7 +21,7 @@ interface Preferences {
   stability: number;
 }
 
-export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobComparisonPageProps) {
+export function JobComparisonPage({ jobs, onBack, onRemoveJob }: JobComparisonPageProps) {
   const [preferences, setPreferences] = useState<Preferences>({
     salary: 25,
     growth: 25,
@@ -63,13 +37,13 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
       skillMatch: Math.floor(Math.random() * 30) + 70, // 70-100%
       careerFit: ["Product Management", "Leadership", "Technical Growth"][Math.floor(Math.random() * 3)],
       summary:
-        job.source.platform === "Qelsa"
+        job.resource === "Qelsa"
           ? "Best for candidates seeking fast growth in innovative tech startups with strong mentorship."
-          : job.source.platform === "LinkedIn"
+          : job.resource === "LinkedIn"
           ? "Best for candidates prioritizing stable MNC careers with comprehensive benefits."
           : "Best for candidates looking for work-life balance and established company culture.",
       strengths: ["Competitive salary", "Strong team culture", "Growth opportunities"],
-      improvements: job.skillMatch < 80 ? ["SQL proficiency", "Cloud architecture knowledge"] : [],
+      // improvements: job.skillMatch < 80 ? ["SQL proficiency", "Cloud architecture knowledge"] : [],
       scores: {
         salary: Math.floor(Math.random() * 30) + 70,
         growth: Math.floor(Math.random() * 30) + 70,
@@ -251,15 +225,15 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                     {/* Company Logo & Basic Info */}
                     <div className="flex items-start gap-3 mb-4">
                       <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
-                        {job.logo ? <img src={job.logo} alt={job.company} className="w-10 h-10 rounded-lg object-cover" /> : <Briefcase className="w-6 h-6 text-muted-foreground" />}
+                        {job.company_logo ? <img src={job.company_logo} alt={job.company_name || job.page?.name} className="w-10 h-10 rounded-lg object-cover" /> : <Briefcase className="w-6 h-6 text-muted-foreground" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-white mb-1 line-clamp-2">{job.title}</h3>
-                        <p className="text-sm text-muted-foreground">{job.company}</p>
-                        <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-xs mt-2 ${getSourceColor(job.source.platform)}`}>
+                        <p className="text-sm text-muted-foreground">{job.company_name || job.page?.name}</p>
+                        <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-xs mt-2 ${getSourceColor(job.resource)}`}>
                           <ExternalLink className="w-3 h-3" />
-                          {job.source.platform}
-                          {job.source.verified && <CheckCircle2 className="w-3 h-3 ml-1" />}
+                          {job.resource}
+                          {/* {job.source.verified && <CheckCircle2 className="w-3 h-3 ml-1" />} */}
                         </div>
                       </div>
                     </div>
@@ -272,7 +246,7 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Briefcase className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-white">{job.workType}</span>
+                        <span className="text-white">{job.work_type}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Clock className="w-4 h-4 text-muted-foreground" />
@@ -335,7 +309,7 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                     </div>
 
                     {/* Improvement Suggestions */}
-                    {insights.improvements.length > 0 && (
+                    {/* {insights.improvements.length > 0 && (
                       <div className="mt-3 glass rounded-lg p-3 bg-neon-yellow/5 border border-neon-yellow/20">
                         <p className="text-xs text-neon-yellow mb-2">💡 To improve your match:</p>
                         <ul className="text-xs text-white space-y-1">
@@ -347,13 +321,13 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                           ))}
                         </ul>
                       </div>
-                    )}
+                    )} */}
                   </div>
 
                   {/* Bottom Section */}
                   <div className="p-4 lg:p-6">
                     {/* Benefits */}
-                    {job.benefits && job.benefits.length > 0 && (
+                    {/* {job.benefits && job.benefits.length > 0 && (
                       <div className="mb-4">
                         <p className="text-sm text-white mb-2 flex items-center gap-2">
                           <Star className="w-4 h-4 text-neon-yellow" />
@@ -367,20 +341,20 @@ export function JobComparisonPage({ jobs, onBack, onApply, onRemoveJob }: JobCom
                           ))}
                         </div>
                       </div>
-                    )}
+                    )} */}
 
                     {/* Company Rating */}
-                    {job.companyInfo?.rating && (
+                    {/* {job.companyInfo?.rating && (
                       <div className="mb-4 flex items-center gap-2">
                         <Star className="w-4 h-4 text-neon-yellow fill-neon-yellow" />
                         <span className="text-sm text-white">{job.companyInfo.rating.toFixed(1)}</span>
                         {job.companyInfo.reviews && <span className="text-xs text-muted-foreground">({job.companyInfo.reviews.toLocaleString()} reviews)</span>}
                       </div>
-                    )}
+                    )} */}
 
                     {/* Action Buttons */}
                     <div className="space-y-2">
-                      <Button onClick={() => onApply(job.id)} className="w-full gradient-animated text-black hover:opacity-90">
+                      <Button  className="w-full gradient-animated text-black hover:opacity-90">
                         Apply Now
                       </Button>
                       <Button variant="outline" onClick={() => onRemoveJob(job.id)} className="w-full text-muted-foreground hover:text-white">

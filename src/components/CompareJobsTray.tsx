@@ -1,19 +1,10 @@
 import { X, TrendingUp, ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
-
-interface Job {
-  id: string;
-  title: string;
-  company: string;
-  logo?: string;
-  source: {
-    platform: 'Qelsa' | 'LinkedIn' | 'Indeed' | 'Naukri' | 'AngelList' | 'Glassdoor';
-  };
-}
+import { Job } from '@/types/job';
 
 interface CompareJobsTrayProps {
   jobs: Job[];
-  onRemoveJob: (jobId: string) => void;
+  onRemoveJob: (jobId: number) => void;
   onCompare: () => void;
   onClear: () => void;
 }
@@ -73,17 +64,17 @@ export function CompareJobsTray({ jobs, onRemoveJob, onCompare, onClear }: Compa
                 
                 <div className="flex items-start gap-2">
                   <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-                    {job.logo ? (
-                      <img src={job.logo} alt={job.company} className="w-8 h-8 rounded object-cover" />
+                    {job.company_logo ? (
+                      <img src={job.company_logo} alt={job.company_name || job.page?.name} className="w-8 h-8 rounded object-cover" />
                     ) : (
-                      <span className="text-xs">{job.company.charAt(0)}</span>
+                      <span className="text-xs">{job.company_name?.charAt(0) || job.page?.name?.charAt(0)}</span>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-white line-clamp-1">{job.title}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-1">{job.company}</p>
-                    <div className={`text-xs mt-1 ${getSourceColor(job.source.platform)}`}>
-                      {job.source.platform}
+                    <p className="text-xs text-muted-foreground line-clamp-1">{job.company_name || job.page?.name}</p>
+                    <div className={`text-xs mt-1 ${getSourceColor(job.resource)}`}>
+                      {job.resource}
                     </div>
                   </div>
                 </div>

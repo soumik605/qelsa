@@ -1,11 +1,31 @@
-import { Job } from "@/types/job";
-import { Award, Bookmark, BookmarkCheck, Briefcase, ChevronLeft, ChevronRight, EyeOff, MapPin, MoreVertical, Pin, Sparkles } from "lucide-react";
-import { useRouter } from "next/navigation";
+import {
+  Award,
+  Bookmark,
+  BookmarkCheck,
+  Briefcase,
+  Building2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Eye,
+  EyeOff,
+  Globe,
+  MapPin,
+  MoreVertical,
+  Pin,
+  Sparkles,
+  Star,
+  Target,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
 import { useState } from "react";
+import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { useToggleSaveJobMutation } from "@/features/api/jobsApi";
+import { Job } from "@/types/job";
+import { useRouter } from "next/navigation";
 
 interface Rail {
   id: string;
@@ -19,11 +39,17 @@ interface Rail {
 }
 
 interface JobDiscoveryRailsProps {
+  onJobClick: (job: Job) => void;
+  onToggleCompare?: (job: Job) => void;
+  comparedJobs?: Job[];
+  onToggleBookmark?: (job: Job) => void;
+  bookmarkedJobs?: Job[];
   jobs: Job[];
 }
 
-export function JobDiscoveryRails({ jobs }: JobDiscoveryRailsProps) {
+export function JobDiscoveryRails({ onJobClick, onToggleCompare, comparedJobs = [], onToggleBookmark, bookmarkedJobs = [], jobs }: JobDiscoveryRailsProps) {
   const [rails, setRails] = useState<Rail[]>(generateMockRails());
+  const [scrollPositions, setScrollPositions] = useState<{ [key: string]: number }>({});
 
   const togglePin = (railId: string) => {
     setRails((prev) =>
@@ -81,7 +107,19 @@ export function JobDiscoveryRails({ jobs }: JobDiscoveryRailsProps) {
   return (
     <div className="space-y-8">
       {visibleRails.map((rail) => (
-        <RailSection key={rail.id} rail={rail} onScroll={scroll} onTogglePin={togglePin} onToggleHide={toggleHide} jobs={jobs} />
+        <RailSection
+          key={rail.id}
+          rail={rail}
+          onJobClick={onJobClick}
+          onToggleCompare={onToggleCompare}
+          comparedJobs={comparedJobs}
+          onScroll={scroll}
+          onTogglePin={togglePin}
+          onToggleHide={toggleHide}
+          onToggleBookmark={onToggleBookmark}
+          bookmarkedJobs={bookmarkedJobs}
+          jobs={jobs}
+        />
       ))}
 
       {/* Manage Rails Button */}
@@ -97,14 +135,18 @@ export function JobDiscoveryRails({ jobs }: JobDiscoveryRailsProps) {
 
 interface RailSectionProps {
   rail: Rail;
+  onJobClick: (job: Job) => void;
+  onToggleCompare?: (job: Job) => void;
+  comparedJobs: Job[];
   onScroll: (railId: string, direction: "left" | "right") => void;
   onTogglePin: (railId: string) => void;
   onToggleHide: (railId: string) => void;
   onToggleBookmark?: (job: Job) => void;
+  bookmarkedJobs: Job[];
   jobs: Job[];
 }
 
-function RailSection({ rail, onScroll, onTogglePin, onToggleHide, jobs }: RailSectionProps) {
+function RailSection({ rail, onJobClick, onToggleCompare, comparedJobs, onScroll, onTogglePin, onToggleHide, onToggleBookmark, bookmarkedJobs, jobs }: RailSectionProps) {
   const router = useRouter();
   const Icon = rail.icon;
   const colorClasses = {
@@ -166,7 +208,15 @@ function RailSection({ rail, onScroll, onTogglePin, onToggleHide, jobs }: RailSe
       <div className="relative">
         <div id={`rail-${rail.id}`} className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
           {jobs?.map((job) => (
-            <JobRailCard key={job.id} job={job} onClick={() => router.push(`/jobs/${job.id}`)} isCompared={false} isBookmarked={job.is_bookmarked} />
+            <JobRailCard
+              key={job.id}
+              job={job}
+              onClick={() => onJobClick(job)}
+              onToggleCompare={onToggleCompare}
+              isCompared={comparedJobs.some((j) => j.id === job.id)}
+              onToggleBookmark={onToggleBookmark}
+              isBookmarked={bookmarkedJobs.some((j) => j.id === job.id)}
+            />
           ))}
         </div>
       </div>
@@ -177,12 +227,13 @@ function RailSection({ rail, onScroll, onTogglePin, onToggleHide, jobs }: RailSe
 interface JobRailCardProps {
   job: Job;
   onClick: () => void;
+  onToggleCompare?: (job: Job) => void;
   isCompared: boolean;
+  onToggleBookmark?: (job: Job) => void;
   isBookmarked: boolean;
 }
 
-function JobRailCard({ job, onClick, isCompared, isBookmarked }: JobRailCardProps) {
-  const [toggleSaveJob] = useToggleSaveJobMutation();
+function JobRailCard({ job, onClick, onToggleCompare, isCompared, onToggleBookmark, isBookmarked }: JobRailCardProps) {
   const getSourceColor = (platform: string) => {
     switch (platform) {
       case "Qelsa":
@@ -208,76 +259,87 @@ function JobRailCard({ job, onClick, isCompared, isBookmarked }: JobRailCardProp
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 flex-1 min-w-0">
-            {/* {job.companyLogo && <img src={job.companyLogo} alt={job.company} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />} */}
+            {job.company_logo && <img src={job.company_logo} alt={job.company_name || job.page?.name} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />}
             <div className="flex-1 min-w-0">
               <h4 className="text-white line-clamp-1 group-hover:text-neon-cyan transition-colors">{job.title}</h4>
-              <p className="text-sm text-muted-foreground line-clamp-1">{job.page?.name || job.company_name}</p>
+              <p className="text-sm text-muted-foreground line-clamp-1">{job.company_name || job.page?.name}</p>
             </div>
           </div>
 
           {/* Compare Checkbox */}
-          {/* {onToggleCompare && (
+          {onToggleCompare && (
             <Button
               variant="ghost"
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
+                onToggleCompare(job);
               }}
               className={`h-8 w-8 p-0 flex-shrink-0 ${isCompared ? "bg-neon-cyan/20 text-neon-cyan hover:bg-neon-cyan/30" : "hover:bg-white/5"}`}
             >
               {isCompared ? <Star className="w-4 h-4 fill-current" /> : <Star className="w-4 h-4" />}
             </Button>
-          )} */}
+          )}
 
           {/* Bookmark Checkbox */}
-          <Button
+          {onToggleBookmark && (
+            <Button
               variant="ghost"
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                toggleSaveJob(job.id);
+                onToggleBookmark(job);
               }}
               className={`h-8 w-8 p-0 flex-shrink-0 ${isBookmarked ? "bg-neon-cyan/20 text-neon-cyan hover:bg-neon-cyan/30" : "hover:bg-white/5"}`}
             >
               {isBookmarked ? <BookmarkCheck className="w-4 h-4 fill-current" /> : <Bookmark className="w-4 h-4" />}
             </Button>
+          )}
         </div>
 
         {/* Job Details */}
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="w-4 h-4" />
+            <MapPin className="w-4 h-4 flex-shrink-0" />
             <span className="line-clamp-1">{job.location}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Briefcase className="w-4 h-4" />
+          <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
+            <Briefcase className="w-4 h-4 flex-shrink-0" />
             <span>{job.work_type}</span>
-            <span className="text-muted-foreground/50">•</span>
+            {job.workplace_type && (
+              <>
+                <span className="text-muted-foreground/50">•</span>
+                <span>{job.workplace_type}</span>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Clock className="w-4 h-4 flex-shrink-0" />
             <span>{job.experience}</span>
           </div>
-          {job.salary && <div className="text-sm text-neon-green">{job.salary}</div>}
+          {job.salary && <div className="text-sm text-neon-green font-medium">{job.salary}</div>}
         </div>
 
         {/* Skills */}
-        {/* <div className="flex flex-wrap gap-1.5">
-          {job.skills.slice(0, 3).map((skill, index) => (
+        <div className="flex flex-wrap gap-1.5">
+          {job.job_skills.slice(0, 3).map((skill, index) => (
             <Badge key={index} variant="secondary" className="text-xs bg-white/5 hover:bg-white/10 border-white/10">
-              {skill}
+              {skill.title}
             </Badge>
           ))}
-          {job.skills.length > 3 && (
+          {job.job_skills.length > 3 && (
             <Badge variant="secondary" className="text-xs bg-white/5 border-white/10">
-              +{job.skills.length - 3}
+              +{job.job_skills.length - 3}
             </Badge>
           )}
-        </div> */}
+        </div>
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-2 border-t border-white/5">
           <div className="flex items-center gap-2">
-            {/* <Badge variant="outline" className={`text-xs border-${getSourceColor(job.source.platform)}`}>
-              {job.source.platform}
-            </Badge> */}
+            <Badge variant="outline" className={`text-xs border-${getSourceColor(job.resource)}`}>
+              {job.resource}
+            </Badge>
           </div>
 
           {/* {job.fitScore && (
