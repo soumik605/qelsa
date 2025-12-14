@@ -1,15 +1,16 @@
 import JobLayout from "@/components/job/layout";
-import { useGetDiscoverJobsQuery } from "@/features/api/jobsApi";
+import { useLazyGetDiscoverJobsQuery } from "@/features/api/jobsApi";
 import { Card } from "@mui/material";
-import { Bookmark, BookmarkCheck, Briefcase, Clock, Eye, MapPin, Search, Sparkles, Target } from "lucide-react";
+import { Bookmark, BookmarkCheck, Briefcase, Clock, Eye, MapPin, Search, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import Layout from "../../layout";
+import { SearchFilters } from "./smart_matches";
 
 const All = () => {
-  const { data: jobs } = useGetDiscoverJobsQuery();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
   const [experienceFilter, setExperienceFilter] = useState("all");
@@ -17,13 +18,56 @@ const All = () => {
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
   const [viewedJobs, setViewedJobs] = useState<string[]>([]);
 
-  const router = useRouter();
+  const [jobs, setJobs] = useState([]);
+  const [query, setQuery] = useState("");
+
+  const [filters, setFilters] = useState<SearchFilters>({
+    cities: [],
+    job_types: [],
+    experience_levels: [],
+    departments: [],
+    remote: false,
+    sort_by: "relevance",
+  });
+
+  const [triggerGetJobs, { data: jobsList, error, isLoading }] = useLazyGetDiscoverJobsQuery();
+
+  useEffect(() => {
+    if (jobsList) {
+      setJobs(jobsList);
+    }
+  }, [jobsList]);
+
+  useEffect(() => {
+    triggerGetJobs(
+      {
+        ...filters,
+        search: query,
+      },
+      false
+    );
+  }, []);
+
+  const onSearch = async () => {
+    console.log({
+      ...filters,
+      search: query,
+    });
+
+    await triggerGetJobs(
+      {
+        ...filters,
+        search: query,
+      },
+      false
+    ).unwrap();
+  };
 
   const filteredJobs = jobs || [];
 
   return (
     <Layout activeSection={"jobs"}>
-      <JobLayout active_job_page="all">
+      <JobLayout active_job_page="all" {...{ jobs, filters, setFilters, query, setQuery, onSearch }}>
         <div className="space-y-6">
           {/* Stats Bar */}
           <div className="flex items-center justify-between">

@@ -1,57 +1,69 @@
 import MyJobLayout from "@/components/job/MyJobLayout";
-import { useGetSavedJobsQuery, useToggleSaveJobMutation } from "@/features/api/jobsApi";
+import { useLazyGetSavedJobsQuery, useToggleSaveJobMutation } from "@/features/api/jobsApi";
 import Layout from "@/layout";
 import { Box } from "@mui/material";
 import { Archive, ArrowRight, Bell, DollarSign, Eye, MessageSquare, MoreVertical, Share2, Star, Target, Trash2, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
+import { SearchFilters } from "../smart_matches";
 
 const Saved = () => {
-  const { data: savedJobs, error, isLoading } = useGetSavedJobsQuery();
   const [toggleSaveJob] = useToggleSaveJobMutation();
   const router = useRouter();
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "border-neon-green/30 text-neon-green bg-neon-green/10";
-      case "paused":
-        return "border-neon-yellow/30 text-neon-yellow bg-neon-yellow/10";
-      case "closed":
-        return "border-muted-foreground/30 text-muted-foreground bg-muted/10";
-      case "draft":
-        return "border-neon-cyan/30 text-neon-cyan bg-neon-cyan/10";
-      case "interview-scheduled":
-        return "border-neon-purple/30 text-neon-purple bg-neon-purple/10";
-      case "viewed":
-        return "border-neon-cyan/30 text-neon-cyan bg-neon-cyan/10";
-      case "rejected":
-        return "border-destructive/30 text-destructive bg-destructive/10";
-      default:
-        return "border-muted-foreground/30 text-muted-foreground bg-muted/10";
-    }
-  };
+  const [jobs, setJobs] = useState([]);
+  const [query, setQuery] = useState("");
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "text-destructive";
-      case "medium":
-        return "text-neon-yellow";
-      case "low":
-        return "text-neon-cyan";
-      default:
-        return "text-muted-foreground";
+  const [filters, setFilters] = useState<SearchFilters>({
+    cities: [],
+    job_types: [],
+    experience_levels: [],
+    departments: [],
+    remote: false,
+    sort_by: "relevance",
+  });
+
+  const [triggerGetJobs, { data: jobsList, error, isLoading }] = useLazyGetSavedJobsQuery();
+
+  useEffect(() => {
+    if (jobsList) {
+      setJobs(jobsList);
     }
+  }, [jobsList]);
+
+  useEffect(() => {
+    triggerGetJobs(
+      {
+        ...filters,
+        search: query,
+      },
+      false
+    );
+  }, []);
+
+  const onSearch = async () => {
+    console.log({
+      ...filters,
+      search: query,
+    });
+
+    await triggerGetJobs(
+      {
+        ...filters,
+        search: query,
+      },
+      false
+    ).unwrap();
   };
 
   return (
     <Layout activeSection={"jobs"}>
-      <MyJobLayout active_page={"saved"}>
+      <MyJobLayout active_page={"saved"} {...{ jobs, filters, setFilters, query, setQuery, onSearch }}>
         <Box className="space-y-4">
-          {savedJobs?.map((job) => (
+          {jobs?.map((job) => (
             <Card key={job.id} className="glass border-glass-border p-6 hover:border-neon-cyan/50 transition-all">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">

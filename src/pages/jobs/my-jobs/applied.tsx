@@ -1,18 +1,63 @@
 import MyJobLayout from "@/components/job/MyJobLayout";
 import { Badge } from "@/components/ui/badge";
-import { useGetAppliedJobsQuery } from "@/features/api/jobsApi";
+import { useLazyGetAppliedJobsQuery } from "@/features/api/jobsApi";
 import Layout from "@/layout";
 import { Box } from "@mui/material";
 import { Archive, ExternalLink, Eye, MessageSquare, MoreVertical, TrendingUp } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
+import { SearchFilters } from "../smart_matches";
 
 const Applied = () => {
-  const { data: applications, error, isLoading } = useGetAppliedJobsQuery();
   const router = useRouter();
-  console.log("🚀 ~ Applied ~ applications:", applications);
+
+  const [jobs, setJobs] = useState([]);
+  const [query, setQuery] = useState("");
+
+  const [filters, setFilters] = useState<SearchFilters>({
+    cities: [],
+    job_types: [],
+    experience_levels: [],
+    departments: [],
+    remote: false,
+    sort_by: "relevance",
+  });
+
+  const [triggerGetJobs, { data: applications, error, isLoading }] = useLazyGetAppliedJobsQuery();
+
+  useEffect(() => {
+    if (applications) {
+      setJobs(applications);
+    }
+  }, [applications]);
+
+  useEffect(() => {
+    triggerGetJobs(
+      {
+        ...filters,
+        search: query,
+      },
+      false
+    );
+  }, []);
+
+  const onSearch = async () => {
+    console.log({
+      ...filters,
+      search: query,
+    });
+
+    await triggerGetJobs(
+      {
+        ...filters,
+        search: query,
+      },
+      false
+    ).unwrap();
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -37,7 +82,7 @@ const Applied = () => {
 
   return (
     <Layout activeSection={"jobs"}>
-      <MyJobLayout active_page={"applied"}>
+      <MyJobLayout active_page={"applied"} {...{ jobs, filters, setFilters, query, setQuery, onSearch }}>
         <Box className="space-y-4">
           {applications?.map((application) => (
             <Card key={application.id} className="glass border-glass-border p-6 hover:border-neon-green/50 transition-all">

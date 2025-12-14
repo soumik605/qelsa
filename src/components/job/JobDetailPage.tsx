@@ -1,6 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useGetJobByIdQuery, useToggleSaveJobMutation } from "@/features/api/jobsApi";
 import { useGetMyResumesQuery } from "@/features/api/resumeApi";
+import DOMPurify from "dompurify";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -28,7 +29,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { QuickApplyModal } from "../QuickApplyModal";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -62,6 +63,18 @@ export function JobDetailPage() {
   } = useGetJobByIdQuery(id!, {
     skip: !id,
   });
+
+  const jobDescription = DOMPurify.sanitize(job?.description || "");
+
+  useEffect(() => {
+    if (job) {
+      console.log(job.applications);
+      console.log(user.id);
+
+      const hasApplied = job.applications?.some((application) => application.user_id === user?.id);
+      setIsApplied(hasApplied || false);
+    }
+  }, [job]);
 
   if (!id || isLoading) return <p>Loading job...</p>;
   if (error) return <p>Error loading job.</p>;
@@ -186,8 +199,7 @@ export function JobDetailPage() {
     },
   ];
 
-
-  const applied = job.applications?.some(application => {
+  const applied = job.applications?.some((application) => {
     return application.user_id === user?.id;
   });
 
@@ -207,7 +219,7 @@ export function JobDetailPage() {
                 <Share2 className="w-4 h-4" />
               </Button>
               <Button variant="ghost" size="sm" onClick={() => toggleSaveJob(job.id)} className="hover:bg-neon-cyan/10 hover:text-neon-cyan">
-                {job?.is_bookmarked ? <BookmarkCheck className="w-4 h-4 text-neon-cyan"  /> : <Bookmark className="w-4 h-4" />}
+                {job?.is_bookmarked ? <BookmarkCheck className="w-4 h-4 text-neon-cyan" /> : <Bookmark className="w-4 h-4" />}
               </Button>
             </div>
           </div>
@@ -309,7 +321,7 @@ export function JobDetailPage() {
                 )} */}
 
                 <div className="space-y-4">
-                  {applied ? (
+                  {!isApplied ? (
                     <div>
                       {job.resource == "qelsa" ? (
                         <Button onClick={() => setShowQuickApplyModal(true)} className="w-full bg-neon-green hover:bg-neon-green/90 text-black font-medium">
@@ -547,7 +559,9 @@ export function JobDetailPage() {
           <div className="space-y-6">
             <div>
               <h4 className="font-medium text-neon-cyan mb-3">About the Role</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-4">{job.description || "Job description not available."}</p>
+              <div className="text-sm text-muted-foreground leading-relaxed mb-4">
+                <div dangerouslySetInnerHTML={{ __html: jobDescription }} />
+              </div>
 
               {/* {job.responsibilities && job.responsibilities.length > 0 && (
                 <ul className="space-y-2">

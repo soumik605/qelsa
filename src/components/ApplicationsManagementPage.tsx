@@ -1,9 +1,6 @@
 import { useEditBulkStatusMutation, useGetJobApplicationsQuery } from "@/features/api/jobApplicationsApi";
 import { useEditJobMutation, useGetJobByIdQuery } from "@/features/api/jobsApi";
 import { JobApplication } from "@/types/jobApplication";
-import { Viewer, Worker } from "@react-pdf-viewer/core";
-import "@react-pdf-viewer/core/lib/styles/index.css";
-import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import {
   Archive,
   ArrowLeft,
@@ -36,6 +33,7 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { CandidateNLPSearch } from "./CandidateNLPSearch";
+import PdfPreview from "./PdfPreview";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -924,14 +922,16 @@ export function ApplicationsManagementPage() {
                                 <h4 className="font-semibold">Resume</h4>
                               </div>
 
+                              <PdfPreview pdfUrl={`${process.env.NEXT_PUBLIC_API_BASE_URL}${selectedApplication.resume?.file_url}`} />
+                              
                               {/* Resume Content Preview */}
                               {/* <iframe src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${selectedApplication.resume?.file_url}`} width="100%" height="90vh" style={{ border: "none" }} /> */}
-
-                              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                              {/* <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                                 <div style={{ height: "90vh" }}>
                                   <Viewer fileUrl={`${process.env.NEXT_PUBLIC_API_BASE_URL}${selectedApplication.resume?.file_url}`} />
                                 </div>
-                              </Worker>
+                              </Worker> */}
+                              {/* {ReactPDF.render(<PdfPreview />, `${process.env.NEXT_PUBLIC_API_BASE_URL}${selectedApplication.resume?.file_url}`)} */}
                             </div>
                           </div>
                         </div>
