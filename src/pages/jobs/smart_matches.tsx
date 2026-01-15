@@ -1,11 +1,11 @@
+import { JobComparisonPage } from "@/components/job/JobComparisonPage";
 import { JobDiscoveryRails } from "@/components/job/JobDiscoveryRails";
 import JobLayout from "@/components/job/layout";
-import { useLazyGetDiscoverJobsQuery } from "@/features/api/jobsApi";
+import { useLazyGetDiscoverJobsQuery, useToggleSaveJobMutation } from "@/features/api/jobsApi";
 import { Job } from "@/types/job";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Layout from "../../layout";
-import { JobComparisonPage } from "@/components/job/JobComparisonPage";
 
 export interface SearchFilters {
   cities: string[];
@@ -24,6 +24,7 @@ const SmartMatches = () => {
   const [comparedJobs, setComparedJobs] = useState<Job[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [toggleSaveJob] = useToggleSaveJobMutation();
 
   const [filters, setFilters] = useState<SearchFilters>({
     cities: [],
@@ -103,6 +104,10 @@ const SmartMatches = () => {
     toast.success("Comparison cleared");
   };
 
+  const onToggleBookmark = (job: Job) => {
+    toggleSaveJob(job.id);
+  };
+
   if (showComparison) {
     return (
       <Layout activeSection={"jobs"}>
@@ -117,7 +122,7 @@ const SmartMatches = () => {
         active_job_page="smart_matches"
         {...{ jobs, filters, setFilters, query, setQuery, onSearch, comparedJobs, onToggleCompare, onCompare, onClearCompare, onRemoveFromCompare, showComparison }}
       >
-        <JobDiscoveryRails jobs={jobs} onJobClick={setSelectedJob} onToggleCompare={onToggleCompare} comparedJobs={comparedJobs} onToggleBookmark={() => {}} bookmarkedJobs={[]} />
+        <JobDiscoveryRails jobs={jobs} onToggleCompare={onToggleCompare} comparedJobs={comparedJobs} onToggleBookmark={onToggleBookmark} bookmarkedJobs={[]} />
       </JobLayout>
     </Layout>
   );

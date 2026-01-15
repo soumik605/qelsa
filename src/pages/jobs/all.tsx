@@ -1,9 +1,12 @@
+import { JobComparisonPage } from "@/components/job/JobComparisonPage";
 import JobLayout from "@/components/job/layout";
-import { useLazyGetDiscoverJobsQuery } from "@/features/api/jobsApi";
-import { Card } from "@mui/material";
-import { Bookmark, BookmarkCheck, Briefcase, Clock, Eye, MapPin, Search, Sparkles } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { useLazyGetDiscoverJobsQuery, useToggleSaveJobMutation } from "@/features/api/jobsApi";
+import { Job } from "@/types/job";
+import { Bookmark, BookmarkCheck, Briefcase, Clock, Eye, MapPin, Search, Sparkles, Star, Target } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import Layout from "../../layout";
@@ -17,6 +20,9 @@ const All = () => {
   const [workTypeFilter, setWorkTypeFilter] = useState("all");
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
   const [viewedJobs, setViewedJobs] = useState<string[]>([]);
+  const [comparedJobs, setComparedJobs] = useState<Job[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
+  const [toggleSaveJob] = useToggleSaveJobMutation();
 
   const [jobs, setJobs] = useState([]);
   const [query, setQuery] = useState("");
@@ -63,11 +69,59 @@ const All = () => {
     ).unwrap();
   };
 
+  const onToggleCompare = (job: Job) => {
+    setComparedJobs((prev) => {
+      const exists = prev.find((j) => j.id === job.id);
+      if (exists) {
+        toast.success(`Removed ${job.title} from comparison`);
+        return prev.filter((j) => j.id !== job.id);
+      } else {
+        if (prev.length >= 4) {
+          toast.error("You can only compare up to 4 jobs at a time");
+          return prev;
+        }
+        toast.success(`Added ${job.title} to comparison`);
+        return [...prev, job];
+      }
+    });
+  };
+
+  const onRemoveFromCompare = (jobId: number) => {
+    setComparedJobs((prev) => prev.filter((j) => j.id !== jobId));
+  };
+
+  const onCompare = () => {
+    console.log(comparedJobs);
+
+    if (comparedJobs.length < 2) {
+      toast.error("Please select at least 2 jobs to compare");
+      return;
+    }
+    setShowComparison(true);
+  };
+
+  const onClearCompare = () => {
+    setComparedJobs([]);
+    toast.success("Comparison cleared");
+  };
+
   const filteredJobs = jobs || [];
+
+  const onToggleBookmark = (job: Job) => {
+    toggleSaveJob(job.id);
+  };
+
+  if (showComparison) {
+    return (
+      <Layout activeSection={"jobs"}>
+        <JobComparisonPage jobs={comparedJobs} onBack={() => setShowComparison(false)} onRemoveJob={onRemoveFromCompare} />
+      </Layout>
+    );
+  }
 
   return (
     <Layout activeSection={"jobs"}>
-      <JobLayout active_job_page="all" {...{ jobs, filters, setFilters, query, setQuery, onSearch }}>
+      <JobLayout active_job_page="all" {...{ jobs, filters, setFilters, query, setQuery, onSearch, comparedJobs, onToggleCompare, onCompare, onClearCompare, onRemoveFromCompare, showComparison }}>
         <div className="space-y-6">
           {/* Stats Bar */}
           <div className="flex items-center justify-between">
@@ -159,22 +213,22 @@ const All = () => {
                 <Card
                   key={job.id}
                   className="glass hover:glass-strong border-glass-border hover:border-neon-cyan/30 transition-all cursor-pointer flex-shrink-0 group"
-                  onClick={() => router.push(`/jobs/${job.id}`)}
+                  // onClick={() => handleJobClick(job)}
                 >
                   <div className="p-5 space-y-4">
                     {/* Header */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3 flex-1 min-w-0">
-                        {/* {job.companyLogo && <img src={job.companyLogo} alt={job.page?.name || job.company_name} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />} */}
+                        {job.companyLogo && <img src={job.companyLogo} alt={job.company} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />}
                         <div className="flex-1 min-w-0">
                           <h4 className="text-white line-clamp-1 group-hover:text-neon-cyan transition-colors">{job.title}</h4>
-                          <p className="text-sm text-muted-foreground line-clamp-1">{job.page?.name || job.company_name}</p>
+                          <p className="text-sm text-muted-foreground line-clamp-1">{job.company}</p>
                         </div>
                       </div>
 
                       {/* Action Buttons */}
                       <div className="flex items-center gap-1">
-                        {/* {onToggleCompare && (
+                        {onToggleCompare && (
                           <Button
                             variant="ghost"
                             size="sm"
@@ -188,18 +242,21 @@ const All = () => {
                           >
                             {comparedJobs.some((j) => j.id === job.id) ? <Star className="w-4 h-4 fill-current" /> : <Star className="w-4 h-4" />}
                           </Button>
-                        )} */}
+                        )}
 
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
-                          className={`h-8 w-8 p-0 flex-shrink-0 ${job.is_bookmarked ? "bg-neon-cyan/20 text-neon-cyan hover:bg-neon-cyan/30" : "hover:bg-white/5"}`}
-                        >
-                          {job.is_bookmarked ? <BookmarkCheck className="w-4 h-4 fill-current" /> : <Bookmark className="w-4 h-4" />}
-                        </Button>
+                        {onToggleBookmark && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onToggleBookmark(job);
+                            }}
+                            className={`h-8 w-8 p-0 flex-shrink-0 ${job.is_bookmarked ? "bg-neon-cyan/20 text-neon-cyan hover:bg-neon-cyan/30" : "hover:bg-white/5"}`}
+                          >
+                            {job.is_bookmarked ? <BookmarkCheck className="w-4 h-4 fill-current" /> : <Bookmark className="w-4 h-4" />}
+                          </Button>
+                        )}
                       </div>
                     </div>
 
@@ -211,11 +268,11 @@ const All = () => {
                       </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
                         <Briefcase className="w-4 h-4 flex-shrink-0" />
-                        <span>{job.work_type}</span>
-                        {job.workplace_type && (
+                        <span>{job.workType}</span>
+                        {job.workplaceType && (
                           <>
                             <span className="text-muted-foreground/50">•</span>
-                            <span>{job.workplace_type}</span>
+                            <span>{job.workplaceType}</span>
                           </>
                         )}
                       </div>
@@ -228,12 +285,12 @@ const All = () => {
 
                     {/* Skills */}
                     <div className="flex flex-wrap gap-1.5">
-                      {job.job_skills?.slice(0, 3).map((skill, index) => (
+                      {job.job_skills.slice(0, 3).map((skill, index) => (
                         <Badge key={index} variant="secondary" className="text-xs bg-white/5 hover:bg-white/10 border-white/10">
-                          {skill.title}
+                          {skill}
                         </Badge>
                       ))}
-                      {job.job_skills?.length > 3 && (
+                      {job.job_skills.length > 3 && (
                         <Badge variant="secondary" className="text-xs bg-white/5 border-white/10">
                           +{job.job_skills.length - 3}
                         </Badge>
@@ -244,16 +301,16 @@ const All = () => {
                     <div className="flex items-center justify-between pt-2 border-t border-white/5">
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-xs">
-                          {/* {job.source.platform} */}
+                          {job.resource}
                         </Badge>
                       </div>
 
-                      {/* {job.fitScore && (
+                      {job.fitScore && (
                         <div className="flex items-center gap-1.5 text-xs">
                           <Target className="w-3.5 h-3.5 text-neon-green" />
                           <span className="text-neon-green">{job.fitScore}% fit</span>
                         </div>
-                      )} */}
+                      )}
                     </div>
                   </div>
                 </Card>

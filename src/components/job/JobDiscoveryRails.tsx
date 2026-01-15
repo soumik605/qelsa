@@ -1,31 +1,11 @@
-import {
-  Award,
-  Bookmark,
-  BookmarkCheck,
-  Briefcase,
-  Building2,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  Eye,
-  EyeOff,
-  Globe,
-  MapPin,
-  MoreVertical,
-  Pin,
-  Sparkles,
-  Star,
-  Target,
-  TrendingUp,
-  Zap,
-} from "lucide-react";
+import { Job } from "@/types/job";
+import { Award, Bookmark, BookmarkCheck, Briefcase, ChevronLeft, ChevronRight, Clock, EyeOff, MapPin, MoreVertical, Pin, Sparkles, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { Job } from "@/types/job";
-import { useRouter } from "next/navigation";
 
 interface Rail {
   id: string;
@@ -39,7 +19,6 @@ interface Rail {
 }
 
 interface JobDiscoveryRailsProps {
-  onJobClick: (job: Job) => void;
   onToggleCompare?: (job: Job) => void;
   comparedJobs?: Job[];
   onToggleBookmark?: (job: Job) => void;
@@ -47,7 +26,7 @@ interface JobDiscoveryRailsProps {
   jobs: Job[];
 }
 
-export function JobDiscoveryRails({ onJobClick, onToggleCompare, comparedJobs = [], onToggleBookmark, bookmarkedJobs = [], jobs }: JobDiscoveryRailsProps) {
+export function JobDiscoveryRails({ onToggleCompare, comparedJobs = [], onToggleBookmark, bookmarkedJobs = [], jobs }: JobDiscoveryRailsProps) {
   const [rails, setRails] = useState<Rail[]>(generateMockRails());
   const [scrollPositions, setScrollPositions] = useState<{ [key: string]: number }>({});
 
@@ -110,7 +89,6 @@ export function JobDiscoveryRails({ onJobClick, onToggleCompare, comparedJobs = 
         <RailSection
           key={rail.id}
           rail={rail}
-          onJobClick={onJobClick}
           onToggleCompare={onToggleCompare}
           comparedJobs={comparedJobs}
           onScroll={scroll}
@@ -135,7 +113,6 @@ export function JobDiscoveryRails({ onJobClick, onToggleCompare, comparedJobs = 
 
 interface RailSectionProps {
   rail: Rail;
-  onJobClick: (job: Job) => void;
   onToggleCompare?: (job: Job) => void;
   comparedJobs: Job[];
   onScroll: (railId: string, direction: "left" | "right") => void;
@@ -146,7 +123,7 @@ interface RailSectionProps {
   jobs: Job[];
 }
 
-function RailSection({ rail, onJobClick, onToggleCompare, comparedJobs, onScroll, onTogglePin, onToggleHide, onToggleBookmark, bookmarkedJobs, jobs }: RailSectionProps) {
+function RailSection({ rail, onToggleCompare, comparedJobs, onScroll, onTogglePin, onToggleHide, onToggleBookmark, bookmarkedJobs, jobs }: RailSectionProps) {
   const router = useRouter();
   const Icon = rail.icon;
   const colorClasses = {
@@ -211,11 +188,10 @@ function RailSection({ rail, onJobClick, onToggleCompare, comparedJobs, onScroll
             <JobRailCard
               key={job.id}
               job={job}
-              onClick={() => onJobClick(job)}
               onToggleCompare={onToggleCompare}
               isCompared={comparedJobs.some((j) => j.id === job.id)}
               onToggleBookmark={onToggleBookmark}
-              isBookmarked={bookmarkedJobs.some((j) => j.id === job.id)}
+              is_bookmarked={job.is_bookmarked}
             />
           ))}
         </div>
@@ -226,14 +202,14 @@ function RailSection({ rail, onJobClick, onToggleCompare, comparedJobs, onScroll
 
 interface JobRailCardProps {
   job: Job;
-  onClick: () => void;
   onToggleCompare?: (job: Job) => void;
   isCompared: boolean;
   onToggleBookmark?: (job: Job) => void;
-  isBookmarked: boolean;
+  is_bookmarked: boolean;
 }
 
-function JobRailCard({ job, onClick, onToggleCompare, isCompared, onToggleBookmark, isBookmarked }: JobRailCardProps) {
+function JobRailCard({ job, onToggleCompare, isCompared, onToggleBookmark, is_bookmarked }: JobRailCardProps) {
+  const router = useRouter();
   const getSourceColor = (platform: string) => {
     switch (platform) {
       case "Qelsa":
@@ -254,7 +230,10 @@ function JobRailCard({ job, onClick, onToggleCompare, isCompared, onToggleBookma
   };
 
   return (
-    <Card className="glass hover:glass-strong border-glass-border hover:border-neon-cyan/30 transition-all cursor-pointer flex-shrink-0 w-[340px] snap-start group" onClick={onClick}>
+    <Card
+      className="glass hover:glass-strong border-glass-border hover:border-neon-cyan/30 transition-all cursor-pointer flex-shrink-0 w-[340px] snap-start group"
+      onClick={() => router.push(`/jobs/${job.id}`)}
+    >
       <div className="p-5 space-y-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
@@ -290,9 +269,9 @@ function JobRailCard({ job, onClick, onToggleCompare, isCompared, onToggleBookma
                 e.stopPropagation();
                 onToggleBookmark(job);
               }}
-              className={`h-8 w-8 p-0 flex-shrink-0 ${isBookmarked ? "bg-neon-cyan/20 text-neon-cyan hover:bg-neon-cyan/30" : "hover:bg-white/5"}`}
+              className={`h-8 w-8 p-0 flex-shrink-0 ${is_bookmarked ? "bg-neon-cyan/20 text-neon-cyan hover:bg-neon-cyan/30" : "hover:bg-white/5"}`}
             >
-              {isBookmarked ? <BookmarkCheck className="w-4 h-4 fill-current" /> : <Bookmark className="w-4 h-4" />}
+              {is_bookmarked ? <BookmarkCheck className="w-4 h-4 fill-current" /> : <Bookmark className="w-4 h-4" />}
             </Button>
           )}
         </div>

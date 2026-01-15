@@ -1,4 +1,4 @@
-import { useBulkModifyUserSkillsMutation, useGetUserSkillsQuery } from "@/features/api/userSkillsApi";
+import { useBulkModifyUserSkillsMutation, useGetUserSkillsQuery, useUpdateUserSkillMutation } from "@/features/api/userSkillsApi";
 import { UserSkill } from "@/types/userSkill";
 import { AlertCircle, ArrowLeft, Award, Briefcase, Check, Code, Lightbulb, Plus, Search, Sparkles, Star, Target, Trash2, Upload, Users, X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -108,6 +108,7 @@ export function SkillsEditorPage() {
   const [validationIssues, setValidationIssues] = useState<string[]>([]);
   const [showAddSkill, setShowAddSkill] = useState(false);
   const [newSkillName, setNewSkillName] = useState("");
+  const [updateUserSkill, {}] = useUpdateUserSkillMutation();
 
   const { data: userSkills, error, isLoading } = useGetUserSkillsQuery();
   const [bulkModifyUserSkills, { isLoading: isBulkModifying, error: bulkModifyError }] = useBulkModifyUserSkillsMutation();
@@ -175,7 +176,7 @@ export function SkillsEditorPage() {
     );
   };
 
-  const handleToggleTopSkill = (skillId: number) => {
+  const handleToggleTopSkill = async (skillId: number) => {
     const skill = skills.find((s) => s.id === skillId);
     if (!skill) return;
 
@@ -188,6 +189,11 @@ export function SkillsEditorPage() {
     }
 
     setSkills(skills.map((s) => (s.id === skillId ? { ...s, is_top_skill: !s.is_top_skill } : s)));
+
+    await updateUserSkill({
+      id: skillId,
+      data: { is_top_skill: !skill.is_top_skill },
+    }).unwrap();
 
     if (!skill.is_top_skill) {
       toast.success(`${skill.title} added to top skills!`, {

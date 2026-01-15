@@ -324,15 +324,17 @@ export function EducationEditorPage() {
               ))}
             </div>
 
-            <div className="flex justify-end gap-3 pt-4">
-              <Button variant="outline" className="glass hover:glass-strong">
-                Cancel
-              </Button>
-              <Button onClick={handleSaveAll} className="bg-gradient-to-r from-neon-purple to-neon-pink text-white hover:scale-105 transition-all">
-                <Check className="h-4 w-4 mr-2" />
-                Save All Changes
-              </Button>
-            </div>
+            {educations?.length > 0 && (
+              <div className="flex justify-end gap-3 pt-4">
+                <Button variant="outline" className="glass hover:glass-strong">
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveAll} className="bg-gradient-to-r from-neon-purple to-neon-pink text-white hover:scale-105 transition-all">
+                  <Check className="h-4 w-4 mr-2" />
+                  Save All Changes
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
