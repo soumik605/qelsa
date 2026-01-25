@@ -48,7 +48,16 @@ export const experiencesApi = createApi({
       }),
       invalidatesTags: ["Experiences"],
     }),
+
+    updateExperiencesPosition: builder.mutation<{ success: boolean; message: string }, any>({
+      query: (data) => ({
+        url: `experiences/bulk-edit`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Experiences"],
+    }),
   }),
 });
 
-export const { useGetExperiencesQuery, useCreateExperienceMutation, useUpdateExperienceMutation, useDeleteExperienceMutation } = experiencesApi;
+export const { useGetExperiencesQuery, useCreateExperienceMutation, useUpdateExperienceMutation, useDeleteExperienceMutation, useUpdateExperiencesPositionMutation } = experiencesApi;

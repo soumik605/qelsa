@@ -1,8 +1,8 @@
-import { useCreateExperienceMutation, useDeleteExperienceMutation, useGetExperiencesQuery, useUpdateExperienceMutation } from "@/features/api/experiencesApi";
+import { useCreateExperienceMutation, useDeleteExperienceMutation, useGetExperiencesQuery, useUpdateExperienceMutation, useUpdateExperiencesPositionMutation } from "@/features/api/experiencesApi";
 import { Experience } from "@/types/experience";
 import { ArrowLeft, Briefcase, Calendar, Check, Edit3, GripVertical, Loader2, MapPin, Plus, Sparkles, Trash2, TrendingUp, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -27,10 +27,19 @@ export function WorkExperienceEditorPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
-  const { data: experiences, error, isLoading } = useGetExperiencesQuery();
+  const { data: exp, error, isLoading } = useGetExperiencesQuery();
   const [createExperience, { isLoading: isCreating, error: createError }] = useCreateExperienceMutation();
   const [updateExperience, { isLoading: isUpdating, error: updateError }] = useUpdateExperienceMutation();
   const [deleteExperience, { isLoading: isDeleting, error: deleteError }] = useDeleteExperienceMutation();
+  const [updateExperiencesPosition, { isLoading: isUpdatingPosition, error: updatePositionError }] = useUpdateExperiencesPositionMutation();
+
+  const [experiences, setExperiences] = useState<Experience[]>(exp || []);
+
+  useEffect(() => {
+    if (exp) {
+      setExperiences(exp);
+    }
+  }, [exp]);
 
   const [formData, setFormData] = useState<Partial<Experience>>({
     title: "",
@@ -98,7 +107,7 @@ export function WorkExperienceEditorPage() {
         .unwrap()
         .then(() => {
           toast.success("Education entry saved");
-          window.location.href = "/profile/educations";
+          window.location.href = "/profile/work-experience";
         })
         .catch((error) => {
           toast.error(error?.data?.message || "Failed to save education entry");
@@ -213,15 +222,28 @@ export function WorkExperienceEditorPage() {
     newExperiences.splice(draggedIndex, 1);
     newExperiences.splice(index, 0, draggedItem);
 
-    // setExperiences(newExperiences);
+    setExperiences(newExperiences);
     setDraggedIndex(index);
   };
 
   const handleDragEnd = () => {
     setDraggedIndex(null);
+    // Update the position field for each experience based on its index (starting from 1)
+    const updatedExperiences = experiences.map((exp, idx) => ({
+      ...exp,
+      position: (idx + 1).toString(),
+    }));
+    setExperiences(updatedExperiences);
   };
 
-  const handleSaveAll = () => {};
+  const handleSaveAll = () => {
+    try {
+      updateExperiencesPosition(experiences);
+      toast.success('Experience position updated!');
+    } catch (error) {
+      toast.error('Failed to update experience position.');
+    }
+  };
 
   return (
     <div className="min-h-screen relative">

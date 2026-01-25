@@ -22,7 +22,6 @@ import {
   LayoutDashboard,
   MapPin,
   Network,
-  Plus,
   Rocket,
   Send,
   Share2,
@@ -52,6 +51,8 @@ export function MySpacePage({}: MySpacePageProps) {
   const { data: educations, error, isLoading } = useGetEducationsQuery();
   const { data: experiences, error: experiencesError, isLoading: experiencesLoading } = useGetExperiencesQuery();
   const { data: userSkills, error: userSkillsError, isLoading: userSkillsLoading } = useGetUserSkillsQuery();
+
+  const current_company = experiences?.find((exp) => exp.is_current == true);
 
   const [currentTime, setCurrentTime] = useState(new Date());
   const [animatedValues, setAnimatedValues] = useState({
@@ -207,17 +208,6 @@ export function MySpacePage({}: MySpacePageProps) {
       icon: EyeIcon,
       color: "text-neon-pink",
     },
-  ];
-
-  const skills = [
-    { name: "Product Management", level: 95, category: "Professional" },
-    { name: "Data Analysis", level: 88, category: "Technical" },
-    { name: "User Experience Design", level: 82, category: "Design" },
-    { name: "Digital Marketing", level: 78, category: "Marketing" },
-    { name: "Project Management", level: 90, category: "Professional" },
-    { name: "SQL & Analytics", level: 85, category: "Technical" },
-    { name: "Figma & Prototyping", level: 75, category: "Design" },
-    { name: "Growth Hacking", level: 80, category: "Marketing" },
   ];
 
   function getExperienceLevelFromProficiency(proficiency: number) {
@@ -444,55 +434,26 @@ export function MySpacePage({}: MySpacePageProps) {
           </div>
 
           {/* Enhanced Skill Progress */}
+
           <Card className="glass hover:glass-strong p-6 rounded-2xl border border-glass-border transition-all duration-300">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <Activity className="h-5 w-5 text-neon-cyan" />
-                <h3 className="font-bold text-white">Skill Progress & Insights</h3>
-              </div>
-              <Button variant="outline" size="sm" className="glass hover:glass-strong border-glass-border hover:border-neon-cyan">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Skill
-              </Button>
+            <div className="flex items-center gap-3 mb-6">
+              <Activity className="h-5 w-5 text-neon-cyan" />
+              <h3 className="font-bold text-white">Skill Progress</h3>
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-foreground">Product Management</span>
-                  <span className="font-medium text-neon-cyan">95%</span>
-                </div>
-                <Progress value={95} className="h-3 bg-glass-bg" />
-                <p className="text-xs text-muted-foreground mt-1">Expert level • High demand skill</p>
+            {userSkills?.length > 0 && (
+              <div className="space-y-6">
+                {userSkills.map((userSkill) => (
+                  <div key={userSkill.id}>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-foreground">{userSkill.title}</span>
+                      <span className="font-medium text-neon-cyan">{userSkill.proficiency}%</span>
+                    </div>
+                    <Progress value={userSkill.proficiency} className="h-2 bg-glass-bg" />
+                  </div>
+                ))}
               </div>
-
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-foreground">Data Analysis</span>
-                  <span className="font-medium text-neon-green">88%</span>
-                </div>
-                <Progress value={88} className="h-3 bg-glass-bg" />
-                <p className="text-xs text-muted-foreground mt-1">Advanced • Trending +15%</p>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-foreground">Leadership</span>
-                  <span className="font-medium text-neon-pink">65%</span>
-                </div>
-                <Progress value={65} className="h-3 bg-glass-bg" />
-                <p className="text-xs text-yellow-400 mt-1">Skill gap identified • Recommended for growth</p>
-              </div>
-            </div>
-
-            <div className="mt-6 p-4 glass rounded-xl">
-              <h4 className="font-medium text-white mb-2">AI Recommendations</h4>
-              <ul className="space-y-1 text-sm text-muted-foreground">
-                <li>• Complete &quot;Leadership Fundamentals&quot; to boost career score by +8</li>
-                <li>• AI/ML skills are in high demand in your field (+45% job posts)</li>
-                <li>• Consider learning Agile methodology for PM roles</li>
-              </ul>
-            </div>
+            )}
           </Card>
         </div>
 
@@ -573,18 +534,22 @@ export function MySpacePage({}: MySpacePageProps) {
               <h1 className="text-3xl font-bold text-white mb-2">{user?.name}</h1>
               <p className="text-xl text-neon-cyan mb-4">{user?.headline}</p>
               <div className="flex flex-wrap gap-4 text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  <span>{user?.location}</span>
-                </div>
+                {current_company && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    <span>{current_company?.location}</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
                   <span>5+ years experience</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Building className="h-4 w-4" />
-                  <span>TechFlow Solutions</span>
-                </div>
+                {current_company && (
+                  <div className="flex items-center gap-2">
+                    <Building className="h-4 w-4" />
+                    <span>{current_company?.company_name || "N/A"}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -747,10 +712,10 @@ export function MySpacePage({}: MySpacePageProps) {
                                 getExperienceLevelFromProficiency(skill.proficiency) === "Expert"
                                   ? "bg-neon-yellow/10 border-neon-yellow/30 text-neon-yellow"
                                   : getExperienceLevelFromProficiency(skill.proficiency) === "Advanced"
-                                  ? "bg-neon-green/10 border-neon-green/30 text-neon-green"
-                                  : getExperienceLevelFromProficiency(skill.proficiency) === "Intermediate"
-                                  ? "bg-neon-cyan/10 border-neon-cyan/30 text-neon-cyan"
-                                  : "bg-neon-pink/10 border-neon-pink/30 text-neon-pink"
+                                    ? "bg-neon-green/10 border-neon-green/30 text-neon-green"
+                                    : getExperienceLevelFromProficiency(skill.proficiency) === "Intermediate"
+                                      ? "bg-neon-cyan/10 border-neon-cyan/30 text-neon-cyan"
+                                      : "bg-neon-pink/10 border-neon-pink/30 text-neon-pink"
                               }`}
                             >
                               {getExperienceLevelFromProficiency(skill.proficiency)}
@@ -791,10 +756,10 @@ export function MySpacePage({}: MySpacePageProps) {
                                   skill.experience_level === "Expert"
                                     ? "text-neon-yellow"
                                     : skill.experience_level === "Advanced"
-                                    ? "text-neon-green"
-                                    : skill.experience_level === "Intermediate"
-                                    ? "text-neon-cyan"
-                                    : "text-neon-pink"
+                                      ? "text-neon-green"
+                                      : skill.experience_level === "Intermediate"
+                                        ? "text-neon-cyan"
+                                        : "text-neon-pink"
                                 }`}
                               >
                                 {skill.experience_level}
