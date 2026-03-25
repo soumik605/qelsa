@@ -239,9 +239,9 @@ export function WorkExperienceEditorPage() {
   const handleSaveAll = () => {
     try {
       updateExperiencesPosition(experiences);
-      toast.success('Experience position updated!');
+      toast.success("Experience position updated!");
     } catch (error) {
-      toast.error('Failed to update experience position.');
+      toast.error("Failed to update experience position.");
     }
   };
 

@@ -1,3 +1,5 @@
+import { Responsibility } from "./responsibility";
+
 export type Experience = {
   id?: number;
   company_name: string;
@@ -11,4 +13,5 @@ export type Experience = {
   title?: string;
   team_size?: number;
   is_current?: boolean;
+  responsibilities?: Responsibility[];
 };
