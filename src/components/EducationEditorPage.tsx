@@ -8,6 +8,7 @@ import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { Badge } from "./ui/badge";
 
 const DEGREE_TYPES = ["B.Tech", "B.E.", "B.Sc", "B.Com", "B.A.", "M.Tech", "M.E.", "M.Sc", "MBA", "M.Com", "M.A.", "Ph.D.", "Diploma", "Other"];
 
@@ -39,7 +40,7 @@ export function EducationEditorPage() {
     field_of_study: "",
     grade: "",
     // achievements: [""],
-    // projects: [""],
+    projects: [],
     // certifications: [],
   });
 
@@ -54,7 +55,7 @@ export function EducationEditorPage() {
       field_of_study: "",
       grade: "",
       // achievements: [""],
-      // projects: [""],
+      projects: [],
       // certifications: [],
     });
   };
@@ -84,7 +85,7 @@ export function EducationEditorPage() {
       field_of_study: formData.field_of_study!,
       grade: formData.grade!,
       // achievements: formData.achievements!.filter((a) => a.trim() !== ""),
-      // projects: formData.projects!.filter((p) => p.trim() !== ""),
+      projects: formData.projects!.filter((p) => p.title.trim() !== ""),
       // certifications: formData.certifications || [],
     };
 
@@ -127,7 +128,7 @@ export function EducationEditorPage() {
       field_of_study: "",
       grade: "",
       // achievements: [""],
-      // projects: [""],
+      projects: [],
       // certifications: [],
     });
   };
@@ -152,25 +153,29 @@ export function EducationEditorPage() {
     // setFormData({ ...formData, achievements: newAchievements });
   };
 
-  const handleAddProject = () => {
-    // setFormData({
-    //   ...formData,
-    //   projects: [...(formData.projects || []), ""],
-    // });
+const handleAddProject = () => {
+  setFormData({
+    ...formData,
+    projects: [...(formData.projects || []), { title: "" }],
+  });
+};
+
+const handleRemoveProject = (index: number) => {
+  setFormData({
+    ...formData,
+    projects: formData.projects!.filter((_, i) => i !== index),
+  });
+};
+
+const handleProjectChange = (index: number, value: string) => {
+  const newProjects = [...formData.projects!];
+  newProjects[index] = {
+    ...newProjects[index],
+    title: value,
   };
 
-  const handleRemoveProject = (index: number) => {
-    // setFormData({
-    //   ...formData,
-    //   projects: formData.projects!.filter((_, i) => i !== index),
-    // });
-  };
-
-  const handleProjectChange = (index: number, value: string) => {
-    // const newProjects = [...formData.projects!];
-    // newProjects[index] = value;
-    // setFormData({ ...formData, projects: newProjects });
-  };
+  setFormData({ ...formData, projects: newProjects });
+};
 
   const handleGetAchievementSuggestions = () => {};
 
@@ -318,7 +323,7 @@ export function EducationEditorPage() {
                         </div>
                       )} */}
 
-                      {/* {edu.projects.length > 0 && (
+                      {edu.projects.length > 0 && (
                         <div className="mb-3">
                           <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
                             <FolderOpen className="h-3 w-3" />
@@ -327,7 +332,7 @@ export function EducationEditorPage() {
                           <div className="flex flex-wrap gap-2">
                             {edu.projects.slice(0, 3).map((project, idx) => (
                               <Badge key={idx} variant="outline" className="border-neon-purple/30 text-neon-purple text-xs">
-                                {project}
+                                {project.title}
                               </Badge>
                             ))}
                             {edu.projects.length > 3 && (
@@ -337,7 +342,7 @@ export function EducationEditorPage() {
                             )}
                           </div>
                         </div>
-                      )} */}
+                      )}
                     </div>
                   </div>
                 </Card>
@@ -579,11 +584,11 @@ export function EducationEditorPage() {
                   </Button>
                 </div>
 
-                {/* <div className="space-y-3">
+                <div className="space-y-3">
                   {formData.projects?.map((project, index) => (
                     <div key={index} className="flex gap-2">
                       <Input
-                        value={project}
+                        value={project.title}
                         onChange={(e) => handleProjectChange(index, e.target.value)}
                         placeholder="e.g., E-commerce Platform with React & Node.js"
                         className="glass border-glass-border focus:border-neon-purple"
@@ -593,7 +598,7 @@ export function EducationEditorPage() {
                       </Button>
                     </div>
                   ))}
-                </div> */}
+                </div>
               </div>
 
               {/* Certification Upload */}

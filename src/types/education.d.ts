@@ -1,3 +1,5 @@
+import { Project } from "./project";
+
 export type Education = {
   id?: number;
   degree: string;
@@ -8,4 +10,5 @@ export type Education = {
   grade?: string;
   description?: string;
   location?: string;
+  projects?: Project[];
 };
