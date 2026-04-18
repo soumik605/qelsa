@@ -11,4 +11,5 @@ export type Education = {
   description?: string;
   location?: string;
   projects?: Project[];
+  achievements?: Achievement[];
 };

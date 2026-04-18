@@ -9,6 +9,7 @@ import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Badge } from "./ui/badge";
+import { Textarea } from "./ui/textarea";
 
 const DEGREE_TYPES = ["B.Tech", "B.E.", "B.Sc", "B.Com", "B.A.", "M.Tech", "M.E.", "M.Sc", "MBA", "M.Com", "M.A.", "Ph.D.", "Diploma", "Other"];
 
@@ -39,7 +40,7 @@ export function EducationEditorPage() {
     end_year: null,
     field_of_study: "",
     grade: "",
-    // achievements: [""],
+    achievements: [""],
     projects: [],
     // certifications: [],
   });
@@ -54,7 +55,7 @@ export function EducationEditorPage() {
       end_year: null,
       field_of_study: "",
       grade: "",
-      // achievements: [""],
+      achievements: [""],
       projects: [],
       // certifications: [],
     });
@@ -84,7 +85,7 @@ export function EducationEditorPage() {
       end_year: formData.end_year!,
       field_of_study: formData.field_of_study!,
       grade: formData.grade!,
-      // achievements: formData.achievements!.filter((a) => a.trim() !== ""),
+      achievements: formData.achievements!.filter((a) => a.title.trim() !== ""),
       projects: formData.projects!.filter((p) => p.title.trim() !== ""),
       // certifications: formData.certifications || [],
     };
@@ -127,31 +128,35 @@ export function EducationEditorPage() {
       end_year: null,
       field_of_study: "",
       grade: "",
-      // achievements: [""],
+      achievements: [],
       projects: [],
       // certifications: [],
     });
   };
 
-  const handleAddAchievement = () => {
-    setFormData({
-      ...formData,
-      // achievements: [...(formData.achievements || []), ""],
-    });
+const handleAddAchievement = () => {
+  setFormData({
+    ...formData,
+    achievements: [...(formData.achievements || []), { title: "" }],
+  });
+};
+
+const handleRemoveAchievement = (index: number) => {
+  setFormData({
+    ...formData,
+    achievements: formData.achievements!.filter((_, i) => i !== index),
+  });
+};
+
+const handleAchievementChange = (index: number, value: string) => {
+  const newAchievements = [...formData.achievements!];
+  newAchievements[index] = {
+    ...newAchievements[index],
+    title: value,
   };
 
-  const handleRemoveAchievement = (index: number) => {
-    setFormData({
-      ...formData,
-      // achievements: formData.achievements!.filter((_, i) => i !== index),
-    });
-  };
-
-  const handleAchievementChange = (index: number, value: string) => {
-    // const newAchievements = [...formData.achievements!];
-    // newAchievements[index] = value;
-    // setFormData({ ...formData, achievements: newAchievements });
-  };
+  setFormData({ ...formData, achievements: newAchievements });
+};
 
 const handleAddProject = () => {
   setFormData({
@@ -305,7 +310,7 @@ const handleProjectChange = (index: number, value: string) => {
                         </div>
                       </div>
 
-                      {/* {edu.achievements.length > 0 && (
+                      {edu.achievements.length > 0 && (
                         <div className="mb-3">
                           <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
                             <Trophy className="h-3 w-3" />
@@ -315,13 +320,13 @@ const handleProjectChange = (index: number, value: string) => {
                             {edu.achievements.slice(0, 2).map((achievement, idx) => (
                               <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
                                 <span className="text-neon-purple mt-1">•</span>
-                                <span>{achievement}</span>
+                                <span>{achievement.title}</span>
                               </li>
                             ))}
                             {edu.achievements.length > 2 && <li className="text-sm text-neon-pink">+{edu.achievements.length - 2} more...</li>}
                           </ul>
                         </div>
-                      )} */}
+                      )}
 
                       {edu.projects.length > 0 && (
                         <div className="mb-3">
@@ -506,12 +511,12 @@ const handleProjectChange = (index: number, value: string) => {
                   </Button>
                 </div>
 
-                {/* <div className="space-y-3">
+                <div className="space-y-3">
                   {formData.achievements?.map((achievement, index) => (
                     <div key={index} className="space-y-2">
                       <div className="flex gap-2">
                         <Textarea
-                          value={achievement}
+                          value={achievement.title}
                           onChange={(e) => handleAchievementChange(index, e.target.value)}
                           placeholder="e.g., Won first place in national hackathon..."
                           rows={2}
@@ -521,14 +526,14 @@ const handleProjectChange = (index: number, value: string) => {
                           <Button onClick={() => handleRemoveAchievement(index)} variant="ghost" size="icon" className="glass hover:glass-strong text-destructive flex-shrink-0">
                             <Trash2 className="h-4 w-4" />
                           </Button>
-                          <Button onClick={() => handleAIEnhanceAchievement(index)} variant="ghost" size="icon" className="glass hover:glass-strong text-neon-pink flex-shrink-0" disabled={aiLoading}>
+                          {/* <Button onClick={() => handleAIEnhanceAchievement(index)} variant="ghost" size="icon" className="glass hover:glass-strong text-neon-pink flex-shrink-0" disabled={aiLoading}>
                             {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                          </Button>
+                          </Button> */}
                         </div>
                       </div>
                     </div>
                   ))}
-                </div> */}
+                </div>
               </div>
 
               {/* AI Achievement Suggestions Panel */}
