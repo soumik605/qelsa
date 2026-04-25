@@ -108,7 +108,7 @@ export function ApplicationsManagementPage() {
     }
 
     return filtered;
-  }, [savedView, nlpFilters, applicants]);
+  }, [nlpFilters, applicants]);
 
   const sortedApplications = useMemo(() => {
     return [...filteredApplications].sort((a, b) => {
@@ -116,7 +116,7 @@ export function ApplicationsManagementPage() {
       // if (sortBy === "match") return b.matchScore - a.matchScore;
       return a.applied_days_ago - b.applied_days_ago; // Most recent first
     });
-  }, [filteredApplications, sortBy]);
+  }, [filteredApplications]);
 
   const handleNLPSearch = useCallback((query: string, filters: any[]) => {
     setIsSearching(true);

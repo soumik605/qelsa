@@ -409,6 +409,7 @@ export function BlogDetailPage({ postId, onBack, onViewPost, onShareToFeed }: Bl
           
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={blogPost.author.avatar}
                 alt={blogPost.author.name}
@@ -582,6 +583,7 @@ export function BlogDetailPage({ postId, onBack, onViewPost, onShareToFeed }: Bl
         {/* Author Bio */}
         <Card className="glass p-6 mb-8">
           <div className="flex items-start gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={blogPost.author.avatar}
               alt={blogPost.author.name}

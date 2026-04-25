@@ -716,6 +716,7 @@ export function BlogEditor({ initialData, onSave, onPublish, onCancel }: BlogEdi
               {thumbnail ? (
                 <div className="space-y-4">
                   <div className="relative aspect-video rounded-lg overflow-hidden border border-glass-border">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={thumbnail}
                       alt="Blog thumbnail"
@@ -818,7 +819,7 @@ export function BlogEditor({ initialData, onSave, onPublish, onCancel }: BlogEdi
               ) : (
                 <div className="aspect-video rounded-lg border-2 border-dashed border-glass-border flex flex-col items-center justify-center space-y-3 bg-glass/30">
                   <div className="w-16 h-16 rounded-full bg-neon-purple/10 flex items-center justify-center">
-                    <Image className="h-8 w-8 text-neon-purple" />
+                    <Image className="h-8 w-8 text-neon-purple" aria-hidden="true" />
                   </div>
                   <div className="text-center">
                     <p className="text-white font-medium mb-1">No thumbnail selected</p>
@@ -854,7 +855,7 @@ export function BlogEditor({ initialData, onSave, onPublish, onCancel }: BlogEdi
                   variant="outline"
                   className="h-20 border-dashed border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10 flex-col"
                 >
-                  <Image className="h-6 w-6 mb-2" />
+                  <Image className="h-6 w-6 mb-2" aria-hidden="true" />
                   <span className="text-sm">Add Image</span>
                 </Button>
                 <Button

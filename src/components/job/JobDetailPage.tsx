@@ -74,6 +74,7 @@ export function JobDetailPage() {
       const hasApplied = job.applications?.some((application) => application.user_id === user?.id);
       setIsApplied(hasApplied || false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [job]);
 
   if (!id || isLoading) return <p>Loading job...</p>;
@@ -232,6 +233,7 @@ export function JobDetailPage() {
           <div className="flex items-start gap-6 mb-6">
             {job.company_logo && (
               <div className="relative flex-shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={job.company_logo} alt={job.page?.name || job.company_name} className="w-16 h-16 rounded-xl object-cover border border-glass-border" />
                 {/* {job.source.verified && (
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-neon-green rounded-full flex items-center justify-center">
@@ -723,6 +725,7 @@ export function JobDetailPage() {
           <div className="space-y-3">
             {mockSimilarJobs.map((similarJob) => (
               <div key={similarJob.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/50 border border-glass-border hover:border-neon-cyan/30 cursor-pointer transition-colors">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={similarJob.logo} alt={similarJob.company} className="w-10 h-10 rounded-lg object-cover" />
                 <div className="flex-1">
                   <h4 className="font-medium text-sm">{similarJob.title}</h4>

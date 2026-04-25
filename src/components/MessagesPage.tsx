@@ -190,8 +190,9 @@ export function MessagesPage({}: MessagesPageProps) {
               <div className="flex items-start gap-3">
                 <div className="relative">
                   <Avatar className="h-12 w-12">
-                    <img 
-                      src={conversation.user.avatar} 
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={conversation.user.avatar}
                       alt={conversation.user.name}
                       className="w-full h-full object-cover"
                     />
@@ -230,8 +231,9 @@ export function MessagesPage({}: MessagesPageProps) {
             <div className="flex items-center gap-3">
               <div className="relative">
                 <Avatar className="h-10 w-10">
-                  <img 
-                    src={selectedUser?.user.avatar} 
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={selectedUser?.user.avatar}
                     alt={selectedUser?.user.name}
                     className="w-full h-full object-cover"
                   />
@@ -356,8 +358,9 @@ export function MessagesPage({}: MessagesPageProps) {
             <div className="flex items-center gap-3 flex-1">
               <div className="relative">
                 <Avatar className="h-8 w-8">
-                  <img 
-                    src={selectedUser?.user.avatar} 
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={selectedUser?.user.avatar}
                     alt={selectedUser?.user.name}
                     className="w-full h-full object-cover"
                   />

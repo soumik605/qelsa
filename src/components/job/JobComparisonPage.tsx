@@ -225,7 +225,10 @@ export function JobComparisonPage({ jobs, onBack, onRemoveJob }: JobComparisonPa
                     {/* Company Logo & Basic Info */}
                     <div className="flex items-start gap-3 mb-4">
                       <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
-                        {job.company_logo ? <img src={job.company_logo} alt={job.company_name || job.page?.name} className="w-10 h-10 rounded-lg object-cover" /> : <Briefcase className="w-6 h-6 text-muted-foreground" />}
+                        {job.company_logo ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={job.company_logo} alt={job.company_name || job.page?.name} className="w-10 h-10 rounded-lg object-cover" />
+                        ) : <Briefcase className="w-6 h-6 text-muted-foreground" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-white mb-1 line-clamp-2">{job.title}</h3>

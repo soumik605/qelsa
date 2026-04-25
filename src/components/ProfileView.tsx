@@ -503,8 +503,9 @@ export function ProfileView({ userId, onClose }: ProfileViewProps) {
                         {/* Media if exists */}
                         {post.media && (
                           <div className="mt-4 rounded-xl overflow-hidden">
-                            <img 
-                              src={post.media.url} 
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={post.media.url}
                               alt="Post media"
                               className="w-full h-auto max-h-96 object-cover"
                             />

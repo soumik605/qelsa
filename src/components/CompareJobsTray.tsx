@@ -65,6 +65,7 @@ export function CompareJobsTray({ jobs, onRemoveJob, onCompare, onClear }: Compa
                 <div className="flex items-start gap-2">
                   <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
                     {job.company_logo ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img src={job.company_logo} alt={job.company_name || job.page?.name} className="w-8 h-8 rounded object-cover" />
                     ) : (
                       <span className="text-xs">{job.company_name?.charAt(0) || job.page?.name?.charAt(0)}</span>

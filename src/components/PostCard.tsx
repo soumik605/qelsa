@@ -88,8 +88,9 @@ export function PostCard({ post, onInteraction }: PostCardProps) {
       <div className="flex items-start gap-4 mb-4">
         <div className="relative">
           <Avatar className="h-12 w-12">
-            <img 
-              src={post.author.avatar} 
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.author.avatar}
               alt={post.author.name}
               className="w-full h-full object-cover"
             />
@@ -204,8 +205,9 @@ export function PostCard({ post, onInteraction }: PostCardProps) {
         <div className="mt-4 pt-4 border-t border-glass-border">
           <div className="flex gap-3 mb-4">
             <Avatar className="h-8 w-8">
-              <img 
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face" 
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
                 alt="Your avatar"
                 className="w-full h-full object-cover"
               />
@@ -234,8 +236,9 @@ export function PostCard({ post, onInteraction }: PostCardProps) {
           <div className="space-y-3">
             <div className="flex gap-3">
               <Avatar className="h-8 w-8">
-                <img 
-                  src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face" 
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face"
                   alt="Commenter"
                   className="w-full h-full object-cover"
                 />

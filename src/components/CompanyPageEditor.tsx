@@ -102,6 +102,7 @@ export function CompanyPageEditor() {
     }, 10000); // 10 seconds
 
     return () => clearTimeout(autoSaveTimer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, isDraft]);
 
   const handleAutoSave = () => {
@@ -389,6 +390,7 @@ export function CompanyPageEditor() {
                       <div className="relative aspect-square glass-strong rounded-xl border-2 border-dashed border-glass-border hover:border-neon-cyan transition-all group cursor-pointer overflow-hidden">
                         {page.logo ? (
                           <>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={page.logo} alt="Logo" className="w-full h-full object-cover" />
                             <button
                               onClick={() => {
@@ -822,7 +824,10 @@ export function CompanyPageEditor() {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full glass-strong flex items-center justify-center">
-                                {user.avatar ? <img src={user.avatar} alt={user.name} className="w-full h-full rounded-full object-cover" /> : <User className="h-5 w-5 text-muted-foreground" />}
+                                {user.avatar ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={user.avatar} alt={user.name} className="w-full h-full rounded-full object-cover" />
+                                ) : <User className="h-5 w-5 text-muted-foreground" />}
                               </div>
                               <div>
                                 <div className="flex items-center gap-2">
@@ -958,6 +963,7 @@ export function CompanyPageEditor() {
                   <div className="space-y-4">
                     {page.logo && (
                       <div className="w-16 h-16 rounded-xl overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={page.logo} alt="Logo" className="w-full h-full object-cover" />
                       </div>
                     )}
@@ -1000,7 +1006,7 @@ export function CompanyPageEditor() {
 
                 {activeSection === "culture" && (
                   <div className="space-y-4">
-                    {page.culture.tagline && <p className="text-sm italic text-muted-foreground">"{page.culture.tagline}"</p>}
+                    {page.culture.tagline && <p className="text-sm italic text-muted-foreground">&quot;{page.culture.tagline}&quot;</p>}
                     {page.culture.values.length > 0 && (
                       <div>
                         <h5 className="text-xs font-semibold text-white mb-2">Core Values</h5>
@@ -1095,6 +1101,7 @@ export function CompanyPageEditor() {
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                             {user.avatar ? (
+                              // eslint-disable-next-line @next/next/no-img-element
                               <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-white font-semibold">{user.name.charAt(0)}</div>
@@ -1131,6 +1138,7 @@ export function CompanyPageEditor() {
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                         {selectedUser.avatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img src={selectedUser.avatar} alt={selectedUser.name} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-white font-semibold">{selectedUser.name.charAt(0)}</div>

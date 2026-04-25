@@ -161,8 +161,9 @@ export function FloatingMessages({}: FloatingMessagesProps) {
                         <div className="flex items-start gap-3">
                           <div className="relative">
                             <Avatar className="h-10 w-10">
-                              <img 
-                                src={conversation.user.avatar} 
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={conversation.user.avatar}
                                 alt={conversation.user.name}
                                 className="w-full h-full object-cover"
                               />

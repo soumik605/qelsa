@@ -271,8 +271,9 @@ export function SocialFeed({ }: SocialFeedProps = {}) {
       case 'image':
         return (
           <div className="mt-4 rounded-xl overflow-hidden">
-            <img 
-              src={post.mediaUrl} 
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.mediaUrl}
               alt="Post media"
               className="w-full h-auto max-h-96 object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
             />

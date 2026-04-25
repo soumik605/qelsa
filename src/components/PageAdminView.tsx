@@ -59,6 +59,7 @@ export function PageAdminView() {
     if (page && !page.can_manage) {
       router.push(`/jobs/${page.id}`);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   const handleUpdatePage = async () => {

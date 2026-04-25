@@ -78,6 +78,7 @@ export function JobAIAssistant({ filteredJobs, onJobClick, onSaveJob, onQuickApp
     setCurrentPlaceholder(modePlaceholders[0]);
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aiMode, filteredJobs]);
 
   const handleSubmit = () => {
@@ -272,6 +273,7 @@ function ComparisonResults({ results, onJobClick, onSaveJob }: { results: Compar
           <Card key={result.job.id} className="p-5 glass border-glass-border hover:border-neon-purple/40 transition-all duration-300 cursor-pointer" onClick={() => onJobClick?.(result.job)}>
             {/* Job Header */}
             <div className="flex items-start gap-3 mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               {result.job.companyLogo && <img src={result.job.companyLogo} alt={result.job.company} className="w-12 h-12 rounded-xl object-cover" />}
               <div className="flex-1 min-w-0">
                 <h4 className="font-semibold text-sm line-clamp-2 mb-1">{result.job.title}</h4>
@@ -510,6 +512,7 @@ function SimilarJobsResults({
           <Card key={job.id} className="p-5 glass border-glass-border hover:border-neon-purple/40 transition-all duration-300 cursor-pointer" onClick={() => onJobClick?.(job)}>
             {/* Job Header */}
             <div className="flex items-start gap-3 mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               {job.companyLogo && <img src={job.companyLogo} alt={job.company} className="w-12 h-12 rounded-xl object-cover" />}
               <div className="flex-1 min-w-0">
                 <h4 className="font-semibold text-sm line-clamp-2 mb-1">{job.title}</h4>

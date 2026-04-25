@@ -238,6 +238,7 @@ function JobRailCard({ job, onToggleCompare, isCompared, onToggleBookmark, is_bo
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 flex-1 min-w-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             {job.company_logo && <img src={job.company_logo} alt={job.company_name || job.page?.name} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />}
             <div className="flex-1 min-w-0">
               <h4 className="text-white line-clamp-1 group-hover:text-neon-cyan transition-colors">{job.title}</h4>

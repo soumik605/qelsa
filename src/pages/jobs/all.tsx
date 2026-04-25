@@ -52,6 +52,7 @@ const All = () => {
       },
       false
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSearch = async () => {

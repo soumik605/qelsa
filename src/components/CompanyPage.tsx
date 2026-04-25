@@ -52,6 +52,7 @@ export function CompanyPage() {
 
       {/* Cover Image */}
       <div className="relative h-64 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={"https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=300&fit=crop&crop=center"} alt={`${pageData.name} cover`} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
       </div>
@@ -62,6 +63,7 @@ export function CompanyPage() {
           <div className="flex items-start gap-6">
             {/* Company Logo */}
             <div className="relative flex-shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={pageData.logo} alt={pageData.name} className="w-24 h-24 rounded-xl object-cover border-2 border-glass-border bg-background" />
             </div>
 
@@ -83,15 +85,19 @@ export function CompanyPage() {
                       {/* Overlapping Avatars */}
                       <div className="flex -space-x-2">
                         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple border-2 border-background overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" alt="Follower" className="w-full h-full object-cover" />
                         </div>
                         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink border-2 border-background overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="Follower" className="w-full h-full object-cover" />
                         </div>
                         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-pink to-neon-cyan border-2 border-background overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt="Follower" className="w-full h-full object-cover" />
                         </div>
                         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple border-2 border-background overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop" alt="Follower" className="w-full h-full object-cover" />
                         </div>
                         <div className="w-6 h-6 rounded-full glass border-2 border-background flex items-center justify-center">

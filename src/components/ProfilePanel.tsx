@@ -67,7 +67,10 @@ export function ProfilePanel({ isOpen, onClose }: ProfilePanelProps) {
               {isAuthenticated && user ? (
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full glass-strong border-2 border-neon-cyan/30 flex items-center justify-center">
-                    {user.profile_image ? <img src={user.profile_image} alt={user.name} className="w-full h-full rounded-full object-cover" /> : <User className="w-6 h-6 text-neon-cyan" />}
+                    {user.profile_image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={user.profile_image} alt={user.name} className="w-full h-full rounded-full object-cover" />
+                    ) : <User className="w-6 h-6 text-neon-cyan" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-white truncate">{user.name || "User"}</p>

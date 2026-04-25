@@ -81,8 +81,9 @@ export function CreatePost({ onClose, onSubmit }: CreatePostProps) {
           {/* User Info */}
           <div className="flex items-center gap-3 mb-6">
             <Avatar className="h-12 w-12">
-              <img 
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face" 
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
                 alt="Your avatar"
                 className="w-full h-full object-cover"
               />
@@ -216,7 +217,7 @@ export function CreatePost({ onClose, onSubmit }: CreatePostProps) {
                 className="text-muted-foreground hover:text-neon-cyan opacity-50 cursor-not-allowed"
                 disabled
               >
-                <Image className="h-4 w-4 mr-2" />
+                <Image className="h-4 w-4 mr-2" aria-hidden="true" />
                 Photo
               </Button>
               <Button

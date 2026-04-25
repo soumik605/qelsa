@@ -328,6 +328,7 @@ export function BlogListingPage({ onViewPost, onCreatePost, onEditPost }: BlogLi
               {/* Thumbnail */}
               {post.thumbnail && (
                 <div className="aspect-video overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={post.thumbnail}
                     alt={post.title}
@@ -389,6 +390,7 @@ export function BlogListingPage({ onViewPost, onCreatePost, onEditPost }: BlogLi
                 {/* Author and Meta */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={post.author.avatar} alt={post.author.name} className="w-8 h-8 rounded-full" />
                     <div>
                       <p className="text-sm font-medium">{post.author.name}</p>

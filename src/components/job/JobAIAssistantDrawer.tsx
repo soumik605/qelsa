@@ -356,6 +356,7 @@ What would you like me to help with? Try asking "Summarize this job" or "What's 
         {selectedJob && (
           <div className="p-4 border-b border-glass-border bg-neon-cyan/5">
             <div className="flex items-start gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               {selectedJob.companyLogo && <img src={selectedJob.companyLogo} alt={selectedJob.company} className="w-10 h-10 rounded-lg object-cover border border-glass-border" />}
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-sm line-clamp-1">{selectedJob.title}</h3>

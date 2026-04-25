@@ -27,6 +27,7 @@ export default function RouteGuard({ children }) {
     if (profile) {
       setUserProfile(profile);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
   useEffect(() => {
@@ -53,6 +54,7 @@ export default function RouteGuard({ children }) {
     if (profile && ["/login", "/register", "/auth"].includes(path)) {
       router.replace("/jobs/all");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, isClient, isFetching, error, profile, router.pathname]);
 
   if (!isClient || isFetching) return null;
