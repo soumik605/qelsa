@@ -1,6 +1,6 @@
 import { JobComparisonPage } from "@/components/job/JobComparisonPage";
 import { JobDiscoveryRails } from "@/components/job/JobDiscoveryRails";
-import JobLayout from "@/components/job/layout";
+import JobLayout from "@/components/job/JobsLayout";
 import { useLazyGetDiscoverJobsQuery, useToggleSaveJobMutation } from "@/features/api/jobsApi";
 import { Job } from "@/types/job";
 import { useEffect, useState } from "react";

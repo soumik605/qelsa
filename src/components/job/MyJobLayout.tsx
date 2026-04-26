@@ -1,7 +1,7 @@
 import { Bookmark, FileText, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
-import Layout from "./layout";
+import Layout from "./JobsLayout";
 
 const MyJobLayout = ({ active_page, children, jobs = [], filters, setFilters, query = "", setQuery, onSearch }: { active_page?: string; children?: any; jobs?: any[]; filters?: any; setFilters?: any; query?: string; setQuery?: any; onSearch?: any }) => {
   const router = useRouter();

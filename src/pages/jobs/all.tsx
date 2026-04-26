@@ -1,5 +1,5 @@
 import { JobComparisonPage } from "@/components/job/JobComparisonPage";
-import JobLayout from "@/components/job/layout";
+import JobLayout from "@/components/job/JobsLayout";
 import { Card } from "@/components/ui/card";
 import { useLazyGetDiscoverJobsQuery, useToggleSaveJobMutation } from "@/features/api/jobsApi";
 import { Job } from "@/types/job";
