@@ -1,3 +1,4 @@
+import { ImpactMetric } from "./impactMetric";
 import { Responsibility } from "./responsibility";
 import { UserSkill } from "./userSkill";
 
@@ -13,7 +14,7 @@ export type Experience = {
   location?: string;
   title?: string;
   team_size?: number;
-  is_current?: boolean;
   responsibilities?: Responsibility[];
+  impact_metrics?: ImpactMetric[];
   skills?: UserSkill[];
 };

@@ -1,5 +1,7 @@
 import { useCreateExperienceMutation, useDeleteExperienceMutation, useGetExperiencesQuery, useUpdateExperienceMutation, useUpdateExperiencesPositionMutation } from "@/features/api/experiencesApi";
+import { useGetUserSkillsQuery } from "@/features/api/userSkillsApi";
 import { Experience } from "@/types/experience";
+import { ImpactMetric } from "@/types/impactMetric";
 import { UserSkill } from "@/types/userSkill";
 import { ArrowLeft, Briefcase, Calendar, Check, Edit3, GripVertical, Loader2, MapPin, Plus, Sparkles, Trash2, TrendingUp, Users, X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -11,18 +13,9 @@ import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
-import { useGetUserSkillsQuery } from "@/features/api/userSkillsApi";
 
-interface Metric {
-  id: string;
-  type: string;
-  value: string;
-  outcome: string;
-}
+const METRIC_TYPES = ["Revenue", "Cost Savings", "User Growth", "Efficiency Improvement", "Customer Satisfaction", "Team Performance", "Time Saved", "Quality Improvement"];
 
-const METRIC_TYPES = ["Revenue Growth", "User Growth", "Cost Reduction", "Efficiency Improvement", "Customer Satisfaction", "Team Performance", "Time Saved", "Quality Improvement"];
-
-const COMMON_SKILLS = ["Product Management", "Project Management", "Leadership", "Strategy", "Data Analysis", "Agile", "Scrum", "SQL", "Python", "Figma", "Jira", "Communication", "Problem Solving"];
 
 export function WorkExperienceEditorPage() {
   const router = useRouter();
@@ -52,10 +45,9 @@ export function WorkExperienceEditorPage() {
     end_date: undefined,
     is_current: false,
     responsibilities: [],
-    // metrics: [],
+    impact_metrics: [],
     skills: [],
     team_size: undefined,
-    // proofs: [],
   });
 
   const handleAddNew = () => {
@@ -68,10 +60,9 @@ export function WorkExperienceEditorPage() {
       end_date: undefined,
       is_current: false,
       responsibilities: [],
-      // metrics: [],
+      impact_metrics: [],
       skills: [],
       team_size: undefined,
-      // proofs: [],
     });
   };
 
@@ -98,7 +89,7 @@ export function WorkExperienceEditorPage() {
       end_date: formData.end_date,
       is_current: formData.is_current!,
       responsibilities: (formData.responsibilities || []).filter((r) => r.title.trim() !== ""),
-      // metrics: formData.metrics || [],
+      impact_metrics: (formData.impact_metrics || []).filter((m) => m.impact_type.trim() !== "" || m.impact_value.trim() !== ""),
       skills: formData.skills || [],
       team_size: formData.team_size,
       position: "",
@@ -188,30 +179,23 @@ export function WorkExperienceEditorPage() {
   };
 
   const handleAddMetric = () => {
-    const newMetric: Metric = {
-      id: Date.now().toString(),
-      type: "",
-      value: "",
-      outcome: "",
-    };
-    // setFormData({
-    //   ...formData,
-    //   metrics: [...(formData.metrics || []), newMetric],
-    // });
+    setFormData({
+      ...formData,
+      impact_metrics: [...(formData.impact_metrics || []), { impact_type: "", impact_value: "", description: "" }],
+    });
   };
 
-  const handleRemoveMetric = (id: string) => {
-    // setFormData({
-    //   ...formData,
-    //   metrics: formData.metrics!.filter((m) => m.id !== id),
-    // });
+  const handleRemoveMetric = (index: number) => {
+    setFormData({
+      ...formData,
+      impact_metrics: (formData.impact_metrics || []).filter((_, i) => i !== index),
+    });
   };
 
-  const handleMetricChange = (id: string, field: keyof Metric, value: string) => {
-    // setFormData({
-    //   ...formData,
-    //   metrics: formData.metrics!.map((m) => (m.id === id ? { ...m, [field]: value } : m)),
-    // });
+  const handleMetricChange = (index: number, field: keyof ImpactMetric, value: string) => {
+    const updated = [...(formData.impact_metrics || [])];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData({ ...formData, impact_metrics: updated });
   };
 
   const handleAddSkill = (skill: UserSkill) => {
@@ -379,16 +363,16 @@ export function WorkExperienceEditorPage() {
                           );
                         })()}
 
-                      {/* {exp.metrics.length > 0 && (
+                      {exp.impact_metrics && exp.impact_metrics.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-3">
-                          {exp.metrics.map((metric) => (
-                            <Badge key={metric.id} variant="outline" className="border-neon-green/30 text-neon-green">
+                          {exp.impact_metrics.map((metric, idx) => (
+                            <Badge key={metric.id ?? idx} variant="outline" className="border-neon-green/30 text-neon-green">
                               <TrendingUp className="h-3 w-3 mr-1" />
-                              {metric.value}
+                              {metric.impact_value}
                             </Badge>
                           ))}
                         </div>
-                      )} */}
+                      )}
 
                       {exp.skills.length > 0 && (
                         <div className="flex flex-wrap gap-2">
@@ -555,13 +539,13 @@ export function WorkExperienceEditorPage() {
                   </Button>
                 </div>
 
-                {/* <div className="space-y-3">
-                  {formData.metrics?.map((metric) => (
-                    <Card key={metric.id} className="glass p-4">
+                <div className="space-y-3">
+                  {(formData.impact_metrics || []).map((metric, index) => (
+                    <Card key={index} className="glass p-4">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <select
-                          value={metric.type}
-                          onChange={(e) => handleMetricChange(metric.id, "type", e.target.value)}
+                          value={metric.impact_type}
+                          onChange={(e) => handleMetricChange(index, "impact_type", e.target.value)}
                           className="glass border border-glass-border rounded-lg px-3 py-2 focus:border-neon-green focus:outline-none bg-transparent text-white"
                         >
                           <option value="" className="bg-gray-900">
@@ -575,27 +559,27 @@ export function WorkExperienceEditorPage() {
                         </select>
 
                         <Input
-                          value={metric.value}
-                          onChange={(e) => handleMetricChange(metric.id, "value", e.target.value)}
-                          placeholder="e.g., 40%"
+                          value={metric.impact_value}
+                          onChange={(e) => handleMetricChange(index, "impact_value", e.target.value)}
+                          placeholder="e.g., $2M, 40%"
                           className="glass border-glass-border focus:border-neon-green"
                         />
 
                         <div className="flex gap-2">
                           <Input
-                            value={metric.outcome}
-                            onChange={(e) => handleMetricChange(metric.id, "outcome", e.target.value)}
-                            placeholder="e.g., increased engagement"
+                            value={metric.description || ""}
+                            onChange={(e) => handleMetricChange(index, "description", e.target.value)}
+                            placeholder="e.g., increased revenue by..."
                             className="glass border-glass-border focus:border-neon-green"
                           />
-                          <Button onClick={() => handleRemoveMetric(metric.id)} variant="ghost" size="icon" className="glass hover:glass-strong text-destructive flex-shrink-0">
+                          <Button onClick={() => handleRemoveMetric(index)} variant="ghost" size="icon" className="glass hover:glass-strong text-destructive flex-shrink-0">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
                     </Card>
                   ))}
-                </div> */}
+                </div>
               </div>
 
               {/* Skills */}
